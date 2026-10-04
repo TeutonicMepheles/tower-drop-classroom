@@ -2,8 +2,8 @@
 
 ## Educational Purpose
 
-This project was created primarily for **educational and learning purposes**.  
-While it is well-structured and could technically be used in production, it is **not intended for commercialization**.  
+This project was created primarily for **educational and learning purposes**.
+While it is well-structured and could technically be used in production, it is **not intended for commercialization**.
 The main goal is to explore and demonstrate best practices, patterns, and technologies in software development.
 
 ## Description
