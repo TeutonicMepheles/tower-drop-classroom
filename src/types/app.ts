@@ -13,7 +13,7 @@ export type Coords = Partial<{
 export type Direction = "x" | "y" | "z";
 
 export interface Block {
-  mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshLambertMaterial>;
+  mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardMaterial>;
   body: CANNON.Body;
   sizes: Sizes;
   direction?: Direction;

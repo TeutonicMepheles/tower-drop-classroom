@@ -1,5 +1,14 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
+import { Atmosphere } from "@/visual/Atmosphere";
+import { SuccessParticles } from "@/visual/SuccessParticles";
+import {
+  createBlockMaterial,
+  restoreBlockGlow,
+  addBlockOutline,
+  releaseBlockOutline,
+} from "@/visual/blockMaterials";
+import { VISUAL_THEME } from "@/config/visualTheme";
 import { REWARD_INTERVAL, emptyRewards, drawRewards } from "@/config/rewards";
 import { loadRecords, saveRecords } from "./records";
 import type { RewardId } from "@/config/rewards";
@@ -28,6 +37,51 @@ import type { GameState } from "@/types/states";
 import type { Page } from "@/types/pages";
 
 export class TowerDrop {
+  private disposed = false;
+  private feedbackMaterial: THREE.MeshStandardMaterial | undefined;
+  private feedbackUntil = 0;
+  private onLanded = (event: Event): void => {
+    const detail = (event as CustomEvent<LandedDetail>).detail;
+    const block = this.gameState.blocks[detail.index];
+    if (block)
+      this.particles.emit(
+        {
+          x: block.mesh.position.x,
+          y: block.mesh.position.y - this.blockSizes.height / 2,
+          z: block.mesh.position.z,
+          width: block.sizes.width,
+          depth: block.sizes.depth ?? 0,
+        },
+        performance.now(),
+        detail.perfect
+      );
+    if (!detail.perfect) return;
+    this.clearFeedback();
+    const material = this.gameState.blocks[detail.index]?.mesh.material;
+    if (!material) return;
+    material.emissive.set(VISUAL_THEME.feedback.color);
+    material.emissiveIntensity = VISUAL_THEME.feedback.intensity;
+    this.feedbackMaterial = material;
+    this.feedbackUntil = performance.now() + VISUAL_THEME.feedback.durationMs;
+  };
+  private onRoundState = (event: Event): void => {
+    if (
+      (event as CustomEvent<GameSnapshot>).detail.phase === "ended" ||
+      (event as CustomEvent<GameSnapshot>).detail.phase === "ready"
+    ) {
+      this.clearFeedback();
+      this.particles.clear();
+      this.render();
+    }
+  };
+  private clearFeedback(): void {
+    if (this.feedbackMaterial) restoreBlockGlow(this.feedbackMaterial);
+    this.feedbackMaterial = undefined;
+  }
+
+  private atmosphere: Atmosphere;
+  private particles: SuccessParticles;
+
   private records = loadRecords();
   private scene: THREE.Scene;
   private camera: THREE.OrthographicCamera;
@@ -125,6 +179,7 @@ export class TowerDrop {
   }
 
   private rebuildBlock(block: Block): void {
+    releaseBlockOutline(block.mesh, false);
     block.mesh.geometry.dispose();
     block.mesh.geometry = new THREE.BoxGeometry(
       block.sizes.width,
@@ -132,6 +187,7 @@ export class TowerDrop {
       block.sizes.depth
     );
     block.mesh.scale.x = block.mesh.scale.y = block.mesh.scale.z = 1;
+    addBlockOutline(block.mesh);
     block.body.shapes = [];
     block.body.shapeOffsets = [];
     block.body.shapeOrientations = [];
@@ -168,6 +224,13 @@ export class TowerDrop {
     private container: Page
   ) {
     this.scene = new THREE.Scene();
+    this.scene.background = null;
+    this.scene.fog = new THREE.FogExp2(
+      VISUAL_THEME.fog.color,
+      VISUAL_THEME.fog.density
+    );
+    this.atmosphere = new Atmosphere(this.container);
+    this.particles = new SuccessParticles(this.scene);
 
     this.world = new CANNON.World();
 
@@ -187,6 +250,7 @@ export class TowerDrop {
     this.renderer = new THREE.WebGLRenderer({
       canvas: canvas,
       antialias: true,
+      alpha: true,
     });
 
     this.boundOnWindowResize = this.onWindowResize.bind(this);
@@ -196,6 +260,8 @@ export class TowerDrop {
     this.addCamera();
     this.addLights();
     this.addEventListeners();
+    this.container.addEventListener(LANDED_EVENT, this.onLanded);
+    this.container.addEventListener(STATE_EVENT, this.onRoundState);
 
     this.initialConfigGame();
 
@@ -211,8 +277,14 @@ export class TowerDrop {
   }
 
   private addLights(): void {
-    const ambientLight = new THREE.AmbientLight("#FFFFFF", 0.6);
-    const directionalLight = new THREE.DirectionalLight("#FFFFFF", 0.6);
+    const ambientLight = new THREE.AmbientLight(
+      VISUAL_THEME.ambient.color,
+      VISUAL_THEME.ambient.intensity
+    );
+    const directionalLight = new THREE.DirectionalLight(
+      VISUAL_THEME.key.color,
+      VISUAL_THEME.key.intensity
+    );
 
     directionalLight.position.set(10, 20, 0);
 
@@ -276,6 +348,8 @@ export class TowerDrop {
   }
 
   private initialConfigGame(): void {
+    this.clearFeedback();
+    this.particles.clear();
     const { blocks, fallBlocks } = this.gameState;
 
     const allBlocks: Block[] = blocks.concat(fallBlocks);
@@ -283,6 +357,7 @@ export class TowerDrop {
     for (const block of allBlocks) {
       const mesh = block.mesh;
 
+      releaseBlockOutline(mesh);
       mesh.geometry.dispose();
 
       const material = mesh.material as
@@ -331,6 +406,8 @@ export class TowerDrop {
   }
 
   private render(): void {
+    this.particles.update(performance.now());
+    if (performance.now() >= this.feedbackUntil) this.clearFeedback();
     this.renderer.setSize(this.sizes.width, this.sizes.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -338,6 +415,7 @@ export class TowerDrop {
   }
 
   private onWindowResize(): void {
+    this.particles.resize();
     this.sizes.width = window.innerWidth;
     this.sizes.height = window.innerHeight;
 
@@ -625,10 +703,12 @@ export class TowerDrop {
       sizes.depth
     );
 
-    const color = new THREE.Color(`hsl(${30 + blocks.length * 4}, 100%, 50%)`);
-    const material = new THREE.MeshLambertMaterial({ color: color });
+    const material = createBlockMaterial(
+      isBlockFalling ? blocks.length - 1 : blocks.length
+    );
 
     const mesh = new THREE.Mesh(geometry, material);
+    addBlockOutline(mesh);
     mesh.position.set(x!, y!, z!);
     this.scene.add(mesh);
 
@@ -662,6 +742,7 @@ export class TowerDrop {
       if (block.body.position.y >= this.camera.position.y - 20) return true;
       this.scene.remove(block.mesh);
       this.world.remove(block.body);
+      releaseBlockOutline(block.mesh);
       block.mesh.geometry.dispose();
       block.mesh.material.dispose();
       return false;
@@ -727,6 +808,13 @@ export class TowerDrop {
   }
 
   public dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.atmosphere.dispose();
+    this.particles.dispose();
+    this.clearFeedback();
+    this.container.removeEventListener(LANDED_EVENT, this.onLanded);
+    this.container.removeEventListener(STATE_EVENT, this.onRoundState);
     this.stopAnimation();
 
     window.removeEventListener("resize", this.boundOnWindowResize);
@@ -740,6 +828,7 @@ export class TowerDrop {
     const allBlocks = blocks.concat(fallBlocks);
 
     for (const block of allBlocks) {
+      releaseBlockOutline(block.mesh);
       block.mesh.geometry.dispose();
 
       const material = block.mesh.material as

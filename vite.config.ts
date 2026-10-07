@@ -23,6 +23,12 @@ export default defineConfig({
     port: 3001,
   },
   build: {
+    rollupOptions: {
+      input: {
+        game: path.resolve(import.meta.dirname, "index.html"),
+        artLab: path.resolve(import.meta.dirname, "art-lab.html"),
+      },
+    },
     outDir: "dist",
     sourcemap: true,
     minify: "esbuild",
