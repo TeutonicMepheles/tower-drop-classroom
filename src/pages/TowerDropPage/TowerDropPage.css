@@ -71,3 +71,20 @@
 .tower-drop__button:hover {
   background-color: var(--color-primary-hover);
 }
+
+.gameplay-status {
+  position: absolute;
+  top: 7rem;
+  left: 2.813rem;
+  color: white;
+  pointer-events: none;
+}
+.tower-drop__menu-wrapper > p,
+.tower-drop__menu-wrapper label {
+  color: white;
+  text-align: center;
+}
+.tower-drop__menu-wrapper select {
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+}
