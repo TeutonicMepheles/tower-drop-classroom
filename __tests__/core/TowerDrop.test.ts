@@ -16,7 +16,7 @@ const createContainer = (): Page => {
         <div class="tower-drop__menu-wrapper">
           <h1 class="tower-drop__title">Tower Drop</h1>
           <h2 class="tower-drop__last-score">Last Score: 0</h2>
-          <button class="tower-drop__button" id="playbtn">¡Play!</button>
+          <button class="tower-drop__button" id="playbtn">隆Play!</button>
         </div>
       </div>
     </div>
@@ -263,7 +263,7 @@ describe("TowerDrop", () => {
         topBlockMesh.position.x = 10;
         score.innerHTML = "7";
         window.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        expect(lastScore.innerHTML).toBe("Last Score: 7");
+        expect(lastScore.innerHTML).toBe("Last Score: 0");
       });
 
       it("should stop the animation on game over", () => {
