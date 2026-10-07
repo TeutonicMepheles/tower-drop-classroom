@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
+import { Atmosphere } from "@/visual/Atmosphere";
 import { VISUAL_THEME, blockColor } from "@/config/visualTheme";
 import { GAME_CONFIG, STATE_EVENT, LANDED_EVENT } from "@/config/gameConfig";
 import type {
@@ -43,6 +44,7 @@ export class TowerDrop {
     this.feedbackMaterial = undefined;
   }
 
+  private atmosphere: Atmosphere;
   private scene: THREE.Scene;
   private camera: THREE.OrthographicCamera;
   private renderer: THREE.WebGLRenderer;
@@ -106,7 +108,8 @@ export class TowerDrop {
     private container: Page
   ) {
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(VISUAL_THEME.background);
+    this.scene.background = null;
+    this.atmosphere = new Atmosphere(this.container);
     this.container.addEventListener(LANDED_EVENT, this.onLanded);
     this.container.addEventListener(STATE_EVENT, this.onRoundState);
 
@@ -128,6 +131,7 @@ export class TowerDrop {
     this.renderer = new THREE.WebGLRenderer({
       canvas: canvas,
       antialias: true,
+      alpha: true,
     });
 
     this.boundOnWindowResize = this.onWindowResize.bind(this);
@@ -578,6 +582,7 @@ export class TowerDrop {
   }
 
   public dispose(): void {
+    this.atmosphere.dispose();
     this.container.removeEventListener(LANDED_EVENT, this.onLanded);
     this.container.removeEventListener(STATE_EVENT, this.onRoundState);
     this.clearFeedback();
