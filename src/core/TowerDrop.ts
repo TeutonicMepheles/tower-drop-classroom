@@ -1,5 +1,11 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
+import { GAME_CONFIG, STATE_EVENT, LANDED_EVENT } from "@/config/gameConfig";
+import type {
+  Difficulty,
+  GameSnapshot,
+  LandedDetail,
+} from "@/config/gameConfig";
 
 import type { Block, Sizes } from "@/types/app";
 import type {
@@ -25,7 +31,34 @@ export class TowerDrop {
     width: 3,
     depth: 3,
   };
-  private blockSpeed = 0.039;
+  private blockSpeed: number = GAME_CONFIG.normal.speed;
+  private snapshot: GameSnapshot = {
+    difficulty: "normal",
+    phase: "ready",
+    score: 0,
+    layers: 0,
+    perfectStreak: 0,
+    lastResult: "none",
+  };
+
+  public getSnapshot(): Readonly<GameSnapshot> {
+    return { ...this.snapshot };
+  }
+
+  public setDifficulty(difficulty: Difficulty): void {
+    if (this.gameState.gameStarted || !(difficulty in GAME_CONFIG)) return;
+    this.snapshot.difficulty = difficulty;
+    this.blockSpeed = GAME_CONFIG[difficulty].speed;
+    this.publishState();
+  }
+
+  private publishState(): void {
+    this.container.dispatchEvent(
+      new CustomEvent<GameSnapshot>(STATE_EVENT, {
+        detail: { ...this.snapshot },
+      })
+    );
+  }
 
   private gameState: GameState = {
     gameStarted: false,
@@ -247,9 +280,10 @@ export class TowerDrop {
     const { blocks, gameStarted } = this.gameState;
 
     const target = e.target as HTMLElement;
-    const id = target.id;
-
-    if (!gameStarted || id === "playbtn") return;
+    const isControl =
+      target instanceof Element &&
+      target.closest("button, select, input, label, a, [data-game-control]");
+    if (!gameStarted || isControl) return;
 
     const topBlock = blocks[blocks.length - 1];
     const bottomBlock = blocks[blocks.length - 2];
@@ -258,9 +292,15 @@ export class TowerDrop {
 
     const direction = topBlock.direction!;
 
-    const delta =
+    let delta =
       topBlock.mesh.position[direction] - bottomBlock.mesh.position[direction];
-
+    const perfect =
+      Math.abs(delta) <= GAME_CONFIG[this.snapshot.difficulty].perfectTolerance;
+    if (perfect) {
+      topBlock.mesh.position[direction] = bottomBlock.mesh.position[direction];
+      topBlock.body.position[direction] = bottomBlock.body.position[direction];
+      delta = 0;
+    }
     const absDelta = Math.abs(delta);
 
     const size =
@@ -268,11 +308,11 @@ export class TowerDrop {
 
     const overlap = size! - absDelta;
 
-    if (overlap < 0) {
+    if (overlap <= 0) {
       this.stopAnimation();
 
       if (lastScore && score) {
-        lastScore.innerHTML = `Last Score: ${score.innerHTML}`;
+        lastScore.innerHTML = `Last Score: ${this.snapshot.score}`;
         score.innerHTML = "0";
         score.style.display = "none";
       }
@@ -281,14 +321,27 @@ export class TowerDrop {
       }
 
       this.gameState.gameStarted = false;
-
+      this.snapshot.phase = "ended";
+      this.snapshot.lastResult = "miss";
+      this.snapshot.perfectStreak = 0;
+      this.publishState();
       return;
     }
 
     this.gameState.isMovingForward = false;
-    if (score) {
-      score.innerHTML = `${Number(score.innerHTML) + 1}`;
-    }
+    this.snapshot.perfectStreak = perfect ? this.snapshot.perfectStreak + 1 : 0;
+    this.snapshot.score += perfect
+      ? Math.min(this.snapshot.perfectStreak, 5)
+      : 1;
+    this.snapshot.layers += 1;
+    this.snapshot.lastResult = perfect ? "perfect" : "normal";
+    if (score) score.textContent = String(this.snapshot.score);
+    this.container.dispatchEvent(
+      new CustomEvent<LandedDetail>(LANDED_EVENT, {
+        detail: { perfect, index: blocks.length - 1 },
+      })
+    );
+    this.publishState();
 
     const newBlockWidth = direction === "x" ? overlap : topBlock.sizes.width;
     const newBlockDepth = direction === "z" ? overlap : topBlock.sizes.depth;
@@ -324,14 +377,15 @@ export class TowerDrop {
     const fallBlockWidth = direction === "x" ? absDelta : newBlockWidth;
     const fallBlockDepth = direction === "z" ? absDelta : newBlockDepth;
 
-    this.addFallBlock({
-      coords: { x: fallBlockX, z: fallBlockZ },
-      sizes: {
-        width: fallBlockWidth,
-        height: this.blockSizes.height,
-        depth: fallBlockDepth!,
-      },
-    });
+    if (absDelta > 0)
+      this.addFallBlock({
+        coords: { x: fallBlockX, z: fallBlockZ },
+        sizes: {
+          width: fallBlockWidth,
+          height: this.blockSizes.height,
+          depth: fallBlockDepth!,
+        },
+      });
 
     const newBlockX = direction === "x" ? topBlock.mesh.position.x : -10;
     const newBlockZ = direction === "z" ? topBlock.mesh.position.z : -10;
@@ -360,6 +414,15 @@ export class TowerDrop {
     if (gameStarted) return;
 
     this.initialConfigGame();
+    this.snapshot = {
+      ...this.snapshot,
+      phase: "playing",
+      score: 0,
+      layers: 0,
+      perfectStreak: 0,
+      lastResult: "none",
+    };
+    if (score) score.textContent = "0";
 
     if (score) {
       score.style.display = "block";
@@ -372,6 +435,7 @@ export class TowerDrop {
 
     this.startAnimation();
     this.gameState.gameStarted = true;
+    this.publishState();
   }
 
   private createBlock({
