@@ -31,6 +31,12 @@ export class TowerDrop {
     this.feedbackMaterial = material;
     this.feedbackUntil = performance.now() + VISUAL_THEME.feedback.durationMs;
   };
+  private onRoundState = (event: Event): void => {
+    if ((event as CustomEvent<GameSnapshot>).detail.phase !== "playing") {
+      this.clearFeedback();
+      this.render();
+    }
+  };
   private clearFeedback(): void {
     this.feedbackMaterial?.emissive.set("#000000");
     if (this.feedbackMaterial) this.feedbackMaterial.emissiveIntensity = 0;
@@ -102,6 +108,7 @@ export class TowerDrop {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(VISUAL_THEME.background);
     this.container.addEventListener(LANDED_EVENT, this.onLanded);
+    this.container.addEventListener(STATE_EVENT, this.onRoundState);
 
     this.world = new CANNON.World();
 
@@ -572,6 +579,7 @@ export class TowerDrop {
 
   public dispose(): void {
     this.container.removeEventListener(LANDED_EVENT, this.onLanded);
+    this.container.removeEventListener(STATE_EVENT, this.onRoundState);
     this.clearFeedback();
     this.stopAnimation();
 

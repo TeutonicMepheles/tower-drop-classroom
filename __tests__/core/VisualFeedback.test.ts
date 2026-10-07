@@ -29,6 +29,18 @@ describe("perfect block visual feedback", () => {
     tick();
     expect(landed.material.emissiveIntensity).toBe(0);
     expect(landed.material.emissive.set).toHaveBeenLastCalledWith("#000000");
+    const second = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
+      .value as THREE.Mesh<THREE.BoxGeometry, THREE.MeshLambertMaterial>;
+    window.dispatchEvent(new MouseEvent("click"));
+    expect(second.material.emissiveIntensity).toBe(
+      VISUAL_THEME.feedback.intensity
+    );
+    const next = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
+      .value as THREE.Mesh;
+    next.position.x = 3;
+    window.dispatchEvent(new MouseEvent("click"));
+    expect(game.getSnapshot().phase).toBe("ended");
+    expect(second.material.emissiveIntensity).toBe(0);
     game.dispose();
     page.remove();
     clock.mockRestore();
