@@ -57,22 +57,23 @@ describe("TowerDropPage", () => {
     it("should render the last score heading with initial value", () => {
       renderPage();
       expect(
-        screen.getByRole("heading", { name: /Last Score: 0/i, level: 2 })
+        screen.getByRole("heading", { name: /准备好挑战了吗/i, level: 2 })
       ).toBeInTheDocument();
     });
 
     it("should render the play button", () => {
       renderPage();
       expect(
-        screen.getByRole("button", { name: "Start game" })
+        screen.getByRole("button", { name: "开始游戏" })
       ).toBeInTheDocument();
     });
 
     it("should render the play button with the correct id", () => {
       renderPage();
-      expect(
-        screen.getByRole("button", { name: "Start game" })
-      ).toHaveAttribute("id", "playbtn");
+      expect(screen.getByRole("button", { name: "开始游戏" })).toHaveAttribute(
+        "id",
+        "playbtn"
+      );
     });
 
     it("should render the play button inside the menu wrapper", () => {

@@ -1,73 +1,160 @@
 .tower-drop__webgl {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   outline: none;
 }
-
 .tower-drop__container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
+  color: #edf4ff;
+  pointer-events: none;
 }
-
-.tower-drop__score {
-  display: none;
-  position: absolute;
-  top: 3.75rem;
-  left: 2.813rem;
-  font-size: 2rem;
-  font-weight: 500;
-}
-
 .tower-drop__menu {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: absolute;
-  background-color: rgba(var(--color-black-rgb), 0.54);
-  width: 100%;
-  height: 100%;
+  padding: 1rem;
+  background: rgba(6, 14, 28, 0.65);
+  pointer-events: auto;
+  overflow-y: auto;
 }
-
 .tower-drop__menu-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-around;
-  width: 50%;
-  height: 50%;
+  width: min(100%, 460px);
+  padding: 2rem;
+  border: 1px solid #ffffff24;
+  border-radius: 24px;
+  background: #14233aef;
+  box-shadow: 0 20px 80px #0005;
 }
-
+.eyebrow {
+  color: #8ed5ff;
+  font-size: 0.7rem;
+  letter-spacing: 0.13em;
+}
 .tower-drop__title {
-  font-size: 2.5rem;
-  color: var(--color-white);
-  text-align: center;
+  font-size: clamp(2rem, 6vw, 3rem);
+  margin: 0.5rem 0;
+  line-height: 1.1;
 }
-
+.menu-subtitle,
+.instructions,
+.round-summary {
+  color: #aec0d8;
+  font-size: 0.9rem;
+}
 .tower-drop__last-score {
-  font-size: 1.5rem;
-  color: var(--color-white);
-  text-align: center;
+  font-size: 1.1rem;
+  margin-top: 1.25rem;
 }
-
-.tower-drop__button {
-  padding: 0.625rem 1.25rem;
-  border-radius: 0.625rem;
-  font-size: 1rem;
-  border: none;
-  background-color: var(--color-primary);
-  color: var(--color-white);
+.tower-drop__menu fieldset {
+  border: 0;
+  margin: 1.4rem 0;
+}
+.tower-drop__menu legend {
+  font-size: 0.8rem;
+  color: #aec0d8;
+  margin-bottom: 0.5rem;
+}
+.tower-drop__menu label {
+  display: block;
+  background: #ffffff09;
+  border: 1px solid #ffffff18;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
   cursor: pointer;
-  margin-top: 0.625rem;
-  transition: background-color 0.3s ease;
 }
-
+.tower-drop__menu label:has(input:checked) {
+  border-color: #82d6ff;
+  background: #82d6ff15;
+}
+.tower-drop__menu small {
+  display: block;
+  margin-left: 1.5rem;
+  color: #aec0d8;
+  font-size: 0.75rem;
+}
+.tower-drop__menu input {
+  accent-color: #82d6ff;
+}
+.tower-drop__button {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #102238;
+  background: #8ed5ff;
+  cursor: pointer;
+}
 .tower-drop__button:hover {
-  background-color: var(--color-primary-hover);
+  background: #b2e3ff;
+}
+.tower-drop__button:focus-visible,
+.tower-drop__menu input:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+.game-hud {
+  position: absolute;
+  inset: 1.5rem 1.5rem auto;
+  display: flex;
+  gap: 2rem;
+  pointer-events: none;
+}
+.hud-label {
+  display: block;
+  font-size: 0.7rem;
+  color: #c5d5e9;
+}
+.game-hud strong,
+.tower-drop__score {
+  font-size: 2rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+.tower-drop__score {
+  display: block;
+}
+.game-feedback {
+  position: absolute;
+  top: 7rem;
+  width: 100%;
+  text-align: center;
+  color: #ffe9a4;
+  font-weight: 700;
+  text-shadow: 0 2px 6px #000;
+}
+.play-hint {
+  position: absolute;
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  padding: 0 1rem;
+  width: 100%;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #c5d5e9;
+}
+.tower-drop-page:not([data-phase="playing"]) .game-hud,
+.tower-drop-page:not([data-phase="playing"]) .play-hint {
+  visibility: hidden;
+}
+@media (max-width: 480px), (max-height: 650px) {
+  .tower-drop__menu-wrapper {
+    padding: 1.25rem;
+  }
+  .game-hud {
+    gap: 1.5rem;
+    inset: 1rem 1rem auto;
+  }
+  .tower-drop__menu {
+    align-items: safe center;
+  }
 }
