@@ -1,0 +1,82 @@
+.art-atmosphere {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 78% 8%, #633d6b55, transparent 48%),
+    radial-gradient(ellipse at 12% 70%, #1b746344, transparent 52%),
+    linear-gradient(170deg, #10162d 0%, #193047 52%, #34525e 100%);
+}
+.art-aurora {
+  position: absolute;
+  inset: -35%;
+  background:
+    radial-gradient(ellipse at 35% 45%, #60d8d522, transparent 38%),
+    radial-gradient(ellipse at 75% 30%, #b090d822, transparent 38%);
+  animation: art-drift 28s ease-in-out infinite alternate;
+}
+.art-orbit {
+  position: absolute;
+  width: 70vw;
+  height: 70vw;
+  top: -44vw;
+  right: -10vw;
+  border: 1px solid #d2eafa12;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 48px #d2eafa03,
+    0 0 0 96px #d2eafa03;
+}
+.art-stars {
+  position: absolute;
+  inset: 0;
+}
+.art-stars i {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  background: #d0efff;
+  border-radius: 50%;
+  opacity: 0.35;
+  box-shadow: 0 0 6px #8fdbe580;
+  animation: art-twinkle 5s ease-in-out var(--delay) infinite alternate;
+}
+@keyframes art-drift {
+  to {
+    transform: translate(5%, -3%) rotate(9deg);
+  }
+}
+@keyframes art-twinkle {
+  to {
+    opacity: 0.12;
+    transform: translateY(-8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .art-atmosphere * {
+    animation: none !important;
+  }
+}
+
+/* Layered scenery mist, not volumetric ray marching. */
+.art-mist {
+  position: absolute;
+  inset: 56% -30% -25%;
+  background:
+    radial-gradient(ellipse at 25% 80%, #a6e1de3a, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, #b2badf35, transparent 62%);
+  filter: blur(20px);
+  animation: art-mist-drift 36s ease-in-out infinite alternate;
+}
+.art-mist--far {
+  inset: 68% -20% -25%;
+  opacity: 0.65;
+  animation-duration: 49s;
+  animation-direction: alternate-reverse;
+}
+@keyframes art-mist-drift {
+  to {
+    transform: translateX(8%) translateY(-4%);
+  }
+}

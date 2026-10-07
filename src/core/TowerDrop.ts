@@ -1,10 +1,30 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
-import { GAME_CONFIG, STATE_EVENT, LANDED_EVENT } from "@/config/gameConfig";
+import { Atmosphere } from "@/visual/Atmosphere";
+import { SuccessParticles } from "@/visual/SuccessParticles";
+import {
+  createBlockMaterial,
+  restoreBlockGlow,
+  addBlockOutline,
+  releaseBlockOutline,
+} from "@/visual/blockMaterials";
+import { VISUAL_THEME } from "@/config/visualTheme";
+import { REWARD_INTERVAL, emptyRewards, drawRewards } from "@/config/rewards";
+import { loadRecords, saveRecords } from "./records";
+import type { RewardId } from "@/config/rewards";
+import {
+  GAME_CONFIG,
+  STATE_EVENT,
+  LANDED_EVENT,
+  REWARD_EVENT,
+  RESCUE_EVENT,
+} from "@/config/gameConfig";
 import type {
   Difficulty,
   GameSnapshot,
   LandedDetail,
+  RewardAppliedDetail,
+  RescueDetail,
 } from "@/config/gameConfig";
 
 import type { Block, Sizes } from "@/types/app";
@@ -17,6 +37,52 @@ import type { GameState } from "@/types/states";
 import type { Page } from "@/types/pages";
 
 export class TowerDrop {
+  private disposed = false;
+  private feedbackMaterial: THREE.MeshStandardMaterial | undefined;
+  private feedbackUntil = 0;
+  private onLanded = (event: Event): void => {
+    const detail = (event as CustomEvent<LandedDetail>).detail;
+    const block = this.gameState.blocks[detail.index];
+    if (block)
+      this.particles.emit(
+        {
+          x: block.mesh.position.x,
+          y: block.mesh.position.y - this.blockSizes.height / 2,
+          z: block.mesh.position.z,
+          width: block.sizes.width,
+          depth: block.sizes.depth ?? 0,
+        },
+        performance.now(),
+        detail.perfect
+      );
+    if (!detail.perfect) return;
+    this.clearFeedback();
+    const material = this.gameState.blocks[detail.index]?.mesh.material;
+    if (!material) return;
+    material.emissive.set(VISUAL_THEME.feedback.color);
+    material.emissiveIntensity = VISUAL_THEME.feedback.intensity;
+    this.feedbackMaterial = material;
+    this.feedbackUntil = performance.now() + VISUAL_THEME.feedback.durationMs;
+  };
+  private onRoundState = (event: Event): void => {
+    if (
+      (event as CustomEvent<GameSnapshot>).detail.phase === "ended" ||
+      (event as CustomEvent<GameSnapshot>).detail.phase === "ready"
+    ) {
+      this.clearFeedback();
+      this.particles.clear();
+      this.render();
+    }
+  };
+  private clearFeedback(): void {
+    if (this.feedbackMaterial) restoreBlockGlow(this.feedbackMaterial);
+    this.feedbackMaterial = undefined;
+  }
+
+  private atmosphere: Atmosphere;
+  private particles: SuccessParticles;
+
+  private records = loadRecords();
   private scene: THREE.Scene;
   private camera: THREE.OrthographicCamera;
   private renderer: THREE.WebGLRenderer;
@@ -39,15 +105,29 @@ export class TowerDrop {
     layers: 0,
     perfectStreak: 0,
     lastResult: "none",
+    rewards: emptyRewards(),
+    rewardChoices: [],
+    layersUntilReward: REWARD_INTERVAL,
+    shields: 0,
+    rescuesUsed: 0,
+    perfectCount: 0,
+    longestStreak: 0,
+    bestLayers: this.records.normal,
+    recordBroken: false,
   };
 
   public getSnapshot(): Readonly<GameSnapshot> {
-    return { ...this.snapshot };
+    return {
+      ...this.snapshot,
+      rewards: { ...this.snapshot.rewards },
+      rewardChoices: [...this.snapshot.rewardChoices],
+    };
   }
 
   public setDifficulty(difficulty: Difficulty): void {
     if (this.gameState.gameStarted || !(difficulty in GAME_CONFIG)) return;
     this.snapshot.difficulty = difficulty;
+    this.snapshot.bestLayers = this.records[difficulty];
     this.blockSpeed = GAME_CONFIG[difficulty].speed;
     this.publishState();
   }
@@ -55,9 +135,72 @@ export class TowerDrop {
   private publishState(): void {
     this.container.dispatchEvent(
       new CustomEvent<GameSnapshot>(STATE_EVENT, {
-        detail: { ...this.snapshot },
+        detail: this.getSnapshot(),
       })
     );
+  }
+
+  public chooseReward(id: RewardId): boolean {
+    if (
+      this.snapshot.phase !== "reward" ||
+      !this.snapshot.rewardChoices.includes(id)
+    )
+      return false;
+    this.snapshot.rewards[id] += 1;
+    if (id === "shield") this.snapshot.shields += 1;
+    if (id === "repair") {
+      for (const block of this.gameState.blocks.slice(-2)) {
+        block.sizes.width = Math.min(
+          this.blockSizes.width,
+          block.sizes.width + 0.3
+        );
+        block.sizes.depth = Math.min(
+          this.blockSizes.depth!,
+          block.sizes.depth! + 0.3
+        );
+        this.rebuildBlock(block);
+      }
+    }
+    this.blockSpeed =
+      GAME_CONFIG[this.snapshot.difficulty].speed *
+      0.92 ** this.snapshot.rewards.slow;
+    this.snapshot.phase = "playing";
+    this.snapshot.rewardChoices = [];
+    this.snapshot.layersUntilReward = REWARD_INTERVAL;
+    this.container.dispatchEvent(
+      new CustomEvent<RewardAppliedDetail>(REWARD_EVENT, {
+        detail: { id, index: this.gameState.blocks.length - 2 },
+      })
+    );
+    this.publishState();
+    this.render();
+    this.startAnimation();
+    return true;
+  }
+
+  private rebuildBlock(block: Block): void {
+    releaseBlockOutline(block.mesh, false);
+    block.mesh.geometry.dispose();
+    block.mesh.geometry = new THREE.BoxGeometry(
+      block.sizes.width,
+      block.sizes.height,
+      block.sizes.depth
+    );
+    block.mesh.scale.x = block.mesh.scale.y = block.mesh.scale.z = 1;
+    addBlockOutline(block.mesh);
+    block.body.shapes = [];
+    block.body.shapeOffsets = [];
+    block.body.shapeOrientations = [];
+    block.body.addShape(
+      new CANNON.Box(
+        new CANNON.Vec3(
+          block.sizes.width / 2,
+          block.sizes.height / 2,
+          block.sizes.depth! / 2
+        )
+      )
+    );
+    block.body.aabbNeedsUpdate = true;
   }
 
   private gameState: GameState = {
@@ -72,6 +215,7 @@ export class TowerDrop {
   private boundOnGameStart: () => void;
 
   private isAnimating = false;
+  private lastFrameTime = 0;
 
   private btnPlay: HTMLButtonElement | null = null;
 
@@ -80,6 +224,13 @@ export class TowerDrop {
     private container: Page
   ) {
     this.scene = new THREE.Scene();
+    this.scene.background = null;
+    this.scene.fog = new THREE.FogExp2(
+      VISUAL_THEME.fog.color,
+      VISUAL_THEME.fog.density
+    );
+    this.atmosphere = new Atmosphere(this.container);
+    this.particles = new SuccessParticles(this.scene);
 
     this.world = new CANNON.World();
 
@@ -99,6 +250,7 @@ export class TowerDrop {
     this.renderer = new THREE.WebGLRenderer({
       canvas: canvas,
       antialias: true,
+      alpha: true,
     });
 
     this.boundOnWindowResize = this.onWindowResize.bind(this);
@@ -108,6 +260,8 @@ export class TowerDrop {
     this.addCamera();
     this.addLights();
     this.addEventListeners();
+    this.container.addEventListener(LANDED_EVENT, this.onLanded);
+    this.container.addEventListener(STATE_EVENT, this.onRoundState);
 
     this.initialConfigGame();
 
@@ -123,8 +277,14 @@ export class TowerDrop {
   }
 
   private addLights(): void {
-    const ambientLight = new THREE.AmbientLight("#FFFFFF", 0.6);
-    const directionalLight = new THREE.DirectionalLight("#FFFFFF", 0.6);
+    const ambientLight = new THREE.AmbientLight(
+      VISUAL_THEME.ambient.color,
+      VISUAL_THEME.ambient.intensity
+    );
+    const directionalLight = new THREE.DirectionalLight(
+      VISUAL_THEME.key.color,
+      VISUAL_THEME.key.intensity
+    );
 
     directionalLight.position.set(10, 20, 0);
 
@@ -188,6 +348,8 @@ export class TowerDrop {
   }
 
   private initialConfigGame(): void {
+    this.clearFeedback();
+    this.particles.clear();
     const { blocks, fallBlocks } = this.gameState;
 
     const allBlocks: Block[] = blocks.concat(fallBlocks);
@@ -195,6 +357,7 @@ export class TowerDrop {
     for (const block of allBlocks) {
       const mesh = block.mesh;
 
+      releaseBlockOutline(mesh);
       mesh.geometry.dispose();
 
       const material = mesh.material as
@@ -243,6 +406,8 @@ export class TowerDrop {
   }
 
   private render(): void {
+    this.particles.update(performance.now());
+    if (performance.now() >= this.feedbackUntil) this.clearFeedback();
     this.renderer.setSize(this.sizes.width, this.sizes.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -250,6 +415,7 @@ export class TowerDrop {
   }
 
   private onWindowResize(): void {
+    this.particles.resize();
     this.sizes.width = window.innerWidth;
     this.sizes.height = window.innerHeight;
 
@@ -283,7 +449,7 @@ export class TowerDrop {
     const isControl =
       target instanceof Element &&
       target.closest("button, select, input, label, a, [data-game-control]");
-    if (!gameStarted || isControl) return;
+    if (!gameStarted || this.snapshot.phase !== "playing" || isControl) return;
 
     const topBlock = blocks[blocks.length - 1];
     const bottomBlock = blocks[blocks.length - 2];
@@ -295,7 +461,9 @@ export class TowerDrop {
     let delta =
       topBlock.mesh.position[direction] - bottomBlock.mesh.position[direction];
     const perfect =
-      Math.abs(delta) <= GAME_CONFIG[this.snapshot.difficulty].perfectTolerance;
+      Math.abs(delta) <=
+      GAME_CONFIG[this.snapshot.difficulty].perfectTolerance *
+        (1 + 0.2 * this.snapshot.rewards.precision);
     if (perfect) {
       topBlock.mesh.position[direction] = bottomBlock.mesh.position[direction];
       topBlock.body.position[direction] = bottomBlock.body.position[direction];
@@ -309,6 +477,24 @@ export class TowerDrop {
     const overlap = size! - absDelta;
 
     if (overlap <= 0) {
+      if (this.snapshot.shields > 0) {
+        this.snapshot.shields -= 1;
+        this.snapshot.rescuesUsed += 1;
+        this.snapshot.perfectStreak = 0;
+        this.snapshot.lastResult = "rescue";
+        const spawn = bottomBlock.mesh.position[direction] - 10;
+        topBlock.mesh.position[direction] = spawn;
+        topBlock.body.position[direction] = spawn;
+        this.gameState.isMovingForward = false;
+        this.publishState();
+        this.container.dispatchEvent(
+          new CustomEvent<RescueDetail>(RESCUE_EVENT, {
+            detail: { index: blocks.length - 1 },
+          })
+        );
+        this.render();
+        return;
+      }
       this.stopAnimation();
 
       if (lastScore && score) {
@@ -334,14 +520,19 @@ export class TowerDrop {
       ? Math.min(this.snapshot.perfectStreak, 5)
       : 1;
     this.snapshot.layers += 1;
+    if (perfect) this.snapshot.perfectCount += 1;
+    this.snapshot.longestStreak = Math.max(
+      this.snapshot.longestStreak,
+      this.snapshot.perfectStreak
+    );
+    if (this.snapshot.layers > this.records[this.snapshot.difficulty]) {
+      this.snapshot.recordBroken = true;
+      this.records[this.snapshot.difficulty] = this.snapshot.layers;
+      this.snapshot.bestLayers = this.snapshot.layers;
+      saveRecords(this.records);
+    }
     this.snapshot.lastResult = perfect ? "perfect" : "normal";
     if (score) score.textContent = String(this.snapshot.score);
-    this.container.dispatchEvent(
-      new CustomEvent<LandedDetail>(LANDED_EVENT, {
-        detail: { perfect, index: blocks.length - 1 },
-      })
-    );
-    this.publishState();
 
     const newBlockWidth = direction === "x" ? overlap : topBlock.sizes.width;
     const newBlockDepth = direction === "z" ? overlap : topBlock.sizes.depth;
@@ -362,7 +553,10 @@ export class TowerDrop {
     );
 
     topBlock.body.shapes = [];
+    topBlock.body.shapeOffsets = [];
+    topBlock.body.shapeOrientations = [];
     topBlock.body.addShape(shape);
+    topBlock.body.aabbNeedsUpdate = true;
 
     const fallBlock = (overlap / 2 + absDelta / 2) * Math.sign(delta);
     const fallBlockX =
@@ -387,6 +581,31 @@ export class TowerDrop {
         },
       });
 
+    const recovered = absDelta * 0.15 * this.snapshot.rewards.steady;
+    const perfectGrowth = perfect
+      ? 0.03 * this.snapshot.rewards.perfectRepair
+      : 0;
+    if (recovered > 0 || perfectGrowth > 0) {
+      topBlock.sizes.width = Math.min(
+        this.blockSizes.width,
+        topBlock.sizes.width +
+          (direction === "x" ? recovered : 0) +
+          perfectGrowth
+      );
+      topBlock.sizes.depth = Math.min(
+        this.blockSizes.depth!,
+        topBlock.sizes.depth +
+          (direction === "z" ? recovered : 0) +
+          perfectGrowth
+      );
+      this.rebuildBlock(topBlock);
+    }
+    this.container.dispatchEvent(
+      new CustomEvent<LandedDetail>(LANDED_EVENT, {
+        detail: { perfect, index: blocks.length - 1 },
+      })
+    );
+
     const newBlockX = direction === "x" ? topBlock.mesh.position.x : -10;
     const newBlockZ = direction === "z" ? topBlock.mesh.position.z : -10;
 
@@ -396,11 +615,33 @@ export class TowerDrop {
       coords: { x: newBlockX, z: newBlockZ },
       sizes: {
         height: this.blockSizes.height,
-        width: newBlockWidth,
-        depth: newBlockDepth!,
+        width: topBlock.sizes.width,
+        depth: topBlock.sizes.depth,
       },
       direction: newBlockDirection,
     });
+    this.snapshot.layersUntilReward =
+      REWARD_INTERVAL - (this.snapshot.layers % REWARD_INTERVAL);
+    if (this.snapshot.layers % REWARD_INTERVAL === 0) {
+      this.snapshot.phase = "reward";
+      this.snapshot.rewardChoices = drawRewards(
+        this.snapshot.rewards,
+        this.snapshot.shields,
+        Math.min(topBlock.sizes.width, topBlock.sizes.depth) < 1.8,
+        Math.random,
+        topBlock.sizes.width < this.blockSizes.width ||
+          topBlock.sizes.depth < this.blockSizes.depth!
+      );
+      if (this.snapshot.rewardChoices.length === 0) {
+        this.snapshot.phase = "playing";
+        this.publishState();
+        return;
+      }
+      this.snapshot.layersUntilReward = 0;
+      this.stopAnimation();
+      this.render();
+    }
+    this.publishState();
   }
 
   private onGameStart(): void {
@@ -421,7 +662,17 @@ export class TowerDrop {
       layers: 0,
       perfectStreak: 0,
       lastResult: "none",
+      rewards: emptyRewards(),
+      rewardChoices: [],
+      layersUntilReward: REWARD_INTERVAL,
+      shields: 0,
+      rescuesUsed: 0,
+      perfectCount: 0,
+      longestStreak: 0,
+      bestLayers: this.records[this.snapshot.difficulty],
+      recordBroken: false,
     };
+    this.blockSpeed = GAME_CONFIG[this.snapshot.difficulty].speed;
     if (score) score.textContent = "0";
 
     if (score) {
@@ -452,10 +703,12 @@ export class TowerDrop {
       sizes.depth
     );
 
-    const color = new THREE.Color(`hsl(${30 + blocks.length * 4}, 100%, 50%)`);
-    const material = new THREE.MeshLambertMaterial({ color: color });
+    const material = createBlockMaterial(
+      isBlockFalling ? blocks.length - 1 : blocks.length
+    );
 
     const mesh = new THREE.Mesh(geometry, material);
+    addBlockOutline(mesh);
     mesh.position.set(x!, y!, z!);
     this.scene.add(mesh);
 
@@ -485,10 +738,25 @@ export class TowerDrop {
       block.mesh.position.copy(block.body.position);
       block.mesh.quaternion.copy(block.body.quaternion);
     });
+    this.gameState.fallBlocks = fallBlocks.filter((block) => {
+      if (block.body.position.y >= this.camera.position.y - 20) return true;
+      this.scene.remove(block.mesh);
+      this.world.remove(block.body);
+      releaseBlockOutline(block.mesh);
+      block.mesh.geometry.dispose();
+      block.mesh.material.dispose();
+      return false;
+    });
   }
 
-  private animate(): void {
+  private animate(time?: number): void {
     if (!this.isAnimating) return;
+    const frameScale =
+      time === undefined
+        ? 1
+        : Math.min(Math.max((time - this.lastFrameTime) / 1000, 0), 0.05) * 60;
+    this.lastFrameTime = time ?? performance.now();
+    const movement = this.blockSpeed * frameScale;
 
     const { blocks, isMovingForward } = this.gameState;
 
@@ -504,14 +772,14 @@ export class TowerDrop {
     );
 
     if (isMovingForward) {
-      topBlock.mesh.position[topBlock.direction!] -= this.blockSpeed;
-      topBlock.body.position[topBlock.direction!] -= this.blockSpeed;
+      topBlock.mesh.position[topBlock.direction!] -= movement;
+      topBlock.body.position[topBlock.direction!] -= movement;
       if (delta === -5) this.gameState.isMovingForward = false;
     }
 
     if (!isMovingForward) {
-      topBlock.mesh.position[topBlock.direction!] += this.blockSpeed;
-      topBlock.body.position[topBlock.direction!] += this.blockSpeed;
+      topBlock.mesh.position[topBlock.direction!] += movement;
+      topBlock.body.position[topBlock.direction!] += movement;
       if (delta === 5) this.gameState.isMovingForward = true;
     }
 
@@ -519,7 +787,7 @@ export class TowerDrop {
       this.camera.position.y <
       this.blockSizes.height * (blocks.length - 2) + 4
     ) {
-      this.camera.position.y += this.blockSpeed;
+      this.camera.position.y += movement;
     }
 
     this.updatePhysics();
@@ -529,6 +797,7 @@ export class TowerDrop {
   }
 
   private startAnimation(): void {
+    this.lastFrameTime = performance.now();
     this.isAnimating = true;
     this.renderer.setAnimationLoop(this.animate.bind(this));
   }
@@ -539,6 +808,13 @@ export class TowerDrop {
   }
 
   public dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.atmosphere.dispose();
+    this.particles.dispose();
+    this.clearFeedback();
+    this.container.removeEventListener(LANDED_EVENT, this.onLanded);
+    this.container.removeEventListener(STATE_EVENT, this.onRoundState);
     this.stopAnimation();
 
     window.removeEventListener("resize", this.boundOnWindowResize);
@@ -552,6 +828,7 @@ export class TowerDrop {
     const allBlocks = blocks.concat(fallBlocks);
 
     for (const block of allBlocks) {
+      releaseBlockOutline(block.mesh);
       block.mesh.geometry.dispose();
 
       const material = block.mesh.material as

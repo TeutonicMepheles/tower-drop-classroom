@@ -1,0 +1,34 @@
+html,
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+}
+#art-lab canvas {
+  position: relative;
+  display: block;
+}
+#art-lab nav {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  color: #e2f6ff;
+}
+#art-lab button,
+#art-lab a {
+  border: 1px solid #90dfff66;
+  border-radius: 8px;
+  background: #15273ee0;
+  color: #e2f6ff;
+  padding: 10px 16px;
+  cursor: pointer;
+  text-decoration: none;
+}
+#art-lab button:hover {
+  background: #31506b;
+}

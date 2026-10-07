@@ -158,3 +158,154 @@
     align-items: safe center;
   }
 }
+
+.gameplay-status {
+  position: absolute;
+  top: 7rem;
+  left: 2.813rem;
+  color: white;
+  pointer-events: none;
+}
+.tower-drop__menu-wrapper > p,
+.tower-drop__menu-wrapper label {
+  color: white;
+  text-align: center;
+}
+.tower-drop__menu-wrapper select {
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.reward-panel[hidden] {
+  display: none;
+}
+.reward-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  background: #101820de;
+  color: white;
+  padding: 24px;
+}
+.reward-panel__content {
+  width: min(820px, 100%);
+  text-align: center;
+}
+.reward-panel__content h2 {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+.reward-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.reward-cards button {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 18px;
+  border: 2px solid #71d5be;
+  border-radius: 14px;
+  color: white;
+  background: #173e42;
+  cursor: pointer;
+  text-align: left;
+}
+.reward-cards strong {
+  font-size: 22px;
+}
+.reward-cards span {
+  font-size: 15px;
+  line-height: 1.7;
+}
+.reward-cards button:hover,
+.reward-cards button:focus-visible {
+  background: #286065;
+  outline: 3px solid #fff2ab;
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .reward-cards {
+    grid-template-columns: 1fr;
+  }
+  .reward-cards button {
+    padding: 16px;
+    gap: 6px;
+  }
+  .gameplay-status {
+    left: 16px;
+    right: 16px;
+    font-size: 13px;
+  }
+}
+
+.run-progress {
+  position: absolute;
+  top: 10rem;
+  left: 2.813rem;
+  right: 2rem;
+  color: #e7f7ed;
+  pointer-events: none;
+  max-width: 760px;
+  line-height: 1.7;
+  font-size: 14px;
+}
+.run-feedback {
+  color: #fff3a2;
+}
+.run-summary {
+  text-align: center;
+  line-height: 1.8;
+  color: #fff3a2;
+  max-width: 560px;
+}
+.tower-drop__menu-wrapper {
+  height: auto;
+  min-height: 50%;
+  gap: 18px;
+}
+.reward-cards:has(button:only-child) {
+  grid-template-columns: 1fr;
+}
+@media (max-width: 600px) {
+  .run-progress {
+    left: 16px;
+    right: 16px;
+    top: 10rem;
+    font-size: 12px;
+  }
+  .tower-drop__menu-wrapper {
+    width: 90%;
+  }
+}
+
+.tower-drop-page[data-phase="reward"] .game-hud {
+  visibility: visible;
+}
+.gameplay-status {
+  top: 7.2rem;
+  left: 2.8rem;
+  font-size: 13px;
+}
+.run-progress {
+  top: 9rem;
+  font-size: 13px;
+}
+.reward-panel {
+  z-index: 10;
+  backdrop-filter: blur(6px);
+  pointer-events: auto;
+}
+.game-feedback {
+  top: 14rem;
+}
+@media (max-width: 600px) {
+  .gameplay-status {
+    left: 16px;
+    right: 16px;
+  }
+}

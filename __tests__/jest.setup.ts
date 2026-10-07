@@ -74,14 +74,20 @@ const mockThreeBoxGeometry = jest.fn(() => ({
   dispose: mockThreeBoxGeometryDispose,
 }));
 const mockThreeMeshLambertMaterial = jest.fn(() => ({
+  emissive: { set: jest.fn() },
+  emissiveIntensity: 0,
   dispose: mockThreeMeshLambertMaterialDispose,
 }));
 const mockThreeMeshStandardMaterial = jest.fn(() => ({
+  emissive: { set: jest.fn() },
+  emissiveIntensity: 0,
   dispose: mockThreeMeshStandardMaterialDispose,
 }));
 const mockThreeMesh = jest.fn((geometry, material) => ({
   geometry,
   material,
+  add: jest.fn(),
+  remove: jest.fn(),
   position: {
     x: 0,
     y: 0,
@@ -132,6 +138,7 @@ const mockCannonVec3 = jest.fn((x: number, y: number, z: number) => ({
 
 jest.mock("three", () => ({
   Scene: mockThreeScene,
+  FogExp2: jest.fn((color: string, density: number) => ({ color, density })),
   PerspectiveCamera: mockThreePerspectiveCamera,
   OrthographicCamera: mockThreeOrthographicCamera,
   WebGLRenderer: mockThreeWebGLRenderer,
@@ -141,6 +148,38 @@ jest.mock("three", () => ({
   BoxGeometry: mockThreeBoxGeometry,
   MeshLambertMaterial: mockThreeMeshLambertMaterial,
   MeshStandardMaterial: mockThreeMeshStandardMaterial,
+  DataTexture: jest.fn(() => ({ dispose: jest.fn() })),
+  RGBAFormat: 1023,
+  BufferGeometry: jest.fn(() => ({
+    setAttribute: jest.fn(),
+    dispose: jest.fn(),
+  })),
+  BufferAttribute: jest.fn((array: unknown, itemSize: number) => ({
+    array,
+    itemSize,
+    needsUpdate: false,
+  })),
+  ShaderMaterial: jest.fn(() => ({
+    uniforms: { pixelRatio: { value: 1 } },
+    dispose: jest.fn(),
+  })),
+  Points: jest.fn((geometry: unknown, material: unknown) => ({
+    geometry,
+    material,
+    frustumCulled: true,
+  })),
+  AdditiveBlending: 2,
+  EdgesGeometry: jest.fn(() => ({ dispose: jest.fn() })),
+  LineBasicMaterial: jest.fn(() => ({ dispose: jest.fn() })),
+  LineLoop: jest.fn((geometry: unknown, material: unknown) => ({
+    geometry,
+    material,
+    frustumCulled: true,
+  })),
+  LineSegments: jest.fn((geometry: unknown, material: unknown) => ({
+    geometry,
+    material,
+  })),
   Mesh: mockThreeMesh,
   Color: mockThreeColor,
   Vector3: mockThreeVector3,

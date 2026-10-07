@@ -55,6 +55,7 @@ describe("TowerDrop", () => {
       expect(THREE.WebGLRenderer).toHaveBeenCalledWith({
         canvas,
         antialias: true,
+        alpha: true,
       });
     });
 
