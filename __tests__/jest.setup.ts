@@ -168,6 +168,11 @@ jest.mock("three", () => ({
   AdditiveBlending: 2,
   EdgesGeometry: jest.fn(() => ({ dispose: jest.fn() })),
   LineBasicMaterial: jest.fn(() => ({ dispose: jest.fn() })),
+  LineLoop: jest.fn((geometry: unknown, material: unknown) => ({
+    geometry,
+    material,
+    frustumCulled: true,
+  })),
   LineSegments: jest.fn((geometry: unknown, material: unknown) => ({
     geometry,
     material,

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { PerfectRings } from "./PerfectRings";
 
 export interface LandingSurface {
   x: number;
@@ -31,10 +32,12 @@ export class SuccessParticles {
   private readonly sizeAttribute = new THREE.BufferAttribute(this.sizes, 1);
   private readonly material: THREE.ShaderMaterial;
   private readonly points: THREE.Points;
+  private readonly rings: PerfectRings;
   private cursor = 0;
   private lastTime = 0;
 
   constructor(private scene: THREE.Scene) {
+    this.rings = new PerfectRings(scene);
     this.geometry.setAttribute("position", this.positionAttribute);
     this.geometry.setAttribute("aOpacity", this.opacityAttribute);
     this.geometry.setAttribute("aColor", this.colorAttribute);
@@ -60,8 +63,9 @@ export class SuccessParticles {
     this.scene.add(this.points);
   }
 
-  public emit(surface: LandingSurface, now: number): void {
-    for (let i = 0; i < 18; i++) {
+  public emit(surface: LandingSurface, now: number, perfect = false): void {
+    if (perfect) this.rings.emit(surface, now);
+    for (let i = 0; i < (perfect ? 44 : 18); i++) {
       const slot = this.cursor++ % this.capacity;
       const offset = slot * 3;
       const side = i % 4;
@@ -76,10 +80,10 @@ export class SuccessParticles {
       this.velocities[offset] = dx * (0.7 + Math.random());
       this.velocities[offset + 1] = 0.6 + Math.random() * 0.8;
       this.velocities[offset + 2] = dz * (0.7 + Math.random());
-      this.colors.set([0.55, 0.9, 1], offset);
+      this.colors.set(perfect ? [1, 0.8, 0.3] : [0.55, 0.9, 1], offset);
       this.sizes[slot] = 5 + Math.random() * 3;
       this.born[slot] = now;
-      this.lifetime[slot] = 650 + Math.random() * 350;
+      this.lifetime[slot] = (perfect ? 1000 : 650) + Math.random() * 350;
       this.opacity[slot] = 1;
     }
     this.colorAttribute.needsUpdate = true;
@@ -89,6 +93,7 @@ export class SuccessParticles {
   }
 
   public update(now: number): void {
+    this.rings.update(now);
     const dt = Math.min(Math.max((now - this.lastTime) / 1000, 0), 0.05);
     this.lastTime = now;
     for (let slot = 0; slot < this.capacity; slot++) {
@@ -114,11 +119,13 @@ export class SuccessParticles {
     return this.born.reduce((count, time) => count + (time >= 0 ? 1 : 0), 0);
   }
   public clear(): void {
+    this.rings.clear();
     this.born.fill(-1);
     this.opacity.fill(0);
     this.opacityAttribute.needsUpdate = true;
   }
   public dispose(): void {
+    this.rings.dispose();
     this.clear();
     this.scene.remove(this.points);
     this.geometry.dispose();

@@ -40,7 +40,8 @@ export class TowerDrop {
           width: block.sizes.width,
           depth: block.sizes.depth ?? 0,
         },
-        performance.now()
+        performance.now(),
+        detail.perfect
       );
     if (!detail.perfect) return;
     this.clearFeedback();
