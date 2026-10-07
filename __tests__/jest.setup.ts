@@ -79,11 +79,15 @@ const mockThreeMeshLambertMaterial = jest.fn(() => ({
   dispose: mockThreeMeshLambertMaterialDispose,
 }));
 const mockThreeMeshStandardMaterial = jest.fn(() => ({
+  emissive: { set: jest.fn() },
+  emissiveIntensity: 0,
   dispose: mockThreeMeshStandardMaterialDispose,
 }));
 const mockThreeMesh = jest.fn((geometry, material) => ({
   geometry,
   material,
+  add: jest.fn(),
+  remove: jest.fn(),
   position: {
     x: 0,
     y: 0,
@@ -144,6 +148,14 @@ jest.mock("three", () => ({
   BoxGeometry: mockThreeBoxGeometry,
   MeshLambertMaterial: mockThreeMeshLambertMaterial,
   MeshStandardMaterial: mockThreeMeshStandardMaterial,
+  DataTexture: jest.fn(() => ({ dispose: jest.fn() })),
+  RGBAFormat: 1023,
+  EdgesGeometry: jest.fn(() => ({ dispose: jest.fn() })),
+  LineBasicMaterial: jest.fn(() => ({ dispose: jest.fn() })),
+  LineSegments: jest.fn((geometry: unknown, material: unknown) => ({
+    geometry,
+    material,
+  })),
   Mesh: mockThreeMesh,
   Color: mockThreeColor,
   Vector3: mockThreeVector3,

@@ -1,7 +1,13 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
 import { Atmosphere } from "@/visual/Atmosphere";
-import { VISUAL_THEME, blockColor } from "@/config/visualTheme";
+import {
+  createBlockMaterial,
+  restoreBlockGlow,
+  addBlockOutline,
+  releaseBlockOutline,
+} from "@/visual/blockMaterials";
+import { VISUAL_THEME } from "@/config/visualTheme";
 import { GAME_CONFIG, STATE_EVENT, LANDED_EVENT } from "@/config/gameConfig";
 import type {
   Difficulty,
@@ -19,7 +25,7 @@ import type { GameState } from "@/types/states";
 import type { Page } from "@/types/pages";
 
 export class TowerDrop {
-  private feedbackMaterial: THREE.MeshLambertMaterial | undefined;
+  private feedbackMaterial: THREE.MeshStandardMaterial | undefined;
   private feedbackUntil = 0;
   private onLanded = (event: Event): void => {
     const detail = (event as CustomEvent<LandedDetail>).detail;
@@ -39,8 +45,7 @@ export class TowerDrop {
     }
   };
   private clearFeedback(): void {
-    this.feedbackMaterial?.emissive.set("#000000");
-    if (this.feedbackMaterial) this.feedbackMaterial.emissiveIntensity = 0;
+    if (this.feedbackMaterial) restoreBlockGlow(this.feedbackMaterial);
     this.feedbackMaterial = undefined;
   }
 
@@ -239,6 +244,7 @@ export class TowerDrop {
     for (const block of allBlocks) {
       const mesh = block.mesh;
 
+      releaseBlockOutline(mesh);
       mesh.geometry.dispose();
 
       const material = mesh.material as
@@ -497,12 +503,12 @@ export class TowerDrop {
       sizes.depth
     );
 
-    const color = new THREE.Color(
-      blockColor(isBlockFalling ? blocks.length - 1 : blocks.length)
+    const material = createBlockMaterial(
+      isBlockFalling ? blocks.length - 1 : blocks.length
     );
-    const material = new THREE.MeshLambertMaterial({ color: color });
 
     const mesh = new THREE.Mesh(geometry, material);
+    addBlockOutline(mesh);
     mesh.position.set(x!, y!, z!);
     this.scene.add(mesh);
 
@@ -603,6 +609,7 @@ export class TowerDrop {
     const allBlocks = blocks.concat(fallBlocks);
 
     for (const block of allBlocks) {
+      releaseBlockOutline(block.mesh);
       block.mesh.geometry.dispose();
 
       const material = block.mesh.material as

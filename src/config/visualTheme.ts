@@ -6,4 +6,4 @@ export const VISUAL_THEME = {
   feedback: { color: "#fff4ad", durationMs: 320, intensity: 0.8 },
 } as const;
 export const blockColor = (layer: number): string =>
-  `hsl(${195 + (layer % 24) * 5}, 65%, 62%)`;
+  `hsl(${195 + (layer % 24) * 5}, 58%, 67%)`;
