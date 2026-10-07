@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
+import { VISUAL_THEME, blockColor } from "@/config/visualTheme";
 import { GAME_CONFIG, STATE_EVENT, LANDED_EVENT } from "@/config/gameConfig";
 import type {
   Difficulty,
@@ -17,6 +18,25 @@ import type { GameState } from "@/types/states";
 import type { Page } from "@/types/pages";
 
 export class TowerDrop {
+  private feedbackMaterial: THREE.MeshLambertMaterial | undefined;
+  private feedbackUntil = 0;
+  private onLanded = (event: Event): void => {
+    const detail = (event as CustomEvent<LandedDetail>).detail;
+    if (!detail.perfect) return;
+    this.clearFeedback();
+    const material = this.gameState.blocks[detail.index]?.mesh.material;
+    if (!material) return;
+    material.emissive.set(VISUAL_THEME.feedback.color);
+    material.emissiveIntensity = VISUAL_THEME.feedback.intensity;
+    this.feedbackMaterial = material;
+    this.feedbackUntil = performance.now() + VISUAL_THEME.feedback.durationMs;
+  };
+  private clearFeedback(): void {
+    this.feedbackMaterial?.emissive.set("#000000");
+    if (this.feedbackMaterial) this.feedbackMaterial.emissiveIntensity = 0;
+    this.feedbackMaterial = undefined;
+  }
+
   private scene: THREE.Scene;
   private camera: THREE.OrthographicCamera;
   private renderer: THREE.WebGLRenderer;
@@ -80,6 +100,8 @@ export class TowerDrop {
     private container: Page
   ) {
     this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(VISUAL_THEME.background);
+    this.container.addEventListener(LANDED_EVENT, this.onLanded);
 
     this.world = new CANNON.World();
 
@@ -123,8 +145,14 @@ export class TowerDrop {
   }
 
   private addLights(): void {
-    const ambientLight = new THREE.AmbientLight("#FFFFFF", 0.6);
-    const directionalLight = new THREE.DirectionalLight("#FFFFFF", 0.6);
+    const ambientLight = new THREE.AmbientLight(
+      VISUAL_THEME.ambient.color,
+      VISUAL_THEME.ambient.intensity
+    );
+    const directionalLight = new THREE.DirectionalLight(
+      VISUAL_THEME.key.color,
+      VISUAL_THEME.key.intensity
+    );
 
     directionalLight.position.set(10, 20, 0);
 
@@ -188,6 +216,7 @@ export class TowerDrop {
   }
 
   private initialConfigGame(): void {
+    this.clearFeedback();
     const { blocks, fallBlocks } = this.gameState;
 
     const allBlocks: Block[] = blocks.concat(fallBlocks);
@@ -243,6 +272,7 @@ export class TowerDrop {
   }
 
   private render(): void {
+    if (performance.now() >= this.feedbackUntil) this.clearFeedback();
     this.renderer.setSize(this.sizes.width, this.sizes.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -452,7 +482,9 @@ export class TowerDrop {
       sizes.depth
     );
 
-    const color = new THREE.Color(`hsl(${30 + blocks.length * 4}, 100%, 50%)`);
+    const color = new THREE.Color(
+      blockColor(isBlockFalling ? blocks.length - 1 : blocks.length)
+    );
     const material = new THREE.MeshLambertMaterial({ color: color });
 
     const mesh = new THREE.Mesh(geometry, material);
@@ -539,6 +571,8 @@ export class TowerDrop {
   }
 
   public dispose(): void {
+    this.container.removeEventListener(LANDED_EVENT, this.onLanded);
+    this.clearFeedback();
     this.stopAnimation();
 
     window.removeEventListener("resize", this.boundOnWindowResize);

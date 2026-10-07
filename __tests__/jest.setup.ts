@@ -74,6 +74,8 @@ const mockThreeBoxGeometry = jest.fn(() => ({
   dispose: mockThreeBoxGeometryDispose,
 }));
 const mockThreeMeshLambertMaterial = jest.fn(() => ({
+  emissive: { set: jest.fn() },
+  emissiveIntensity: 0,
   dispose: mockThreeMeshLambertMaterialDispose,
 }));
 const mockThreeMeshStandardMaterial = jest.fn(() => ({
