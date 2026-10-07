@@ -17,7 +17,7 @@ describe("TowerDropPage", () => {
   it("shows round statistics and resets the summary on restart", () => {
     jest.spyOn(Math, "random").mockReturnValue(0);
     renderPage();
-    screen.getByRole("button", { name: "Start game" }).click();
+    screen.getByRole("button", { name: /开始游戏|再玩一次/ }).click();
     for (let i = 0; i < 5; i++) window.dispatchEvent(new MouseEvent("click"));
     screen.getByRole("button", { name: /从容节奏/ }).click();
     const moving = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
@@ -31,7 +31,7 @@ describe("TowerDropPage", () => {
     expect(document.querySelector(".run-summary")).toHaveTextContent(
       "最长连击 5"
     );
-    screen.getByRole("button", { name: "Start game" }).click();
+    screen.getByRole("button", { name: /开始游戏|再玩一次/ }).click();
     expect(document.querySelector(".run-summary")).not.toBeVisible();
     expect(document.querySelector(".run-bonuses")).toHaveTextContent(
       "暂无加成"
@@ -40,7 +40,7 @@ describe("TowerDropPage", () => {
   it("shows three reward cards after five landings and resumes without an extra drop", () => {
     jest.spyOn(Math, "random").mockReturnValue(0);
     renderPage();
-    screen.getByRole("button", { name: "Start game" }).click();
+    screen.getByRole("button", { name: /开始游戏|再玩一次/ }).click();
     for (let i = 0; i < 5; i++) window.dispatchEvent(new MouseEvent("click"));
     expect(screen.getByRole("dialog")).toBeVisible();
     expect(screen.getAllByRole("button")).toHaveLength(3);
@@ -112,22 +112,23 @@ describe("TowerDropPage", () => {
     it("should render the last score heading with initial value", () => {
       renderPage();
       expect(
-        screen.getByRole("heading", { name: /Last Score: 0/i, level: 2 })
+        screen.getByRole("heading", { name: /准备好挑战了吗/i, level: 2 })
       ).toBeInTheDocument();
     });
 
     it("should render the play button", () => {
       renderPage();
       expect(
-        screen.getByRole("button", { name: "Start game" })
+        screen.getByRole("button", { name: "开始游戏" })
       ).toBeInTheDocument();
     });
 
     it("should render the play button with the correct id", () => {
       renderPage();
-      expect(
-        screen.getByRole("button", { name: "Start game" })
-      ).toHaveAttribute("id", "playbtn");
+      expect(screen.getByRole("button", { name: "开始游戏" })).toHaveAttribute(
+        "id",
+        "playbtn"
+      );
     });
 
     it("should render the play button inside the menu wrapper", () => {

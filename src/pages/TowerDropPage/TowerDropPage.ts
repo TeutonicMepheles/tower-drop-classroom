@@ -1,75 +1,67 @@
-import { STATE_EVENT } from "@/config/gameConfig";
-import type { Difficulty, GameSnapshot } from "@/config/gameConfig";
+import type { Page } from "@/types/pages";
+import Button from "@/components/Button/Button";
+import { TowerDrop } from "@/core/TowerDrop";
 import { REWARDS } from "@/config/rewards";
 import type { RewardId } from "@/config/rewards";
-
-import type { Page } from "@/types/pages";
-
-import Button from "@/components/Button/Button";
-
-import { TowerDrop } from "@/core/TowerDrop";
-
+import { STATE_EVENT } from "@/config/gameConfig";
+import type { Difficulty, GameSnapshot } from "@/config/gameConfig";
 import "@/pages/TowerDropPage/TowerDropPage.css";
 
 const TowerDropPage = (): Page => {
   const main = document.createElement("main") as Page;
   main.className = "tower-drop-page";
-
+  main.dataset.phase = "ready";
   main.innerHTML = `
-    <canvas class="tower-drop__webgl" tabindex="-1"></canvas>
-
+    <canvas class="tower-drop__webgl" aria-label="三维堆塔游戏" tabindex="-1"></canvas>
     <div class="tower-drop__container" id="mainContainer">
-        <p class="tower-drop__score" data-game-score>0</p><p class="gameplay-status" aria-live="polite">Ready · Normal</p>
-        <aside class="run-progress" aria-live="polite"><p class="run-record"></p><p class="run-bonuses"></p><p class="run-feedback"></p></aside>
+      <section class="game-hud" aria-label="游戏状态">
+        <div><span class="hud-label">得分</span><p class="tower-drop__score" data-game-score>0</p></div>
+        <div><span class="hud-label">层数</span><strong data-game-layers>0</strong></div>
+        <div><span class="hud-label">完美连击</span><strong data-game-streak>0</strong></div>
+      </section>
+      <p class="game-feedback" aria-live="polite"></p>
+      <p class="gameplay-status" aria-live="polite"></p><aside class="run-progress"><p class="run-record"></p><p class="run-bonuses"></p><p class="run-feedback"></p></aside>
         <section class="reward-panel" role="dialog" aria-modal="true" aria-labelledby="reward-title" data-game-control hidden>
           <div class="reward-panel__content"><h2 id="reward-title">选择本局加成</h2><p>游戏已暂停。选择一个奖励后继续堆叠。</p><div class="reward-cards"></div></div>
         </section>
 
-        <div class="tower-drop__menu">
-            <div class="tower-drop__menu-wrapper">
-                <h1 class="tower-drop__title">Tower Drop</h1>
-                <h2 class="tower-drop__last-score">Last Score: 0</h2>
-                <div class="run-summary" hidden></div>
-                <label data-game-control>Difficulty
-                  <select aria-label="Difficulty"><option value="normal">Normal</option><option value="easy">Easy</option></select>
-                </label>
-                <p>点击堆叠；每成功 5 层选择一次加成。速度不会自动增加。</p>
-            </div>
+      <div class="tower-drop__menu">
+        <div class="tower-drop__menu-wrapper">
+          <p class="eyebrow">RIDER × GITHUB · 团队练习</p>
+          <h1 class="tower-drop__title">Tower Drop</h1>
+          <p class="menu-subtitle">找准时机，一层一层搭起你的塔。</p>
+          <h2 class="tower-drop__last-score">准备好挑战了吗？</h2>
+          <p class="round-summary"></p><div class="run-summary" hidden></div>
+          <fieldset data-game-control>
+            <legend>选择难度</legend>
+            <label><input type="radio" name="difficulty" value="easy"> 简单 <small>速度较慢 · 对齐更宽容</small></label>
+            <label><input type="radio" name="difficulty" value="normal" checked> 普通 <small>标准速度 · 挑战精准度</small></label>
+          </fieldset>
+          <p class="instructions">点击游戏区域落块。连续完美落块，每层可获得 1–5 分。</p>
         </div>
-    </div>
-  `;
-
-  const canvas = main.querySelector<HTMLCanvasElement>(".tower-drop__webgl");
-  const towerDropMenuWrapper = main.querySelector<HTMLDivElement>(
-    ".tower-drop__menu-wrapper"
-  );
-
+      </div>
+      <p class="play-hint">点击空白区域落块 · 对齐方块以获得完美连击</p>
+    </div>`;
   const playButton = Button({
     id: "playbtn",
-    ariaLabel: "Start game",
+    ariaLabel: "开始游戏",
     className: "tower-drop__button",
-    children: "开始堆叠",
+    children: "开始游戏",
   });
-
-  towerDropMenuWrapper?.append(playButton);
-
-  const game = new TowerDrop(canvas!, main);
-
-  const select = main.querySelector<HTMLSelectElement>("select")!;
+  main.querySelector(".tower-drop__menu-wrapper")!.append(playButton);
+  const game = new TowerDrop(main.querySelector("canvas")!, main);
+  const feedback = main.querySelector<HTMLElement>(".game-feedback")!;
+  const canvas = main.querySelector<HTMLCanvasElement>("canvas")!;
   const status = main.querySelector<HTMLElement>(".gameplay-status")!;
   const rewardPanel = main.querySelector<HTMLElement>(".reward-panel")!;
   const cards = main.querySelector<HTMLElement>(".reward-cards")!;
   const record = main.querySelector<HTMLElement>(".run-record")!;
   const bonuses = main.querySelector<HTMLElement>(".run-bonuses")!;
-  const feedback = main.querySelector<HTMLElement>(".run-feedback")!;
+  const runFeedback = main.querySelector<HTMLElement>(".run-feedback")!;
   const summary = main.querySelector<HTMLElement>(".run-summary")!;
-  const onDifficulty = (): void => {
-    game.setDifficulty(select.value as Difficulty);
-    playButton.textContent = `Play · ${select.value === "easy" ? "Easy" : "Normal"}`;
-  };
-  const onState = (event: Event): void => {
-    const state = (event as CustomEvent<GameSnapshot>).detail;
-    select.disabled = state.phase === "playing" || state.phase === "reward";
+  let feedbackTimer: ReturnType<typeof setTimeout> | undefined;
+  const update = (state: Readonly<GameSnapshot>): void => {
+    main.dataset.phase = state.phase;
     const phaseLabel = {
       ready: "准备开始",
       playing: "堆叠中",
@@ -82,7 +74,7 @@ const TowerDropPage = (): Page => {
       (id) => state.rewards[id] > 0
     );
     bonuses.textContent = `护盾 ${state.shields}/2 · ${acquired.length ? acquired.map((id) => `${REWARDS[id].title} ×${state.rewards[id]}`).join(" · ") : "暂无加成"}`;
-    feedback.textContent =
+    runFeedback.textContent =
       state.lastResult === "rescue"
         ? "护盾已救援！本层重新挑战，连击清零。"
         : state.phase === "reward"
@@ -111,7 +103,46 @@ const TowerDropPage = (): Page => {
         })
       );
       cards.querySelector("button")?.focus();
-    } else if (wasReward) canvas?.focus();
+    } else if (wasReward) canvas.focus();
+
+    main.querySelector<HTMLElement>("[data-game-score]")!.textContent = String(
+      state.score
+    );
+    main.querySelector<HTMLElement>("[data-game-layers]")!.textContent = String(
+      state.layers
+    );
+    main.querySelector<HTMLElement>("[data-game-streak]")!.textContent = String(
+      state.perfectStreak
+    );
+    main
+      .querySelectorAll<HTMLInputElement>('input[name="difficulty"]')
+      .forEach((input) => {
+        input.disabled = state.phase === "playing" || state.phase === "reward";
+      });
+    if (feedbackTimer) clearTimeout(feedbackTimer);
+    feedback.textContent =
+      state.lastResult === "perfect" ? `完美！${state.perfectStreak} 连击` : "";
+    if (feedback.textContent)
+      feedbackTimer = setTimeout(() => {
+        feedback.textContent = "";
+      }, 1000);
+    if (state.phase === "ended") {
+      main.querySelector<HTMLElement>(".tower-drop__last-score")!.textContent =
+        `本局得分：${state.score}`;
+      main.querySelector<HTMLElement>(".round-summary")!.textContent =
+        `完成 ${state.layers} 层 · ${state.difficulty === "easy" ? "简单" : "普通"}难度`;
+      playButton.textContent = "再玩一次";
+      playButton.setAttribute("aria-label", "再玩一次");
+      playButton.focus();
+    }
+  };
+  const onState = (event: Event): void => {
+    update((event as CustomEvent<GameSnapshot>).detail);
+  };
+  const onDifficulty = (event: Event): void => {
+    const target = event.target;
+    if (target instanceof HTMLInputElement && target.name === "difficulty")
+      game.setDifficulty(target.value as Difficulty);
   };
   const onReward = (event: Event): void => {
     const button = (event.target as Element).closest<HTMLButtonElement>(
@@ -130,22 +161,19 @@ const TowerDropPage = (): Page => {
   };
   cards.addEventListener("click", onReward);
   rewardPanel.addEventListener("keydown", onRewardKey);
-  select.addEventListener("change", onDifficulty);
+
   main.addEventListener(STATE_EVENT, onState);
-  onState(
-    new CustomEvent<GameSnapshot>(STATE_EVENT, { detail: game.getSnapshot() })
-  );
+  main.addEventListener("change", onDifficulty);
+  update(game.getSnapshot());
   main.cleanup = (): void => {
-    select.removeEventListener("change", onDifficulty);
     main.removeEventListener(STATE_EVENT, onState);
+    main.removeEventListener("change", onDifficulty);
+    if (feedbackTimer) clearTimeout(feedbackTimer);
     cards.removeEventListener("click", onReward);
     rewardPanel.removeEventListener("keydown", onRewardKey);
     game.dispose();
-
     playButton.cleanup?.();
   };
-
   return main;
 };
-
 export default TowerDropPage;

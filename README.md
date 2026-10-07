@@ -6,9 +6,9 @@
 
 ## 当前状态
 
-本分支为 A·玩法 已实现版本：实现简单 / 普通难度、完美拼接与连击、每五层随机奖励、六种基础/续航加成、护盾救援、成长展示和分难度本地纪录。移动不自动加速，以持续堆叠和冲纪录为主。保留 A 分支原视觉，尚未整合 B/C。
+最终整合版包含 A·玩法的简单 / 普通难度、完美拼接与连击、每五层随机奖励、六种基础/续航加成、护盾救援和分难度本地纪录；B·美术的动态背景、雾效、差异材质、成功粒子与完美光环；C·UI 的中文菜单、难度选择、状态展示与重开流程。移动不自动加速，以持续堆叠和冲纪录为主。
 
-详细状态和验证见 [分支成果](docs/teaching/a-gameplay-status.md)。main 仍保留课堂起点。完整肉鸽玩法与验收见 [玩法深化说明](docs/teaching/gameplay-complete.md)。
+合并结果和验证见 [最终整合说明](docs/teaching/integration-status.md)。各角色的阶段文档保留备课过程，涉及“尚未整合”的描述为当时状态。课堂起点仍可通过 `classroom-start` 查看；完整肉鸽玩法见 [玩法深化说明](docs/teaching/gameplay-complete.md)。
 
 ## 启动
 
@@ -43,4 +43,4 @@ A / B / C 分别使用 3101 / 3102 / 3103；访问对应 localhost 端口。Vite
 
 ## CI 与课堂存档
 
-GitHub Actions 只检查 lint、类型、测试、build，不发布 Docker 镜像、不连接原作者服务器。`classroom-start` 保存教学基线；完成并实际验收后再创建 `classroom-finished`，目前不宣称最终版本已完成。
+GitHub Actions 只检查 lint、类型、测试、build，不发布 Docker 镜像、不连接原作者服务器。`classroom-start` 保存教学基线；main 保存三个 PR 合并后的完整版本。课堂可在 Git Log 对比基线、角色提交和合并提交。
