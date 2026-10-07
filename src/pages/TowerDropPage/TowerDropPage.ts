@@ -1,7 +1,7 @@
 import type { Page } from "@/types/pages";
 import Button from "@/components/Button/Button";
 import { TowerDrop } from "@/core/TowerDrop";
-import { STATE_EVENT } from "@/config/gameConfig";
+const STATE_EVENT = "tower-drop:status"; // 教学故障：核心仍发送 tower-drop:state
 import type { Difficulty, GameSnapshot } from "@/config/gameConfig";
 import "@/pages/TowerDropPage/TowerDropPage.css";
 
