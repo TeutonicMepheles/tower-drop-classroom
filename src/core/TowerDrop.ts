@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
 import { Atmosphere } from "@/visual/Atmosphere";
+import { SuccessParticles } from "@/visual/SuccessParticles";
 import {
   createBlockMaterial,
   restoreBlockGlow,
@@ -29,6 +30,18 @@ export class TowerDrop {
   private feedbackUntil = 0;
   private onLanded = (event: Event): void => {
     const detail = (event as CustomEvent<LandedDetail>).detail;
+    const block = this.gameState.blocks[detail.index];
+    if (block)
+      this.particles.emit(
+        {
+          x: block.mesh.position.x,
+          y: block.mesh.position.y - this.blockSizes.height / 2,
+          z: block.mesh.position.z,
+          width: block.sizes.width,
+          depth: block.sizes.depth ?? 0,
+        },
+        performance.now()
+      );
     if (!detail.perfect) return;
     this.clearFeedback();
     const material = this.gameState.blocks[detail.index]?.mesh.material;
@@ -41,6 +54,7 @@ export class TowerDrop {
   private onRoundState = (event: Event): void => {
     if ((event as CustomEvent<GameSnapshot>).detail.phase !== "playing") {
       this.clearFeedback();
+      this.particles.clear();
       this.render();
     }
   };
@@ -50,6 +64,7 @@ export class TowerDrop {
   }
 
   private atmosphere: Atmosphere;
+  private particles: SuccessParticles;
   private scene: THREE.Scene;
   private camera: THREE.OrthographicCamera;
   private renderer: THREE.WebGLRenderer;
@@ -119,6 +134,7 @@ export class TowerDrop {
       VISUAL_THEME.fog.density
     );
     this.atmosphere = new Atmosphere(this.container);
+    this.particles = new SuccessParticles(this.scene);
     this.container.addEventListener(LANDED_EVENT, this.onLanded);
     this.container.addEventListener(STATE_EVENT, this.onRoundState);
 
@@ -237,6 +253,7 @@ export class TowerDrop {
 
   private initialConfigGame(): void {
     this.clearFeedback();
+    this.particles.clear();
     const { blocks, fallBlocks } = this.gameState;
 
     const allBlocks: Block[] = blocks.concat(fallBlocks);
@@ -293,6 +310,7 @@ export class TowerDrop {
   }
 
   private render(): void {
+    this.particles.update(performance.now());
     if (performance.now() >= this.feedbackUntil) this.clearFeedback();
     this.renderer.setSize(this.sizes.width, this.sizes.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -387,11 +405,6 @@ export class TowerDrop {
     this.snapshot.layers += 1;
     this.snapshot.lastResult = perfect ? "perfect" : "normal";
     if (score) score.textContent = String(this.snapshot.score);
-    this.container.dispatchEvent(
-      new CustomEvent<LandedDetail>(LANDED_EVENT, {
-        detail: { perfect, index: blocks.length - 1 },
-      })
-    );
     this.publishState();
 
     const newBlockWidth = direction === "x" ? overlap : topBlock.sizes.width;
@@ -438,6 +451,11 @@ export class TowerDrop {
         },
       });
 
+    this.container.dispatchEvent(
+      new CustomEvent<LandedDetail>(LANDED_EVENT, {
+        detail: { perfect, index: blocks.length - 1 },
+      })
+    );
     const newBlockX = direction === "x" ? topBlock.mesh.position.x : -10;
     const newBlockZ = direction === "z" ? topBlock.mesh.position.z : -10;
 
@@ -593,6 +611,7 @@ export class TowerDrop {
 
   public dispose(): void {
     this.atmosphere.dispose();
+    this.particles.dispose();
     this.container.removeEventListener(LANDED_EVENT, this.onLanded);
     this.container.removeEventListener(STATE_EVENT, this.onRoundState);
     this.clearFeedback();

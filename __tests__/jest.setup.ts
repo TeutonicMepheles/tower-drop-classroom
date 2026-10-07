@@ -150,6 +150,22 @@ jest.mock("three", () => ({
   MeshStandardMaterial: mockThreeMeshStandardMaterial,
   DataTexture: jest.fn(() => ({ dispose: jest.fn() })),
   RGBAFormat: 1023,
+  BufferGeometry: jest.fn(() => ({
+    setAttribute: jest.fn(),
+    dispose: jest.fn(),
+  })),
+  BufferAttribute: jest.fn((array: unknown, itemSize: number) => ({
+    array,
+    itemSize,
+    needsUpdate: false,
+  })),
+  ShaderMaterial: jest.fn(() => ({ dispose: jest.fn() })),
+  Points: jest.fn((geometry: unknown, material: unknown) => ({
+    geometry,
+    material,
+    frustumCulled: true,
+  })),
+  AdditiveBlending: 2,
   EdgesGeometry: jest.fn(() => ({ dispose: jest.fn() })),
   LineBasicMaterial: jest.fn(() => ({ dispose: jest.fn() })),
   LineSegments: jest.fn((geometry: unknown, material: unknown) => ({
