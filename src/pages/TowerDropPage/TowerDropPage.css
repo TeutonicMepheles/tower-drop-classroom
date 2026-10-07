@@ -155,3 +155,43 @@
     font-size: 13px;
   }
 }
+
+.run-progress {
+  position: absolute;
+  top: 10rem;
+  left: 2.813rem;
+  right: 2rem;
+  color: #e7f7ed;
+  pointer-events: none;
+  max-width: 760px;
+  line-height: 1.7;
+  font-size: 14px;
+}
+.run-feedback {
+  color: #fff3a2;
+}
+.run-summary {
+  text-align: center;
+  line-height: 1.8;
+  color: #fff3a2;
+  max-width: 560px;
+}
+.tower-drop__menu-wrapper {
+  height: auto;
+  min-height: 50%;
+  gap: 18px;
+}
+.reward-cards:has(button:only-child) {
+  grid-template-columns: 1fr;
+}
+@media (max-width: 600px) {
+  .run-progress {
+    left: 16px;
+    right: 16px;
+    top: 10rem;
+    font-size: 12px;
+  }
+  .tower-drop__menu-wrapper {
+    width: 90%;
+  }
+}

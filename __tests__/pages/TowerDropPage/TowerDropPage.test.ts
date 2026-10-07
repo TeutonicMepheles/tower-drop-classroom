@@ -14,7 +14,31 @@ const renderPage = (): Page => {
 };
 
 describe("TowerDropPage", () => {
+  it("shows round statistics and resets the summary on restart", () => {
+    jest.spyOn(Math, "random").mockReturnValue(0);
+    renderPage();
+    screen.getByRole("button", { name: "Start game" }).click();
+    for (let i = 0; i < 5; i++) window.dispatchEvent(new MouseEvent("click"));
+    screen.getByRole("button", { name: /从容节奏/ }).click();
+    const moving = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
+      .value as THREE.Mesh;
+    moving.position.x = moving.position.z = 4;
+    window.dispatchEvent(new MouseEvent("click"));
+    expect(document.querySelector(".run-summary")).toBeVisible();
+    expect(document.querySelector(".run-summary")).toHaveTextContent(
+      "完美 5 次"
+    );
+    expect(document.querySelector(".run-summary")).toHaveTextContent(
+      "最长连击 5"
+    );
+    screen.getByRole("button", { name: "Start game" }).click();
+    expect(document.querySelector(".run-summary")).not.toBeVisible();
+    expect(document.querySelector(".run-bonuses")).toHaveTextContent(
+      "暂无加成"
+    );
+  });
   it("shows three reward cards after five landings and resumes without an extra drop", () => {
+    jest.spyOn(Math, "random").mockReturnValue(0);
     renderPage();
     screen.getByRole("button", { name: "Start game" }).click();
     for (let i = 0; i < 5; i++) window.dispatchEvent(new MouseEvent("click"));
@@ -35,7 +59,7 @@ describe("TowerDropPage", () => {
     screen.getByRole("button", { name: /从容节奏/ }).click();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(document.querySelector(".gameplay-status")).toHaveTextContent(
-      "5 layers"
+      "5 层"
     );
     expect(document.querySelector(".gameplay-status")).toHaveTextContent(
       "减速 1/3"
