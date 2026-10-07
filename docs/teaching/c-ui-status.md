@@ -16,7 +16,7 @@ setDifficulty(easy | normal) 仅开始前有效；getSnapshot() 返回副本；t
 
 浏览器 WebGL 已运行；A 验证简单难度开始与真实落块计分，B 验证场景与真实落块计分，C 验证难度选择、开始、失败总结、重开。自动化 WebGL mock 测试不等于全部实机验收；窄屏 CSS 已实现，尚未逐个设备实测。bundle >500kB 为继承的构建警告，不阻止构建。
 
-![分支画面](screenshots/head-menu.png)
+![分支画面](screenshots/c-ui-head-menu.png)
 
 ## 课堂使用
 
