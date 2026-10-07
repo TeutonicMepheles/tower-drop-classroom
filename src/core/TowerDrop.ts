@@ -1,5 +1,11 @@
 import * as THREE from "three";
 import * as CANNON from "cannon";
+import {
+  REWARD_INTERVAL,
+  emptyRewards,
+  availableRewards,
+} from "@/config/rewards";
+import type { RewardId } from "@/config/rewards";
 import { GAME_CONFIG, STATE_EVENT, LANDED_EVENT } from "@/config/gameConfig";
 import type {
   Difficulty,
@@ -39,10 +45,17 @@ export class TowerDrop {
     layers: 0,
     perfectStreak: 0,
     lastResult: "none",
+    rewards: emptyRewards(),
+    rewardChoices: [],
+    layersUntilReward: REWARD_INTERVAL,
   };
 
   public getSnapshot(): Readonly<GameSnapshot> {
-    return { ...this.snapshot };
+    return {
+      ...this.snapshot,
+      rewards: { ...this.snapshot.rewards },
+      rewardChoices: [...this.snapshot.rewardChoices],
+    };
   }
 
   public setDifficulty(difficulty: Difficulty): void {
@@ -55,9 +68,60 @@ export class TowerDrop {
   private publishState(): void {
     this.container.dispatchEvent(
       new CustomEvent<GameSnapshot>(STATE_EVENT, {
-        detail: { ...this.snapshot },
+        detail: this.getSnapshot(),
       })
     );
+  }
+
+  public chooseReward(id: RewardId): boolean {
+    if (
+      this.snapshot.phase !== "reward" ||
+      !this.snapshot.rewardChoices.includes(id)
+    )
+      return false;
+    this.snapshot.rewards[id] += 1;
+    if (id === "repair") {
+      for (const block of this.gameState.blocks.slice(-2)) {
+        block.sizes.width = Math.min(
+          this.blockSizes.width,
+          block.sizes.width + 0.3
+        );
+        block.sizes.depth = Math.min(
+          this.blockSizes.depth!,
+          block.sizes.depth! + 0.3
+        );
+        block.mesh.geometry.dispose();
+        block.mesh.geometry = new THREE.BoxGeometry(
+          block.sizes.width,
+          block.sizes.height,
+          block.sizes.depth
+        );
+        block.mesh.scale.x = block.mesh.scale.y = block.mesh.scale.z = 1;
+        block.body.shapes = [];
+        block.body.shapeOffsets = [];
+        block.body.shapeOrientations = [];
+        block.body.addShape(
+          new CANNON.Box(
+            new CANNON.Vec3(
+              block.sizes.width / 2,
+              block.sizes.height / 2,
+              block.sizes.depth / 2
+            )
+          )
+        );
+        block.body.aabbNeedsUpdate = true;
+      }
+    }
+    this.blockSpeed =
+      GAME_CONFIG[this.snapshot.difficulty].speed *
+      0.92 ** this.snapshot.rewards.slow;
+    this.snapshot.phase = "playing";
+    this.snapshot.rewardChoices = [];
+    this.snapshot.layersUntilReward = REWARD_INTERVAL;
+    this.publishState();
+    this.render();
+    this.startAnimation();
+    return true;
   }
 
   private gameState: GameState = {
@@ -72,6 +136,7 @@ export class TowerDrop {
   private boundOnGameStart: () => void;
 
   private isAnimating = false;
+  private lastFrameTime = 0;
 
   private btnPlay: HTMLButtonElement | null = null;
 
@@ -283,7 +348,7 @@ export class TowerDrop {
     const isControl =
       target instanceof Element &&
       target.closest("button, select, input, label, a, [data-game-control]");
-    if (!gameStarted || isControl) return;
+    if (!gameStarted || this.snapshot.phase !== "playing" || isControl) return;
 
     const topBlock = blocks[blocks.length - 1];
     const bottomBlock = blocks[blocks.length - 2];
@@ -295,7 +360,9 @@ export class TowerDrop {
     let delta =
       topBlock.mesh.position[direction] - bottomBlock.mesh.position[direction];
     const perfect =
-      Math.abs(delta) <= GAME_CONFIG[this.snapshot.difficulty].perfectTolerance;
+      Math.abs(delta) <=
+      GAME_CONFIG[this.snapshot.difficulty].perfectTolerance *
+        (1 + 0.2 * this.snapshot.rewards.precision);
     if (perfect) {
       topBlock.mesh.position[direction] = bottomBlock.mesh.position[direction];
       topBlock.body.position[direction] = bottomBlock.body.position[direction];
@@ -341,7 +408,6 @@ export class TowerDrop {
         detail: { perfect, index: blocks.length - 1 },
       })
     );
-    this.publishState();
 
     const newBlockWidth = direction === "x" ? overlap : topBlock.sizes.width;
     const newBlockDepth = direction === "z" ? overlap : topBlock.sizes.depth;
@@ -401,6 +467,16 @@ export class TowerDrop {
       },
       direction: newBlockDirection,
     });
+    this.snapshot.layersUntilReward =
+      REWARD_INTERVAL - (this.snapshot.layers % REWARD_INTERVAL);
+    if (this.snapshot.layers % REWARD_INTERVAL === 0) {
+      this.snapshot.phase = "reward";
+      this.snapshot.rewardChoices = availableRewards(this.snapshot.rewards);
+      this.snapshot.layersUntilReward = 0;
+      this.stopAnimation();
+      this.render();
+    }
+    this.publishState();
   }
 
   private onGameStart(): void {
@@ -421,7 +497,11 @@ export class TowerDrop {
       layers: 0,
       perfectStreak: 0,
       lastResult: "none",
+      rewards: emptyRewards(),
+      rewardChoices: [],
+      layersUntilReward: REWARD_INTERVAL,
     };
+    this.blockSpeed = GAME_CONFIG[this.snapshot.difficulty].speed;
     if (score) score.textContent = "0";
 
     if (score) {
@@ -487,8 +567,14 @@ export class TowerDrop {
     });
   }
 
-  private animate(): void {
+  private animate(time?: number): void {
     if (!this.isAnimating) return;
+    const frameScale =
+      time === undefined
+        ? 1
+        : Math.min(Math.max((time - this.lastFrameTime) / 1000, 0), 0.05) * 60;
+    this.lastFrameTime = time ?? performance.now();
+    const movement = this.blockSpeed * frameScale;
 
     const { blocks, isMovingForward } = this.gameState;
 
@@ -504,14 +590,14 @@ export class TowerDrop {
     );
 
     if (isMovingForward) {
-      topBlock.mesh.position[topBlock.direction!] -= this.blockSpeed;
-      topBlock.body.position[topBlock.direction!] -= this.blockSpeed;
+      topBlock.mesh.position[topBlock.direction!] -= movement;
+      topBlock.body.position[topBlock.direction!] -= movement;
       if (delta === -5) this.gameState.isMovingForward = false;
     }
 
     if (!isMovingForward) {
-      topBlock.mesh.position[topBlock.direction!] += this.blockSpeed;
-      topBlock.body.position[topBlock.direction!] += this.blockSpeed;
+      topBlock.mesh.position[topBlock.direction!] += movement;
+      topBlock.body.position[topBlock.direction!] += movement;
       if (delta === 5) this.gameState.isMovingForward = true;
     }
 
@@ -519,7 +605,7 @@ export class TowerDrop {
       this.camera.position.y <
       this.blockSizes.height * (blocks.length - 2) + 4
     ) {
-      this.camera.position.y += this.blockSpeed;
+      this.camera.position.y += movement;
     }
 
     this.updatePhysics();
@@ -529,6 +615,7 @@ export class TowerDrop {
   }
 
   private startAnimation(): void {
+    this.lastFrameTime = performance.now();
     this.isAnimating = true;
     this.renderer.setAnimationLoop(this.animate.bind(this));
   }

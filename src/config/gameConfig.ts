@@ -1,4 +1,5 @@
 export type Difficulty = "easy" | "normal";
+import type { RewardId, RewardLevels } from "./rewards";
 export const GAME_CONFIG = {
   easy: { speed: 0.026, perfectTolerance: 0.22 },
   normal: { speed: 0.039, perfectTolerance: 0.1 },
@@ -6,11 +7,14 @@ export const GAME_CONFIG = {
 
 export interface GameSnapshot {
   difficulty: Difficulty;
-  phase: "ready" | "playing" | "ended";
+  phase: "ready" | "playing" | "reward" | "ended";
   score: number;
   layers: number;
   perfectStreak: number;
   lastResult: "none" | "normal" | "perfect" | "miss";
+  rewards: RewardLevels;
+  rewardChoices: RewardId[];
+  layersUntilReward: number;
 }
 export const STATE_EVENT = "tower-drop:state";
 export const LANDED_EVENT = "tower-drop:landed";

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import * as CANNON from "cannon";
 import { TowerDrop } from "@/core/TowerDrop";
 import type { Page } from "@/types/pages";
 import { GAME_CONFIG, STATE_EVENT } from "@/config/gameConfig";
@@ -97,5 +98,103 @@ describe("classroom gameplay contract", () => {
       .querySelector("select")!
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
     expect(game.getSnapshot().layers).toBe(0);
+  });
+
+  const reachReward = (): void => {
+    for (let i = 0; i < 5; i++) click();
+    expect(game.getSnapshot().phase).toBe("reward");
+  };
+  it("keeps movement consistent across display refresh rates", () => {
+    jest.spyOn(performance, "now").mockReturnValue(1000);
+    start();
+    const renderer = (
+      THREE.WebGLRenderer as unknown as jest.Mock
+    ).mock.results.at(-1)!.value as { setAnimationLoop: jest.Mock };
+    const frame = renderer.setAnimationLoop.mock.calls.at(-1)![0] as (
+      time: number
+    ) => void;
+    const moving = latestMesh();
+    frame(1000 + 1000 / 120);
+    expect(moving.position.x).toBeCloseTo(GAME_CONFIG.normal.speed / 2);
+    frame(1000 + 1000 / 60);
+    expect(moving.position.x).toBeCloseTo(GAME_CONFIG.normal.speed);
+  });
+  it("pauses every five layers and accepts exactly one offered reward", () => {
+    start();
+    expect(game.chooseReward("repair")).toBe(false);
+    reachReward();
+    expect(game.getSnapshot().rewardChoices).toEqual([
+      "repair",
+      "slow",
+      "precision",
+    ]);
+    click();
+    expect(game.getSnapshot().layers).toBe(5);
+    game.setDifficulty("easy");
+    expect(game.getSnapshot().difficulty).toBe("normal");
+    expect(game.chooseReward("slow")).toBe(true);
+    expect(game.chooseReward("repair")).toBe(false);
+    expect(game.getSnapshot()).toMatchObject({
+      phase: "playing",
+      layersUntilReward: 5,
+      rewards: { slow: 1 },
+    });
+    reachReward();
+    expect(game.getSnapshot().layers).toBe(10);
+  });
+  it("repairs both axes, rebuilds geometry and collision shapes, and caps dimensions", () => {
+    start();
+    latestMesh().position.x = 0.5;
+    reachReward();
+    const moving = latestMesh();
+    expect(game.chooseReward("repair")).toBe(true);
+    expect(THREE.BoxGeometry).toHaveBeenLastCalledWith(2.8, 1, 3);
+    expect(CANNON.Vec3).toHaveBeenLastCalledWith(1.4, 0.5, 1.5);
+    expect(moving.scale).toEqual({ x: 1, y: 1, z: 1 });
+    reachReward();
+    game.chooseReward("repair");
+    expect(THREE.BoxGeometry).toHaveBeenLastCalledWith(3, 1, 3);
+  });
+  it("applies speed reduction and enhanced precision to actual movement and landing", () => {
+    start();
+    reachReward();
+    game.chooseReward("slow");
+    const renderer = (
+      THREE.WebGLRenderer as unknown as jest.Mock
+    ).mock.results.at(-1)!.value as { setAnimationLoop: jest.Mock };
+    const frame = renderer.setAnimationLoop.mock.calls.at(-1)![0] as () => void;
+    const moving = latestMesh();
+    frame();
+    expect(moving.position.z).toBeCloseTo(GAME_CONFIG.normal.speed * 0.92);
+    moving.position.z = 0;
+    reachReward();
+    game.chooseReward("precision");
+    latestMesh().position.x = 0.115;
+    click();
+    expect(game.getSnapshot().lastResult).toBe("perfect");
+  });
+  it("filters capped rewards, isolates nested snapshots, and resets all bonuses on restart", () => {
+    start();
+    for (let i = 0; i < 3; i++) {
+      reachReward();
+      game.chooseReward("slow");
+    }
+    reachReward();
+    expect(game.getSnapshot().rewardChoices).not.toContain("slow");
+    const copy = game.getSnapshot();
+    copy.rewards.slow = 999;
+    copy.rewardChoices.length = 0;
+    expect(game.getSnapshot().rewards.slow).toBe(3);
+    expect(game.chooseReward("slow")).toBe(false);
+    game.chooseReward("precision");
+    latestMesh().position.x = latestMesh().position.z = 4;
+    click();
+    expect(game.getSnapshot().phase).toBe("ended");
+    start();
+    expect(game.getSnapshot()).toMatchObject({
+      rewards: { repair: 0, slow: 0, precision: 0 },
+      rewardChoices: [],
+      layersUntilReward: 5,
+    });
   });
 });

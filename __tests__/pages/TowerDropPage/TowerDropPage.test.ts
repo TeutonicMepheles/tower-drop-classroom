@@ -1,4 +1,5 @@
 import { screen } from "@testing-library/dom";
+import * as THREE from "three";
 
 import type { Page } from "@/types/pages";
 
@@ -13,6 +14,36 @@ const renderPage = (): Page => {
 };
 
 describe("TowerDropPage", () => {
+  it("shows three reward cards after five landings and resumes without an extra drop", () => {
+    renderPage();
+    screen.getByRole("button", { name: "Start game" }).click();
+    for (let i = 0; i < 5; i++) window.dispatchEvent(new MouseEvent("click"));
+    expect(screen.getByRole("dialog")).toBeVisible();
+    expect(screen.getAllByRole("button")).toHaveLength(3);
+    const moving = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
+      .value as THREE.Mesh;
+    const before = {
+      x: moving.position.x,
+      y: moving.position.y,
+      z: moving.position.z,
+    };
+    const renderer = (
+      THREE.WebGLRenderer as unknown as jest.Mock
+    ).mock.results.at(-1)!.value as { setAnimationLoop: jest.Mock };
+    expect(renderer.setAnimationLoop).toHaveBeenLastCalledWith(null);
+    expect(moving.position).toMatchObject(before);
+    screen.getByRole("button", { name: /从容节奏/ }).click();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(document.querySelector(".gameplay-status")).toHaveTextContent(
+      "5 layers"
+    );
+    expect(document.querySelector(".gameplay-status")).toHaveTextContent(
+      "减速 1/3"
+    );
+    expect(renderer.setAnimationLoop).toHaveBeenLastCalledWith(
+      expect.any(Function)
+    );
+  });
   afterEach(() => {
     page?.cleanup?.();
     document.body.innerHTML = "";
