@@ -76,9 +76,12 @@ export function addBlockOutline(mesh: THREE.Mesh): void {
   outlines.set(mesh, line);
 }
 
-export function releaseBlockOutline(mesh: THREE.Mesh): void {
+export function releaseBlockOutline(
+  mesh: THREE.Mesh,
+  disposeTexture = true
+): void {
   const material = mesh.material as THREE.MeshStandardMaterial;
-  material.map?.dispose();
+  if (disposeTexture) material.map?.dispose();
   const line = outlines.get(mesh);
   if (!line) return;
   mesh.remove(line);
