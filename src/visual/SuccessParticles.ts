@@ -35,6 +35,7 @@ export class SuccessParticles {
   private readonly rings: PerfectRings;
   private cursor = 0;
   private lastTime = 0;
+  private disposed = false;
 
   constructor(private scene: THREE.Scene) {
     this.rings = new PerfectRings(scene);
@@ -96,6 +97,7 @@ export class SuccessParticles {
     this.rings.update(now);
     const dt = Math.min(Math.max((now - this.lastTime) / 1000, 0), 0.05);
     this.lastTime = now;
+    if (this.activeCount === 0) return;
     for (let slot = 0; slot < this.capacity; slot++) {
       if (this.born[slot]! < 0) continue;
       const age = (now - this.born[slot]!) / this.lifetime[slot]!;
@@ -125,10 +127,19 @@ export class SuccessParticles {
     this.opacityAttribute.needsUpdate = true;
   }
   public dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     this.rings.dispose();
     this.clear();
     this.scene.remove(this.points);
     this.geometry.dispose();
     this.material.dispose();
+  }
+
+  public resize(): void {
+    this.material.uniforms.pixelRatio!.value = Math.min(
+      window.devicePixelRatio,
+      2
+    );
   }
 }

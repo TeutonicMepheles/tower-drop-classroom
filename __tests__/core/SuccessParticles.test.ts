@@ -20,6 +20,7 @@ describe("landing particle lifecycle", () => {
     particles.clear();
     expect(particles.activeCount).toBe(0);
     particles.dispose();
-    expect(scene.remove).toHaveBeenCalled();
+    particles.dispose();
+    expect(scene.remove).toHaveBeenCalledTimes(7);
   });
 });

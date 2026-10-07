@@ -13,5 +13,6 @@ it("bounds perfect rings and clears them on expiration or restart", () => {
   rings.clear();
   expect(rings.activeCount).toBe(0);
   rings.dispose();
+  rings.dispose();
   expect(scene.remove).toHaveBeenCalledTimes(6);
 });

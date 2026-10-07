@@ -159,7 +159,10 @@ jest.mock("three", () => ({
     itemSize,
     needsUpdate: false,
   })),
-  ShaderMaterial: jest.fn(() => ({ dispose: jest.fn() })),
+  ShaderMaterial: jest.fn(() => ({
+    uniforms: { pixelRatio: { value: 1 } },
+    dispose: jest.fn(),
+  })),
   Points: jest.fn((geometry: unknown, material: unknown) => ({
     geometry,
     material,

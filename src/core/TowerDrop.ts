@@ -26,6 +26,7 @@ import type { GameState } from "@/types/states";
 import type { Page } from "@/types/pages";
 
 export class TowerDrop {
+  private disposed = false;
   private feedbackMaterial: THREE.MeshStandardMaterial | undefined;
   private feedbackUntil = 0;
   private onLanded = (event: Event): void => {
@@ -159,6 +160,8 @@ export class TowerDrop {
       antialias: true,
       alpha: true,
     });
+    this.renderer.setSize(this.sizes.width, this.sizes.height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     this.boundOnWindowResize = this.onWindowResize.bind(this);
     this.boundOnWindowClick = this.onWindowClick.bind(this);
@@ -313,13 +316,12 @@ export class TowerDrop {
   private render(): void {
     this.particles.update(performance.now());
     if (performance.now() >= this.feedbackUntil) this.clearFeedback();
-    this.renderer.setSize(this.sizes.width, this.sizes.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     this.renderer.render(this.scene, this.camera);
   }
 
   private onWindowResize(): void {
+    this.particles.resize();
     this.sizes.width = window.innerWidth;
     this.sizes.height = window.innerHeight;
 
@@ -611,6 +613,8 @@ export class TowerDrop {
   }
 
   public dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     this.atmosphere.dispose();
     this.particles.dispose();
     this.container.removeEventListener(LANDED_EVENT, this.onLanded);

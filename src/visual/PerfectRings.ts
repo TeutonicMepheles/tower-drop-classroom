@@ -28,6 +28,7 @@ export class PerfectRings {
     };
   });
   private cursor = 0;
+  private disposed = false;
   constructor(private scene: THREE.Scene) {
     this.rings.forEach((ring) => scene.add(ring.line));
   }
@@ -78,6 +79,8 @@ export class PerfectRings {
     });
   }
   public dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     this.clear();
     this.rings.forEach((ring) => {
       this.scene.remove(ring.line);

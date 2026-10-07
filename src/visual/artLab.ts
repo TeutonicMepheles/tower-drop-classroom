@@ -55,6 +55,7 @@ document.querySelector("#clear")!.addEventListener("click", () => {
   particles.clear();
 });
 function resize(): void {
+  particles.resize();
   const aspect = window.innerWidth / window.innerHeight;
   camera.left = -6 * aspect;
   camera.right = 6 * aspect;
