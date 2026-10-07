@@ -9,7 +9,7 @@ export class Atmosphere {
     this.root.className = "art-atmosphere";
     this.root.setAttribute("aria-hidden", "true");
     this.root.innerHTML =
-      '<div class="art-aurora"></div><div class="art-orbit"></div><div class="art-stars"></div>';
+      '<div class="art-aurora"></div><div class="art-orbit"></div><div class="art-stars"></div><div class="art-mist"></div><div class="art-mist art-mist--far"></div>';
     const stars = this.root.querySelector(".art-stars")!;
     for (let i = 0; i < 36; i++) {
       const star = document.createElement("i");

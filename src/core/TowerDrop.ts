@@ -109,6 +109,10 @@ export class TowerDrop {
   ) {
     this.scene = new THREE.Scene();
     this.scene.background = null;
+    this.scene.fog = new THREE.FogExp2(
+      VISUAL_THEME.fog.color,
+      VISUAL_THEME.fog.density
+    );
     this.atmosphere = new Atmosphere(this.container);
     this.container.addEventListener(LANDED_EVENT, this.onLanded);
     this.container.addEventListener(STATE_EVENT, this.onRoundState);

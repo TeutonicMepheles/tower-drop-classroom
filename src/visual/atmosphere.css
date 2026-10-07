@@ -58,3 +58,25 @@
     animation: none !important;
   }
 }
+
+/* Layered scenery mist, not volumetric ray marching. */
+.art-mist {
+  position: absolute;
+  inset: 56% -30% -25%;
+  background:
+    radial-gradient(ellipse at 25% 80%, #a6e1de3a, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, #b2badf35, transparent 62%);
+  filter: blur(20px);
+  animation: art-mist-drift 36s ease-in-out infinite alternate;
+}
+.art-mist--far {
+  inset: 68% -20% -25%;
+  opacity: 0.65;
+  animation-duration: 49s;
+  animation-direction: alternate-reverse;
+}
+@keyframes art-mist-drift {
+  to {
+    transform: translateX(8%) translateY(-4%);
+  }
+}

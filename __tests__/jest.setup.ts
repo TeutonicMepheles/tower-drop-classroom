@@ -134,6 +134,7 @@ const mockCannonVec3 = jest.fn((x: number, y: number, z: number) => ({
 
 jest.mock("three", () => ({
   Scene: mockThreeScene,
+  FogExp2: jest.fn((color: string, density: number) => ({ color, density })),
   PerspectiveCamera: mockThreePerspectiveCamera,
   OrthographicCamera: mockThreeOrthographicCamera,
   WebGLRenderer: mockThreeWebGLRenderer,
