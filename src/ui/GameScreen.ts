@@ -39,8 +39,8 @@ export const createGameScreen = (
           <p class="round-summary"></p><div class="run-summary" hidden></div>
           <fieldset data-game-control>
             <legend>选择难度</legend>
-            <label><input type="radio" name="difficulty" value="easy"> 简单 <small>速度较慢 · 对齐更宽容</small></label>
-            <label><input type="radio" name="difficulty" value="normal" checked> 普通 <small>标准速度 · 挑战精准度</small></label>
+            <label><input type="radio" autocomplete="off" name="difficulty" value="easy"> 简单 <small>速度较慢 · 对齐更宽容</small></label>
+            <label><input type="radio" autocomplete="off" name="difficulty" value="normal" checked> 普通 <small>标准速度 · 挑战精准度</small></label>
           </fieldset>
           <p class="instructions">点击游戏区域落块。连续完美落块，每层可获得 1–5 分。</p>
         </div>
@@ -131,6 +131,7 @@ export const createGameScreen = (
     main
       .querySelectorAll<HTMLInputElement>('input[name="difficulty"]')
       .forEach((input) => {
+        input.checked = input.value === state.difficulty;
         input.disabled = state.phase === "playing" || state.phase === "reward";
       });
     if (feedbackTimer) clearTimeout(feedbackTimer);

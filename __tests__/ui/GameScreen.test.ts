@@ -50,3 +50,36 @@ it("renders snapshots without creating a game and emits commands without changin
   screen.dispose();
   screen.element.remove();
 });
+
+it("keeps reward focus inside the dialog and removes handlers on disposal", () => {
+  const commands = {
+    start: jest.fn(),
+    drop: jest.fn(),
+    setDifficulty: jest.fn(),
+    chooseReward: jest.fn(() => true),
+  };
+  const screen = createGameScreen(commands);
+  document.body.append(screen.element);
+  screen.update({
+    ...state,
+    difficulty: "easy",
+    phase: "reward",
+    rewardChoices: ["repair", "slow", "shield"],
+  });
+  const buttons = screen.element.querySelectorAll<HTMLButtonElement>(
+    ".reward-cards button"
+  );
+  expect(document.activeElement).toBe(buttons[0]);
+  buttons[0]!.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true })
+  );
+  expect(document.activeElement).toBe(buttons[2]);
+  expect(
+    screen.element.querySelector<HTMLInputElement>('input[value="easy"]')!
+      .checked
+  ).toBe(true);
+  screen.dispose();
+  buttons[0]!.click();
+  expect(commands.chooseReward).not.toHaveBeenCalled();
+  screen.element.remove();
+});

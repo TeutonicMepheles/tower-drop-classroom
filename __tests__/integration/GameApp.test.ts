@@ -155,3 +155,26 @@ describe("TowerDropPage", () => {
     });
   });
 });
+
+it("recreates the app without retaining old global input handlers", () => {
+  const oldSession = new GameSession();
+  const oldPage = createGameApp(oldSession);
+  document.body.append(oldPage);
+  oldPage.querySelector<HTMLButtonElement>("#playbtn")!.click();
+  oldPage.cleanup?.();
+  oldPage.cleanup?.();
+  oldPage.remove();
+  const nextSession = new GameSession();
+  const nextPage = createGameApp(nextSession);
+  document.body.append(nextPage);
+  nextPage.querySelector<HTMLButtonElement>("#playbtn")!.click();
+  nextSession.advance(10 / nextSession.speed);
+  window.dispatchEvent(new MouseEvent("click"));
+  expect(nextSession.getSnapshot().layers).toBe(1);
+  expect(oldSession.getSnapshot()).toMatchObject({
+    phase: "playing",
+    layers: 0,
+  });
+  nextPage.cleanup?.();
+  nextPage.remove();
+});
