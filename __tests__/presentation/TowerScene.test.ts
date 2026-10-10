@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { TowerScene } from "@/presentation/TowerScene";
-import { VISUAL_THEME } from "@/config/visualTheme";
+import { VISUAL_THEME } from "@/presentation/theme";
 import type { BlockData } from "@/contracts/game";
 const block: BlockData = {
   id: 1,

@@ -11,7 +11,7 @@ import type {
   ScenePort,
 } from "@/contracts/ports";
 import type { GameSession } from "@/gameplay/GameSession";
-import { FrameLoop } from "./frameLoop";
+import { FrameLoop } from "@/runtime/frameLoop";
 export class GameController implements GameCommands {
   private readonly loop: FrameLoop;
   private disposed = false;

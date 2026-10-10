@@ -7,9 +7,9 @@ import type {
   Records,
   RewardId,
 } from "@/contracts/game";
-import { GAME_CONFIG } from "./difficulty";
-import { REWARD_INTERVAL, emptyRewards, drawRewards } from "./rewards";
-import { measureLanding } from "./stacking";
+import { GAME_CONFIG } from "@/gameplay/difficulty";
+import { REWARD_INTERVAL, emptyRewards, drawRewards } from "@/gameplay/rewards";
+import { measureLanding } from "@/gameplay/stacking";
 
 const cloneBlock = (block: BlockData): BlockData => ({
   ...block,

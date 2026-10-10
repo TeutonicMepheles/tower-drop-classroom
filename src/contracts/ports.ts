@@ -4,7 +4,7 @@ import type {
   GameSnapshot,
   Records,
   Vector3,
-} from "./game";
+} from "@/contracts/game";
 export interface RecordStore {
   load(): Records;
   save(records: Records): void;

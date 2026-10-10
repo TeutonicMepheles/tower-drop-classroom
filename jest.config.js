@@ -5,12 +5,12 @@ const config = {
   testEnvironment: "jsdom",
   rootDir: ".",
   roots: ["<rootDir>/__tests__"],
-  setupFilesAfterEnv: ["<rootDir>/__tests__/jest.setup.ts"],
+  setupFilesAfterEnv: ["<rootDir>/__tests__/support/jest.setup.ts"],
   testMatch: ["**/*.test.ts", "**/*.spec.ts"],
   moduleNameMapper: {
-    "\\.(css|scss)$": "<rootDir>/__tests__/__mocks__/style.mock.ts",
+    "\\.(css|scss)$": "<rootDir>/__tests__/support/mocks/style.mock.ts",
     "\\.(png|jpg|jpeg|gif|svg|webp)$":
-      "<rootDir>/__tests__/__mocks__/file.mock.ts",
+      "<rootDir>/__tests__/support/mocks/file.mock.ts",
     "^@/(.*)$": "<rootDir>/src/$1",
     "^@tests/(.*)$": "<rootDir>/__tests__/$1",
   },
@@ -20,8 +20,9 @@ const config = {
   collectCoverageFrom: [
     "src/**/*.ts",
     "!src/**/*.d.ts",
-    "!src/index.ts",
-    "!src/types/**/*.ts",
+    "!src/app/main.ts",
+    "!src/contracts/**/*.ts",
+    "!src/dev/**",
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],

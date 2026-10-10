@@ -1,10 +1,10 @@
-import type { Page } from "@/types/pages";
-import Button from "@/components/Button/Button";
+import type { Page } from "@/ui/types";
+import Button from "@/ui/components/Button/Button";
 import type { GameCommands } from "@/contracts/game";
-import { REWARDS } from "@/config/rewards";
-import type { RewardId } from "@/config/rewards";
-import type { Difficulty, GameSnapshot } from "@/config/gameConfig";
-import "@/pages/TowerDropPage/TowerDropPage.css";
+import { REWARD_LABELS as REWARDS } from "./rewards/catalog";
+import type { RewardId } from "@/contracts/game";
+import type { Difficulty, GameSnapshot } from "@/contracts/game";
+import "@/ui/GameScreen.css";
 
 export const createGameScreen = (
   game: GameCommands

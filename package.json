@@ -46,7 +46,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:all": "prettier --write \"src/**/*.{ts,css}\" \"__tests__/**/*.ts\"",
-    "type-check": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "type-check": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.test.json --noEmit && tsc -p tsconfig.gameplay.json --noEmit",
     "prepare": "husky"
   },
   "lint-staged": {

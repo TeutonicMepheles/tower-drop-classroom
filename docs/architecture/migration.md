@@ -25,3 +25,7 @@ GameSession 持有纯数据块、阶段、奖励和纪录副本，支持注入�
 ## M4 场景与运行层
 
 GameController 协调纯模型、ScenePort、PhysicsPort 与存档。TowerScene 持有 Mesh，TowerPhysics 持有 Body；稳定 ID 连接纯数据。FrameLoop 唯一推进时间。旧 TowerDrop 删除，旧回归快照不变且通过。13 suites / 56 tests / 2 snapshots、类型检查、构建通过。浏览器已确认真实 WebGL 渲染、简单难度开始、落空结算；完整流程在 M6 验收。
+
+## M5 目录归位与依赖门禁
+
+迁移源码、测试、教学归档、部署配置并修复引用；保留根目录工具配置。奖励显示文案归 UI、规则归玩法；删除旧目录兼容导出和无消费者的 DOM 事件声明。新增 UI 预览。lint、三项目类型检查、构建和 13 suites / 56 tests / 2 snapshots 通过；覆盖率：行 97.58%、分支 88.88%。别名及相对路径的越界导入均被门禁拒绝，本地文档链接检查通过。容器只校验路径，未构建或部署。

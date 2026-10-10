@@ -1,0 +1,18 @@
+services:
+  tower-drop-app:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.development
+    restart: unless-stopped
+    volumes:
+      - ../..:/home/app
+      - /home/app/node_modules
+    ports:
+      - 3000:3000
+    networks:
+      - tower-drop-net
+    stdin_open: true
+    tty: true
+
+networks:
+  tower-drop-net:

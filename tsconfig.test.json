@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "types": ["jest", "@testing-library/jest-dom", "node"]
+    "types": ["jest", "@testing-library/jest-dom", "node", "vite/client"]
   },
   "include": ["src", "__tests__"],
   "exclude": ["node_modules", "dist"]

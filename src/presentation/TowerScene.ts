@@ -5,15 +5,15 @@ import type {
   FragmentPose,
   ScenePort,
 } from "@/contracts/ports";
-import { Atmosphere } from "@/visual/Atmosphere";
-import { SuccessParticles } from "@/visual/SuccessParticles";
+import { Atmosphere } from "@/presentation/effects/Atmosphere";
+import { SuccessParticles } from "@/presentation/effects/SuccessParticles";
 import {
   createBlockMaterial,
   addBlockOutline,
   releaseBlockOutline,
   restoreBlockGlow,
-} from "@/visual/blockMaterials";
-import { VISUAL_THEME } from "@/config/visualTheme";
+} from "@/presentation/materials/blockMaterials";
+import { VISUAL_THEME } from "@/presentation/theme";
 interface View {
   block: BlockData;
   mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardMaterial>;

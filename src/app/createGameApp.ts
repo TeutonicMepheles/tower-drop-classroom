@@ -2,10 +2,10 @@ import { GameController } from "@/runtime/GameController";
 import { GameSession } from "@/gameplay/GameSession";
 import { TowerScene } from "@/presentation/TowerScene";
 import { TowerPhysics } from "@/runtime/physics";
-import { loadRecords, saveRecords } from "@/core/records";
+import { loadRecords, saveRecords } from "@/storage/records";
 import { createGameScreen } from "@/ui/GameScreen";
 import { bindInput } from "@/runtime/input";
-import type { Page } from "@/types/pages";
+import type { Page } from "@/ui/types";
 export function createGameApp(session?: GameSession): Page {
   const screen = createGameScreen({
     start: () => {
