@@ -21,9 +21,11 @@ describe("classroom gameplay contract", () => {
     game.dispose();
     page.remove();
   });
-  const click = (): boolean => window.dispatchEvent(new MouseEvent("click"));
+  const click = (): void => {
+    game.drop();
+  };
   const start = (): void => {
-    page.querySelector<HTMLButtonElement>("button")!.click();
+    game.start();
   };
   const latestMesh = (): THREE.Mesh =>
     (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!

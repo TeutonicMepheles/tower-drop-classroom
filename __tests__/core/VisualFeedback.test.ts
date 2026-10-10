@@ -12,10 +12,10 @@ describe("perfect block visual feedback", () => {
     document.body.append(page);
     const clock = jest.spyOn(performance, "now").mockReturnValue(1000);
     const game = new TowerDrop(page.querySelector("canvas")!, page);
-    page.querySelector<HTMLButtonElement>("button")!.click();
+    game.start();
     const landed = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
       .value as THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardMaterial>;
-    window.dispatchEvent(new MouseEvent("click"));
+    game.drop();
     expect(landed.material.emissive.set).toHaveBeenCalledWith(
       VISUAL_THEME.feedback.color
     );
@@ -31,14 +31,14 @@ describe("perfect block visual feedback", () => {
     expect(landed.material.emissive.set).toHaveBeenLastCalledWith("#000000");
     const second = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
       .value as THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardMaterial>;
-    window.dispatchEvent(new MouseEvent("click"));
+    game.drop();
     expect(second.material.emissiveIntensity).toBe(
       VISUAL_THEME.feedback.intensity
     );
     const next = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
       .value as THREE.Mesh;
     next.position.x = 3;
-    window.dispatchEvent(new MouseEvent("click"));
+    game.drop();
     expect(game.getSnapshot().phase).toBe("ended");
     expect(second.material.emissiveIntensity).toBe(0.22);
     game.dispose();

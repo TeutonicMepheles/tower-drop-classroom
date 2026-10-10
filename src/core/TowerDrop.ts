@@ -211,13 +211,9 @@ export class TowerDrop {
   };
 
   private boundOnWindowResize: (event: UIEvent) => void;
-  private boundOnWindowClick: (event: Event) => void;
-  private boundOnGameStart: () => void;
 
   private isAnimating = false;
   private lastFrameTime = 0;
-
-  private btnPlay: HTMLButtonElement | null = null;
 
   constructor(
     public canvas: HTMLCanvasElement,
@@ -254,8 +250,6 @@ export class TowerDrop {
     });
 
     this.boundOnWindowResize = this.onWindowResize.bind(this);
-    this.boundOnWindowClick = this.onWindowClick.bind(this);
-    this.boundOnGameStart = this.onGameStart.bind(this);
 
     this.addCamera();
     this.addLights();
@@ -293,14 +287,7 @@ export class TowerDrop {
   }
 
   private addEventListeners(): void {
-    this.btnPlay = this.container.querySelector<HTMLButtonElement>(
-      ".tower-drop__button"
-    );
-
     window.addEventListener("resize", this.boundOnWindowResize);
-    window.addEventListener("click", this.boundOnWindowClick);
-
-    this.btnPlay?.addEventListener("click", this.boundOnGameStart);
   }
 
   private addBlock({ coords, sizes, direction }: AddBlockArgs): void {
@@ -435,21 +422,9 @@ export class TowerDrop {
     this.renderer.render(this.scene, this.camera);
   }
 
-  private onWindowClick(e: Event): void {
-    const score =
-      this.container.querySelector<HTMLHeadingElement>(".tower-drop__score");
-    const menu =
-      this.container.querySelector<HTMLDivElement>(".tower-drop__menu");
-    const lastScore = this.container.querySelector<HTMLHeadingElement>(
-      ".tower-drop__last-score"
-    );
+  public drop(): void {
     const { blocks, gameStarted } = this.gameState;
-
-    const target = e.target as HTMLElement;
-    const isControl =
-      target instanceof Element &&
-      target.closest("button, select, input, label, a, [data-game-control]");
-    if (!gameStarted || this.snapshot.phase !== "playing" || isControl) return;
+    if (!gameStarted || this.snapshot.phase !== "playing") return;
 
     const topBlock = blocks[blocks.length - 1];
     const bottomBlock = blocks[blocks.length - 2];
@@ -497,15 +472,6 @@ export class TowerDrop {
       }
       this.stopAnimation();
 
-      if (lastScore && score) {
-        lastScore.innerHTML = `Last Score: ${this.snapshot.score}`;
-        score.innerHTML = "0";
-        score.style.display = "none";
-      }
-      if (menu) {
-        menu.style.display = "flex";
-      }
-
       this.gameState.gameStarted = false;
       this.snapshot.phase = "ended";
       this.snapshot.lastResult = "miss";
@@ -532,7 +498,6 @@ export class TowerDrop {
       saveRecords(this.records);
     }
     this.snapshot.lastResult = perfect ? "perfect" : "normal";
-    if (score) score.textContent = String(this.snapshot.score);
 
     const newBlockWidth = direction === "x" ? overlap : topBlock.sizes.width;
     const newBlockDepth = direction === "z" ? overlap : topBlock.sizes.depth;
@@ -644,12 +609,7 @@ export class TowerDrop {
     this.publishState();
   }
 
-  private onGameStart(): void {
-    const score =
-      this.container.querySelector<HTMLHeadingElement>(".tower-drop__score");
-    const menu =
-      this.container.querySelector<HTMLDivElement>(".tower-drop__menu");
-
+  public start(): void {
     const { gameStarted } = this.gameState;
 
     if (gameStarted) return;
@@ -673,17 +633,6 @@ export class TowerDrop {
       recordBroken: false,
     };
     this.blockSpeed = GAME_CONFIG[this.snapshot.difficulty].speed;
-    if (score) score.textContent = "0";
-
-    if (score) {
-      score.style.display = "block";
-      score.style.color = "#ffffff";
-    }
-
-    if (menu) {
-      menu.style.display = "none";
-    }
-
     this.startAnimation();
     this.gameState.gameStarted = true;
     this.publishState();
@@ -818,11 +767,6 @@ export class TowerDrop {
     this.stopAnimation();
 
     window.removeEventListener("resize", this.boundOnWindowResize);
-    window.removeEventListener("click", this.boundOnWindowClick);
-
-    if (this.btnPlay) {
-      this.btnPlay.removeEventListener("click", this.boundOnGameStart);
-    }
 
     const { blocks, fallBlocks } = this.gameState;
     const allBlocks = blocks.concat(fallBlocks);

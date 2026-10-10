@@ -1,4 +1,3 @@
-import userEvent from "@testing-library/user-event";
 import * as THREE from "three";
 import * as CANNON from "cannon";
 
@@ -87,15 +86,6 @@ describe("TowerDrop", () => {
       );
     });
 
-    it("should remove the click event listener from window", () => {
-      const removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
-      game.dispose();
-      expect(removeEventListenerSpy).toHaveBeenCalledWith(
-        "click",
-        expect.any(Function)
-      );
-    });
-
     it("should stop the animation loop", () => {
       const rendererInstance = (THREE.WebGLRenderer as jest.Mock).mock
         .results[0]!.value;
@@ -147,136 +137,6 @@ describe("TowerDrop", () => {
       rendererInstance.render.mockClear();
       window.dispatchEvent(new UIEvent("resize"));
       expect(rendererInstance.render).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("onGameStart", () => {
-    let playBtn: HTMLButtonElement;
-
-    beforeEach(() => {
-      playBtn = container.querySelector<HTMLButtonElement>("#playbtn")!;
-    });
-
-    it("should hide the menu when the play button is clicked", async () => {
-      const menu =
-        container.querySelector<HTMLDivElement>(".tower-drop__menu")!;
-      const user = userEvent.setup();
-      await user.click(playBtn);
-      expect(menu.style.display).toBe("none");
-    });
-
-    it("should show the score when the play button is clicked", async () => {
-      const score =
-        container.querySelector<HTMLParagraphElement>(".tower-drop__score")!;
-      const user = userEvent.setup();
-      await user.click(playBtn);
-      expect(score.style.display).toBe("block");
-    });
-
-    it("should start the animation loop when play is clicked", async () => {
-      const rendererInstance = (THREE.WebGLRenderer as unknown as jest.Mock)
-        .mock.results[0]!.value;
-      rendererInstance.setAnimationLoop.mockClear();
-      const user = userEvent.setup();
-      await user.click(playBtn);
-      expect(rendererInstance.setAnimationLoop).toHaveBeenCalledWith(
-        expect.any(Function)
-      );
-    });
-
-    it("should reinitialize the blocks when play is clicked", async () => {
-      (THREE.Mesh as unknown as jest.Mock).mockClear();
-      const user = userEvent.setup();
-      await user.click(playBtn);
-      expect(THREE.Mesh).toHaveBeenCalledTimes(2);
-    });
-
-    it("should not restart the game if it is already started", async () => {
-      const menu =
-        container.querySelector<HTMLDivElement>(".tower-drop__menu")!;
-      const user = userEvent.setup();
-      await user.click(playBtn);
-      menu.style.display = "flex";
-      await user.click(playBtn);
-      expect(menu.style.display).toBe("flex");
-    });
-  });
-
-  describe("onWindowClick", () => {
-    describe("before game starts", () => {
-      it("should not modify the score when game has not started", () => {
-        const score =
-          container.querySelector<HTMLParagraphElement>(".tower-drop__score")!;
-        window.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        expect(score.innerHTML).toBe("0");
-      });
-    });
-
-    describe("after game starts", () => {
-      let score: HTMLParagraphElement;
-      let menu: HTMLDivElement;
-      let lastScore: HTMLHeadingElement;
-      let playBtn: HTMLButtonElement;
-
-      beforeEach(async () => {
-        playBtn = container.querySelector<HTMLButtonElement>("#playbtn")!;
-        score =
-          container.querySelector<HTMLParagraphElement>(".tower-drop__score")!;
-        menu = container.querySelector<HTMLDivElement>(".tower-drop__menu")!;
-        lastScore = container.querySelector<HTMLHeadingElement>(
-          ".tower-drop__last-score"
-        )!;
-        const user = userEvent.setup();
-        await user.click(playBtn);
-      });
-
-      it("should increment the score on a valid window click", () => {
-        window.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        expect(score.innerHTML).toBe("1");
-      });
-
-      it("should not react when the click target is the play button", async () => {
-        const user = userEvent.setup();
-        await user.click(playBtn);
-        expect(score.innerHTML).toBe("0");
-      });
-
-      it("should show the menu on game over", () => {
-        const topBlockMesh = (THREE.Mesh as unknown as jest.Mock).mock
-          .results[3]!.value;
-        topBlockMesh.position.x = 10;
-        window.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        expect(menu.style.display).toBe("flex");
-      });
-
-      it("should reset the score display on game over", () => {
-        const topBlockMesh = (THREE.Mesh as unknown as jest.Mock).mock
-          .results[3]!.value;
-        topBlockMesh.position.x = 10;
-        score.innerHTML = "5";
-        window.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        expect(score.innerHTML).toBe("0");
-      });
-
-      it("should update the last score on game over", () => {
-        const topBlockMesh = (THREE.Mesh as unknown as jest.Mock).mock
-          .results[3]!.value;
-        topBlockMesh.position.x = 10;
-        score.innerHTML = "7";
-        window.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        expect(lastScore.innerHTML).toBe("Last Score: 0");
-      });
-
-      it("should stop the animation on game over", () => {
-        const rendererInstance = (THREE.WebGLRenderer as jest.Mock).mock
-          .results[0]!.value;
-        const topBlockMesh = (THREE.Mesh as unknown as jest.Mock).mock
-          .results[3]!.value;
-        topBlockMesh.position.x = 10;
-        rendererInstance.setAnimationLoop.mockClear();
-        window.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        expect(rendererInstance.setAnimationLoop).toHaveBeenCalledWith(null);
-      });
     });
   });
 });
