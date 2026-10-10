@@ -1,0 +1,66 @@
+export type RewardId =
+  | "repair"
+  | "slow"
+  | "precision"
+  | "shield"
+  | "perfectRepair"
+  | "steady";
+export type RewardLevels = Record<RewardId, number>;
+export type Difficulty = "easy" | "normal";
+export interface GameSnapshot {
+  difficulty: Difficulty;
+  phase: "ready" | "playing" | "reward" | "ended";
+  score: number;
+  layers: number;
+  perfectStreak: number;
+  lastResult: "none" | "normal" | "perfect" | "miss" | "rescue";
+  rewards: RewardLevels;
+  rewardChoices: RewardId[];
+  layersUntilReward: number;
+  shields: number;
+  rescuesUsed: number;
+  perfectCount: number;
+  longestStreak: number;
+  bestLayers: number;
+  recordBroken: boolean;
+}
+export const STATE_EVENT = "tower-drop:state";
+export const LANDED_EVENT = "tower-drop:landed";
+export const REWARD_EVENT = "tower-drop:reward-applied";
+export const RESCUE_EVENT = "tower-drop:rescued";
+export interface RewardAppliedDetail {
+  id: RewardId;
+  index: number;
+}
+export interface RescueDetail {
+  index: number;
+}
+export interface LandedDetail {
+  perfect: boolean;
+  index: number;
+}
+
+export interface GameCommands {
+  start(): void;
+  drop(): void;
+  setDifficulty(difficulty: Difficulty): void;
+  chooseReward(id: RewardId): boolean;
+}
+export interface Vector3 {
+  x: number;
+  y: number;
+  z: number;
+}
+export interface BlockSize {
+  width: number;
+  height: number;
+  depth: number;
+}
+export interface BlockData {
+  id: number;
+  position: Vector3;
+  sizes: BlockSize;
+  direction: "x" | "z";
+  layer: number;
+}
+export type Records = Record<Difficulty, number>;

@@ -1,10 +1,5 @@
-export type RewardId =
-  | "repair"
-  | "slow"
-  | "precision"
-  | "shield"
-  | "perfectRepair"
-  | "steady";
+import type { RewardId, RewardLevels } from "@/contracts/game";
+export type { RewardId, RewardLevels } from "@/contracts/game";
 export const REWARD_INTERVAL = 5;
 export const REWARDS = {
   repair: {
@@ -38,7 +33,7 @@ export const REWARDS = {
     max: 3,
   },
 } as const;
-export type RewardLevels = Record<RewardId, number>;
+
 export const emptyRewards = (): RewardLevels => ({
   repair: 0,
   slow: 0,
