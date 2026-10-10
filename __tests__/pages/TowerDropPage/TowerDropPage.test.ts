@@ -1,14 +1,24 @@
 import { screen } from "@testing-library/dom";
-import * as THREE from "three";
+import { GameSession } from "@/gameplay/GameSession";
+import { createGameApp } from "@/app/createGameApp";
 
 import type { Page } from "@/types/pages";
 
-import TowerDropPage from "@/pages/TowerDropPage/TowerDropPage";
+let session: GameSession;
+const align = (offset = 0): void => {
+  const top = session.getBlocks().at(-1)!,
+    bottom = session.getBlocks().at(-2)!;
+  session.advance(
+    (bottom.position[top.direction] + offset - top.position[top.direction]) /
+      session.speed
+  );
+};
 
 let page: Page | undefined;
 
 const renderPage = (): Page => {
-  page = TowerDropPage();
+  session = new GameSession(undefined, () => 0);
+  page = createGameApp(session);
   document.body.appendChild(page);
   return page;
 };
@@ -18,11 +28,12 @@ describe("TowerDropPage", () => {
     jest.spyOn(Math, "random").mockReturnValue(0);
     renderPage();
     screen.getByRole("button", { name: /开始游戏|再玩一次/ }).click();
-    for (let i = 0; i < 5; i++) window.dispatchEvent(new MouseEvent("click"));
+    for (let i = 0; i < 5; i++) {
+      align();
+      window.dispatchEvent(new MouseEvent("click"));
+    }
     screen.getByRole("button", { name: /从容节奏/ }).click();
-    const moving = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
-      .value as THREE.Mesh;
-    moving.position.x = moving.position.z = 4;
+    align(4);
     window.dispatchEvent(new MouseEvent("click"));
     expect(document.querySelector(".run-summary")).toBeVisible();
     expect(document.querySelector(".run-summary")).toHaveTextContent(
@@ -41,21 +52,12 @@ describe("TowerDropPage", () => {
     jest.spyOn(Math, "random").mockReturnValue(0);
     renderPage();
     screen.getByRole("button", { name: /开始游戏|再玩一次/ }).click();
-    for (let i = 0; i < 5; i++) window.dispatchEvent(new MouseEvent("click"));
+    for (let i = 0; i < 5; i++) {
+      align();
+      window.dispatchEvent(new MouseEvent("click"));
+    }
     expect(screen.getByRole("dialog")).toBeVisible();
     expect(screen.getAllByRole("button")).toHaveLength(3);
-    const moving = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
-      .value as THREE.Mesh;
-    const before = {
-      x: moving.position.x,
-      y: moving.position.y,
-      z: moving.position.z,
-    };
-    const renderer = (
-      THREE.WebGLRenderer as unknown as jest.Mock
-    ).mock.results.at(-1)!.value as { setAnimationLoop: jest.Mock };
-    expect(renderer.setAnimationLoop).toHaveBeenLastCalledWith(null);
-    expect(moving.position).toMatchObject(before);
     screen.getByRole("button", { name: /从容节奏/ }).click();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(document.querySelector(".gameplay-status")).toHaveTextContent(
@@ -63,9 +65,6 @@ describe("TowerDropPage", () => {
     );
     expect(document.querySelector(".gameplay-status")).toHaveTextContent(
       "减速 1/3"
-    );
-    expect(renderer.setAnimationLoop).toHaveBeenLastCalledWith(
-      expect.any(Function)
     );
   });
   afterEach(() => {

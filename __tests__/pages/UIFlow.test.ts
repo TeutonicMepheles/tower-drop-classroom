@@ -1,10 +1,11 @@
-import * as THREE from "three";
-import TowerDropPage from "@/pages/TowerDropPage/TowerDropPage";
+import { GameSession } from "@/gameplay/GameSession";
+import { createGameApp } from "@/app/createGameApp";
 
 describe("Chinese game UI integration", () => {
   it("connects difficulty, live HUD, round summary and restart to the real core", () => {
     jest.clearAllMocks();
-    const page = TowerDropPage();
+    const session = new GameSession();
+    const page = createGameApp(session);
     document.body.append(page);
     const easy = page.querySelector<HTMLInputElement>('input[value="easy"]')!;
     easy.click();
@@ -12,13 +13,11 @@ describe("Chinese game UI integration", () => {
     button.click();
     expect(easy.disabled).toBe(true);
     expect(page.dataset.phase).toBe("playing");
+    session.advance(10 / session.speed);
     window.dispatchEvent(new MouseEvent("click"));
     expect(page.querySelector("[data-game-score]")).toHaveTextContent("1");
     expect(page.querySelector("[data-game-layers]")).toHaveTextContent("1");
     expect(page.querySelector("[data-game-streak]")).toHaveTextContent("1");
-    const top = (THREE.Mesh as unknown as jest.Mock).mock.results.at(-1)!
-      .value as THREE.Mesh;
-    top.position.z = 3;
     window.dispatchEvent(new MouseEvent("click"));
     expect(page.dataset.phase).toBe("ended");
     expect(page.querySelector(".tower-drop__last-score")).toHaveTextContent(

@@ -21,3 +21,7 @@
 ## M3 纯玩法模型
 
 GameSession 持有纯数据块、阶段、奖励和纪录副本，支持注入随机数；stacking 独立计算落块。Node 环境测试无需 DOM/WebGL。迁移对照测试在两档难度各执行 60 次落块，并对比旧引擎状态和尺寸；保存旧引擎输出快照供替换后回归。新模型先通过对照测试，再在 M4 接入场景。
+
+## M4 场景与运行层
+
+GameController 协调纯模型、ScenePort、PhysicsPort 与存档。TowerScene 持有 Mesh，TowerPhysics 持有 Body；稳定 ID 连接纯数据。FrameLoop 唯一推进时间。旧 TowerDrop 删除，旧回归快照不变且通过。13 suites / 56 tests / 2 snapshots、类型检查、构建通过。浏览器已确认真实 WebGL 渲染、简单难度开始、落空结算；完整流程在 M6 验收。
