@@ -64,3 +64,9 @@ export interface BlockData {
   layer: number;
 }
 export type Records = Record<Difficulty, number>;
+
+export type GameEvent =
+  | { type: "landed"; block: BlockData; perfect: boolean }
+  | { type: "fragment"; block: BlockData }
+  | { type: "rescued"; blockId: number }
+  | { type: "reward"; id: RewardId; blockId: number };
