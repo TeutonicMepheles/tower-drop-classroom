@@ -1,6 +1,7 @@
 dist
 node_modules
 coverage
+.commit-explorer
 package-lock.json
 *.min.js
 *.min.css
