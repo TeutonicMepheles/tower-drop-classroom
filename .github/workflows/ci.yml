@@ -1,7 +1,7 @@
 name: Classroom Checks
 on:
   push:
-    branches: [main, "feature/**", "fix/**"]
+    branches: [main, "feature/**", "fix/**", "codex/**"]
   pull_request:
     branches: [main]
 permissions:

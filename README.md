@@ -8,7 +8,11 @@
 
 最终整合版包含 A·玩法的简单 / 普通难度、完美拼接与连击、每五层随机奖励、六种基础/续航加成、护盾救援和分难度本地纪录；B·美术的动态背景、雾效、差异材质、成功粒子与完美光环；C·UI 的中文菜单、难度选择、状态展示与重开流程。移动不自动加速，以持续堆叠和冲纪录为主。
 
-合并结果和验证见 [最终整合说明](docs/teaching/integration-status.md)。各角色的阶段文档保留备课过程，涉及“尚未整合”的描述为当时状态。课堂起点仍可通过 `classroom-start` 查看；完整肉鸽玩法见 [玩法深化说明](docs/teaching/gameplay-complete.md)。
+合并结果和验证见 [最终整合说明](docs/teaching/archive/integration-status.md)。各角色的阶段文档保留备课过程，涉及“尚未整合”的描述为当时状态。课堂起点仍可通过 `classroom-start` 查看；完整肉鸽玩法见 [玩法深化说明](docs/teaching/archive/gameplay-complete.md)。
+
+## 工程结构
+
+当前分支已按玩法、三维表现、界面和运行协调拆分。目录职责见 [架构说明](docs/architecture/README.md)，阶段验证见 [迁移记录](docs/architecture/migration.md)。独立预览：`/art-lab.html`（美术）、`/ui-lab.html`（UI）。
 
 ## 启动
 
@@ -33,7 +37,7 @@ A / B / C 分别使用 3101 / 3102 / 3103；访问对应 localhost 端口。Vite
 | B 三维美术 | feature/b-art      | 塔块配色、材质、灯光         | member-b-art      |
 | C UI       | feature/c-ui       | 中文菜单、难度入口、分数排版 | member-c-ui       |
 
-各副本打开独立 Rider 窗口。详见 [教学操作脚本](docs/teaching/lesson-plan.md) 和 [团队任务与接口](docs/teaching/tasks.md)。
+各副本打开独立 Rider 窗口。详见 [教学操作脚本](docs/teaching/guides/lesson-plan.md) 和 [团队任务与接口](docs/architecture/collaboration.md)。
 
 ## PR 约定
 

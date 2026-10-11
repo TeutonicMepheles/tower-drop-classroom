@@ -27,6 +27,7 @@ export default defineConfig({
       input: {
         game: path.resolve(import.meta.dirname, "index.html"),
         artLab: path.resolve(import.meta.dirname, "art-lab.html"),
+        uiLab: path.resolve(import.meta.dirname, "ui-lab.html"),
       },
     },
     outDir: "dist",
