@@ -1,38 +1,16 @@
 import { createGameScreen } from "@/ui/GameScreen";
-import type { GameSnapshot } from "@/contracts/game";
+import { initial, fixtures } from "./fixtures";
 import "@/ui/styles/global.css";
 import "./uiLab.css";
-const initial: GameSnapshot = {
-  difficulty: "normal",
-  phase: "ready",
-  score: 0,
-  layers: 0,
-  perfectStreak: 0,
-  lastResult: "none",
-  rewards: {
-    repair: 0,
-    slow: 0,
-    precision: 0,
-    shield: 0,
-    perfectRepair: 0,
-    steady: 0,
-  },
-  rewardChoices: [],
-  layersUntilReward: 5,
-  shields: 0,
-  rescuesUsed: 0,
-  perfectCount: 0,
-  longestStreak: 0,
-  bestLayers: 12,
-  recordBroken: false,
-};
+// Visual fixtures only: no gameplay, records, audio or frame loop.
 let state = { ...initial };
 const screen = createGameScreen({
   start: () => {
-    show("playing");
+    state = { ...fixtures.游戏中!, difficulty: state.difficulty };
+    screen.update(state);
   },
   drop: () => {
-    /* This preview has no gameplay clock. */
+    /* The fixture has no gameplay clock. */
   },
   setDifficulty: (difficulty) => {
     state = { ...state, difficulty };
@@ -43,40 +21,33 @@ const screen = createGameScreen({
       ...state,
       phase: "playing",
       rewardChoices: [],
+      layersUntilReward: 5,
+      shields: state.shields + (id === "shield" ? 1 : 0),
       rewards: { ...state.rewards, [id]: state.rewards[id] + 1 },
     };
     screen.update(state);
     return true;
   },
 });
-function show(phase: GameSnapshot["phase"]): void {
-  state = {
-    ...initial,
-    difficulty: state.difficulty,
-    phase,
-    score: phase === "ready" ? 0 : 15,
-    layers: phase === "ready" ? 0 : 5,
-    perfectStreak: 5,
-    perfectCount: 5,
-    longestStreak: 5,
-    lastResult: phase === "ended" ? "miss" : "perfect",
-    rewardChoices: phase === "reward" ? ["repair", "slow", "shield"] : [],
-  };
-  screen.update(state);
-}
 const toolbar = document.createElement("nav");
-toolbar.className = "lab-controls";
+toolbar.className = "lab-controls ui-lab-controls";
 toolbar.setAttribute("aria-label", "UI 状态预览");
-for (const [phase, label] of [
-  ["ready", "准备"],
-  ["playing", "游戏中"],
-  ["reward", "奖励"],
-  ["ended", "结算"],
-] as const) {
+toolbar.dataset.gameControl = "";
+for (const [label, fixture] of Object.entries(fixtures)) {
   const button = document.createElement("button");
   button.textContent = label;
   button.onclick = (): void => {
-    show(phase);
+    // Re-enter phases to reset presentation-only result caches between fixtures.
+    screen.update(initial);
+    state = {
+      ...fixture,
+      rewards: { ...fixture.rewards },
+      difficulty: state.difficulty,
+    };
+    screen.update(state);
+    toolbar.querySelectorAll("button").forEach((item) => {
+      item.setAttribute("aria-pressed", String(item === button));
+    });
   };
   toolbar.append(button);
 }

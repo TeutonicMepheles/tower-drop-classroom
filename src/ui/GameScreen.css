@@ -1,3 +1,11 @@
+@import "./styles/tokens.css";
+@import "./styles/hud.css";
+@import "./styles/rewards.css";
+@import "./styles/menu.css";
+
+.tower-drop-page [hidden] {
+  display: none !important;
+}
 .tower-drop__webgl {
   position: fixed;
   inset: 0;
@@ -10,302 +18,97 @@
   width: 100%;
   height: 100vh;
   height: 100dvh;
-  color: #edf4ff;
   pointer-events: none;
 }
-.tower-drop__menu {
+.tower-drop-page .sr-only {
   position: absolute;
-  inset: 0;
-  display: flex;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.ui-icon {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+.section-kicker {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  background: rgba(6, 14, 28, 0.65);
-  pointer-events: auto;
-  overflow-y: auto;
+  gap: 8px;
+  color: var(--ui-mint);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
 }
-.tower-drop__menu-wrapper {
-  width: min(100%, 460px);
-  padding: 2rem;
-  border: 1px solid #ffffff24;
-  border-radius: 24px;
-  background: #14233aef;
-  box-shadow: 0 20px 80px #0005;
-}
-.eyebrow {
-  color: #8ed5ff;
-  font-size: 0.7rem;
-  letter-spacing: 0.13em;
-}
-.tower-drop__title {
-  font-size: clamp(2rem, 6vw, 3rem);
-  margin: 0.5rem 0;
-  line-height: 1.1;
-}
-.menu-subtitle,
-.instructions,
-.round-summary {
-  color: #aec0d8;
-  font-size: 0.9rem;
-}
-.tower-drop__last-score {
-  font-size: 1.1rem;
-  margin-top: 1.25rem;
-}
-.tower-drop__menu fieldset {
-  border: 0;
-  margin: 1.4rem 0;
-}
-.tower-drop__menu legend {
-  font-size: 0.8rem;
-  color: #aec0d8;
-  margin-bottom: 0.5rem;
-}
-.tower-drop__menu label {
-  display: block;
-  background: #ffffff09;
-  border: 1px solid #ffffff18;
-  border-radius: 10px;
-  padding: 0.75rem;
-  margin-top: 0.5rem;
-  cursor: pointer;
-}
-.tower-drop__menu label:has(input:checked) {
-  border-color: #82d6ff;
-  background: #82d6ff15;
-}
-.tower-drop__menu small {
-  display: block;
-  margin-left: 1.5rem;
-  color: #aec0d8;
-  font-size: 0.75rem;
-}
-.tower-drop__menu input {
-  accent-color: #82d6ff;
-}
-.tower-drop__button {
-  width: 100%;
-  margin-top: 1rem;
-  padding: 0.9rem 1rem;
-  border-radius: 12px;
-  border: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #102238;
-  background: #8ed5ff;
-  cursor: pointer;
-}
-.tower-drop__button:hover {
-  background: #b2e3ff;
-}
-.tower-drop__button:focus-visible,
-.tower-drop__menu input:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: 4px;
-}
-.game-hud {
-  position: absolute;
-  inset: 1.5rem 1.5rem auto;
-  display: flex;
-  gap: 2rem;
-  pointer-events: none;
-}
-.hud-label {
-  display: block;
-  font-size: 0.7rem;
-  color: #c5d5e9;
-}
-.game-hud strong,
-.tower-drop__score {
-  font-size: 2rem;
-  line-height: 1.2;
-  font-weight: 700;
-}
-.tower-drop__score {
-  display: block;
-}
-.game-feedback {
-  position: absolute;
-  top: 7rem;
-  width: 100%;
-  text-align: center;
-  color: #ffe9a4;
-  font-weight: 700;
-  text-shadow: 0 2px 6px #000;
-}
-.play-hint {
-  position: absolute;
-  bottom: max(1.5rem, env(safe-area-inset-bottom));
-  padding: 0 1rem;
-  width: 100%;
-  text-align: center;
-  font-size: 0.8rem;
-  color: #c5d5e9;
-}
-.tower-drop-page:not([data-phase="playing"]) .game-hud,
-.tower-drop-page:not([data-phase="playing"]) .play-hint {
-  visibility: hidden;
-}
-@media (max-width: 480px), (max-height: 650px) {
-  .tower-drop__menu-wrapper {
-    padding: 1.25rem;
-  }
-  .game-hud {
-    gap: 1.5rem;
-    inset: 1rem 1rem auto;
-  }
-  .tower-drop__menu {
-    align-items: safe center;
-  }
-}
-
-.gameplay-status {
-  position: absolute;
-  top: 7rem;
-  left: 2.813rem;
-  color: white;
-  pointer-events: none;
-}
-.tower-drop__menu-wrapper > p,
-.tower-drop__menu-wrapper label {
-  color: white;
-  text-align: center;
-}
-.tower-drop__menu-wrapper select {
-  padding: 0.5rem;
-  margin-left: 0.5rem;
-}
-
-.reward-panel[hidden] {
-  display: none;
-}
-.reward-panel {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  display: grid;
-  place-items: center;
-  background: #101820de;
-  color: white;
-  padding: 24px;
-}
-.reward-panel__content {
-  width: min(820px, 100%);
-  text-align: center;
-}
-.reward-panel__content h2 {
-  font-size: 28px;
-  margin-bottom: 12px;
-}
-.reward-cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 24px;
-}
-.reward-cards button {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 24px 18px;
-  border: 2px solid #71d5be;
-  border-radius: 14px;
-  color: white;
-  background: #173e42;
-  cursor: pointer;
-  text-align: left;
-}
-.reward-cards strong {
-  font-size: 22px;
-}
-.reward-cards span {
-  font-size: 15px;
-  line-height: 1.7;
-}
-.reward-cards button:hover,
-.reward-cards button:focus-visible {
-  background: #286065;
-  outline: 3px solid #fff2ab;
-  outline-offset: 3px;
-}
-@media (max-width: 600px) {
-  .reward-cards {
-    grid-template-columns: 1fr;
-  }
-  .reward-cards button {
-    padding: 16px;
-    gap: 6px;
-  }
-  .gameplay-status {
-    left: 16px;
-    right: 16px;
-    font-size: 13px;
-  }
-}
-
-.run-progress {
-  position: absolute;
-  top: 10rem;
-  left: 2.813rem;
-  right: 2rem;
-  color: #e7f7ed;
-  pointer-events: none;
-  max-width: 760px;
-  line-height: 1.7;
+.panel-subtitle {
+  color: var(--ui-muted);
   font-size: 14px;
 }
-.run-feedback {
-  color: #fff3a2;
+.level-dots {
+  display: flex;
+  gap: 4px;
 }
-.run-summary {
-  text-align: center;
-  line-height: 1.8;
-  color: #fff3a2;
-  max-width: 560px;
+.level-dots i {
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  background: #d4efee25;
 }
-.tower-drop__menu-wrapper {
-  height: auto;
-  min-height: 50%;
-  gap: 18px;
+.level-dots .is-filled {
+  background: var(--accent, var(--ui-mint));
 }
-.reward-cards:has(button:only-child) {
-  grid-template-columns: 1fr;
+.tower-drop-page button {
+  -webkit-tap-highlight-color: transparent;
 }
-@media (max-width: 600px) {
-  .run-progress {
-    left: 16px;
-    right: 16px;
-    top: 10rem;
-    font-size: 12px;
-  }
-  .tower-drop__menu-wrapper {
-    width: 90%;
-  }
-}
-
-.tower-drop-page[data-phase="reward"] .game-hud {
-  visibility: visible;
-}
-.gameplay-status {
-  top: 7.2rem;
-  left: 2.8rem;
-  font-size: 13px;
-}
-.run-progress {
-  top: 9rem;
-  font-size: 13px;
-}
-.reward-panel {
-  z-index: 10;
-  backdrop-filter: blur(6px);
-  pointer-events: auto;
+.tower-drop-page button:focus-visible,
+.difficulty-picker label:has(input:focus-visible) {
+  outline: 3px solid var(--ui-ink);
+  outline-offset: 5px;
 }
 .game-feedback {
-  top: 14rem;
+  position: absolute;
+  bottom: 140px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
-@media (max-width: 600px) {
-  .gameplay-status {
-    left: 16px;
-    right: 16px;
+.feedback-toast {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #f5d99442;
+  border-radius: 40px;
+  padding: 10px 18px;
+  background: #142e39e8;
+  color: var(--ui-gold);
+  box-shadow: 0 8px 30px #0002;
+  animation: ui-arrive 240ms ease-out;
+}
+.feedback-toast span {
+  color: var(--ui-ink);
+  font-size: 13px;
+}
+@keyframes ui-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tower-drop__container *,
+  .tower-drop__container *::before,
+  .tower-drop__container *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }

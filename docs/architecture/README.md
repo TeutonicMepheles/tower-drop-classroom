@@ -40,5 +40,6 @@ A/B/C 各用 3101/3102/3103。`/art-lab.html` 是三维美术预览；`/ui-lab.h
 `/integration-lab.html` 仅在开发服务器使用：以可控位置替代时钟移动，其他 UI、游戏命令、场景和物理均为真实实现，用于重复验收；它未列入生产构建入口。
 
 - [接口与时序](contracts.md)
+- [UI 系统与内容规范](ui-system.md)
 - [角色协作](collaboration.md)
 - [迁移与验证记录](migration.md)
