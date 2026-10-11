@@ -74,6 +74,7 @@ export default [
       "dist/**",
       "node_modules/**",
       "coverage/**",
+      ".commit-explorer/**",
       "*.config.js",
       "vite.config.ts",
     ],
@@ -150,6 +151,19 @@ export default [
         "localStorage",
         "performance",
       ],
+    },
+  },
+  {
+    ...typescript.configs.disableTypeChecked,
+    files: ["tools/commit-explorer/**/*.{js,mjs}"],
+    languageOptions: {
+      parserOptions: { project: false, projectService: false },
+      globals: { ...globals.node, ...globals.browser },
+    },
+    rules: {
+      ...typescript.configs.disableTypeChecked.rules,
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "no-console": "off",
     },
   },
   // Reglas específicas para tests (más permisivas)

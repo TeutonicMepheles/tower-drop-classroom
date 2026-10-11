@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Tower Drop · 提交放映室</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <span class="eyebrow">TOWER DROP / CLASSROOM</span>
+        <h1>提交放映室<span>Commit Explorer</span></h1>
+      </div>
+      <button id="refresh">刷新历史 ↻</button>
+    </header>
+    <main>
+      <section class="history">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">01 / DEVELOPMENT TREE</span>
+            <h2>每条分支，都有一个故事</h2>
+          </div>
+          <p id="repository">正在读取本地 Git 历史…</p>
+        </div>
+        <div class="filters">
+          <input
+            id="search"
+            aria-label="搜索提交"
+            placeholder="搜索说明、作者、SHA 或分支…"
+          /><label><input type="checkbox" id="all" /> 显示更早历史</label>
+        </div>
+        <div class="legend">
+          <span>● 提交节点</span><span>连线 = 父子关系</span
+          ><span>多条连线 = 合并</span>
+        </div>
+        <div id="tree" class="tree" aria-label="Git 提交关系图"></div>
+      </section>
+      <section class="stage">
+        <div class="section-head stage-head">
+          <div>
+            <span class="eyebrow">02 / PLAY THE DIFFERENCE</span>
+            <h2>把提交变成可玩的版本</h2>
+          </div>
+          <div class="actions">
+            <span id="count">0 / 3</span><button id="clear">清空选择</button>
+          </div>
+        </div>
+        <p class="hint">
+          点击左侧节点，最多并排比较 3
+          个版本。先选分工前的基线，再选各角色成果，最后展示合并结果。
+        </p>
+        <div id="notice" role="status" aria-live="polite"></div>
+        <div id="previews" class="previews">
+          <div class="empty">
+            <div class="symbol">⌘</div>
+            <h3>从一个提交开始</h3>
+            <p>
+              选择节点后，这里会加载该提交的真实游戏。<br />首次构建需要等待，之后可直接打开。
+            </p>
+          </div>
+        </div>
+        <footer>本地提交快照 · 连线来自真实父子关系 · 不包含未提交改动</footer>
+      </section>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

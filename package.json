@@ -34,6 +34,7 @@
     "vite": "^7.1.6"
   },
   "scripts": {
+    "explorer": "node tools/commit-explorer/server.mjs",
     "dev": "vite",
     "build": "tsc -p tsconfig.app.json && vite build",
     "preview": "vite preview",
