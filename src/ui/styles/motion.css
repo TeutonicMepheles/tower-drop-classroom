@@ -1,0 +1,181 @@
+/* Quiet ambient motion; stronger motion happens only on player achievements. */
+.menu-stack {
+  animation: zen-float 5s ease-in-out infinite;
+}
+.menu-stack i:nth-child(3) {
+  animation: zen-breathe 4s ease-in-out infinite;
+}
+.reward-card {
+  animation: card-bloom 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  box-shadow: 0 14px 36px #28473d0b;
+}
+.reward-card:nth-child(2) {
+  animation-delay: 90ms;
+}
+.reward-card:nth-child(3) {
+  animation-delay: 180ms;
+}
+.reward-card__art {
+  background: radial-gradient(ellipse, #a6caab33, transparent 70%);
+  border-radius: 50%;
+}
+.reward-card:hover .reward-illustration,
+.reward-card:focus-visible .reward-illustration {
+  animation: zen-float 2.5s ease-in-out infinite;
+}
+.tower-drop__button .ui-icon {
+  transition: transform 220ms ease;
+}
+.tower-drop__button:hover .ui-icon {
+  transform: translateX(7px);
+}
+.result-record[data-new="true"] {
+  animation: record-glow 2.4s ease-in-out 3;
+}
+.result-height {
+  animation: result-bloom 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.feedback-toast {
+  position: relative;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: calc(100vw - 40px);
+  gap: 10px 16px;
+}
+.feedback-toast strong {
+  font-size: var(--text-emphasis);
+  font-weight: 600;
+}
+.feedback-toast > span {
+  font-size: var(--text-emphasis);
+}
+.feedback-toast[data-kind="streak"],
+.feedback-toast[data-kind="record"] {
+  border-color: #f6d795aa;
+  box-shadow: 0 0 45px #f6d79522;
+}
+.feedback-toast[data-kind="reward"] {
+  color: var(--ui-mint);
+}
+.feedback-petals {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.feedback-petals i {
+  position: absolute;
+  width: 10px;
+  height: 16px;
+  border-radius: 80% 15% 80% 15%;
+  background: currentColor;
+  opacity: 0;
+  animation: petal-rise 1100ms ease-out;
+}
+.feedback-petals i:nth-child(1) {
+  left: 6%;
+  top: 10%;
+  --drift: -30px;
+}
+.feedback-petals i:nth-child(2) {
+  left: 22%;
+  top: -8%;
+  --drift: -15px;
+  animation-delay: 90ms;
+}
+.feedback-petals i:nth-child(3) {
+  left: 40%;
+  top: 0;
+  --drift: -8px;
+  animation-delay: 160ms;
+}
+.feedback-petals i:nth-child(4) {
+  left: 60%;
+  top: 0;
+  --drift: 14px;
+  animation-delay: 50ms;
+}
+.feedback-petals i:nth-child(5) {
+  left: 78%;
+  top: -8%;
+  --drift: 22px;
+  animation-delay: 130ms;
+}
+.feedback-petals i:nth-child(6) {
+  left: 94%;
+  top: 10%;
+  --drift: 32px;
+  animation-delay: 200ms;
+}
+.feedback-toast[data-kind="normal"] .feedback-petals,
+.feedback-toast[data-kind="rescue"] .feedback-petals {
+  display: none;
+}
+@keyframes zen-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+@keyframes zen-breathe {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.12);
+  }
+}
+@keyframes card-bloom {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes result-bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes record-glow {
+  50% {
+    box-shadow: 0 0 30px #b8913938;
+  }
+}
+@keyframes petal-rise {
+  10% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--drift), -60px) rotate(90deg);
+  }
+}
+@media (max-width: 700px) {
+  .game-feedback {
+    bottom: 185px;
+  }
+  .feedback-toast {
+    padding: 12px 18px;
+  }
+  .hud-resources {
+    max-width: 120px;
+  }
+  .hud-metrics {
+    gap: 10px;
+  }
+  .hud-secondary {
+    padding-left: 10px;
+  }
+}

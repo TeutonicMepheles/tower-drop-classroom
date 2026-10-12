@@ -1,53 +1,13 @@
 import { createGameScreen } from "@/ui/GameScreen";
 import type { GameSnapshot } from "@/contracts/game";
+import { initial, fixtures } from "./fixtures";
 import "@/ui/styles/global.css";
 import "./uiLab.css";
-const initial: GameSnapshot = {
-  speedMultiplier: 1,
-  skills: {
-    magnetCharges: 1,
-    repairCharges: 1,
-    freezeCharges: 1,
-    freezeRemainingMs: 0,
-    canUseRepair: false,
-    canUseFreeze: false,
-    menuOpen: false,
-    remainingMs: 2000,
-    usedThisLayer: false,
-    canUseMagnet: false,
-  },
-  difficulty: "normal",
-  phase: "ready",
-  score: 0,
-  layers: 0,
-  perfectStreak: 0,
-  lastResult: "none",
-  rewards: {
-    repair: 0,
-    precision: 0,
-    shield: 0,
-    perfectRepair: 0,
-    steady: 0,
-    magnetSupply: 0,
-    repairSupply: 0,
-    freezeSupply: 0,
-  },
-  rewardChoices: [],
-  layersUntilReward: 5,
-  shields: 0,
-  rescuesUsed: 0,
-  perfectCount: 0,
-  longestStreak: 0,
-  bestLayers: 12,
-  recordBroken: false,
-};
+// Visual fixtures only: no gameplay, records, audio or frame loop.
 let state = { ...initial };
 const screen = createGameScreen({
   openSkillMenu: () => {
-    state = {
-      ...state,
-      skills: { ...state.skills, menuOpen: true, canUseMagnet: true },
-    };
+    state = { ...state, skills: { ...state.skills, menuOpen: true } };
     screen.update(state);
     return true;
   },
@@ -55,27 +15,31 @@ const screen = createGameScreen({
     state = { ...state, skills: { ...state.skills, menuOpen: false } };
     screen.update(state);
   },
-  useSkill: () => {
+  useSkill: (id) => {
+    const charge = {
+      magnet: "magnetCharges",
+      repair: "repairCharges",
+      freeze: "freezeCharges",
+    } as const;
     state = {
       ...state,
-      skills: { ...state.skills, menuOpen: false, usedThisLayer: true },
+      skills: {
+        ...state.skills,
+        [charge[id]]: Math.max(0, state.skills[charge[id]] - 1),
+        menuOpen: false,
+        usedThisLayer: true,
+      },
     };
     screen.update(state);
     return true;
   },
-  useMagnet: () => {
-    state = {
-      ...state,
-      skills: { ...state.skills, menuOpen: false, magnetCharges: 0 },
-    };
-    screen.update(state);
-    return true;
-  },
+  useMagnet: () => false,
   start: () => {
-    show("playing");
+    state = { ...fixtures.游戏中!, difficulty: state.difficulty };
+    screen.update(state);
   },
   drop: () => {
-    /* This preview has no gameplay clock. */
+    /* The fixture has no gameplay clock. */
   },
   setDifficulty: (difficulty) => {
     state = { ...state, difficulty };
@@ -86,40 +50,78 @@ const screen = createGameScreen({
       ...state,
       phase: "playing",
       rewardChoices: [],
+      layersUntilReward: 5,
+      skills: {
+        ...state.skills,
+        magnetCharges:
+          state.skills.magnetCharges + (id === "magnetSupply" ? 1 : 0),
+        repairCharges:
+          state.skills.repairCharges + (id === "repairSupply" ? 1 : 0),
+        freezeCharges:
+          state.skills.freezeCharges + (id === "freezeSupply" ? 1 : 0),
+      },
+      shields: state.shields + (id === "shield" ? 1 : 0),
       rewards: { ...state.rewards, [id]: state.rewards[id] + 1 },
     };
     screen.update(state);
     return true;
   },
 });
-function show(phase: GameSnapshot["phase"]): void {
-  state = {
-    ...initial,
-    difficulty: state.difficulty,
-    phase,
-    score: phase === "ready" ? 0 : 15,
-    layers: phase === "ready" ? 0 : 5,
-    perfectStreak: 5,
-    perfectCount: 5,
-    longestStreak: 5,
-    lastResult: phase === "ended" ? "miss" : "perfect",
-    rewardChoices: phase === "reward" ? ["repair", "precision", "shield"] : [],
-  };
-  screen.update(state);
-}
 const toolbar = document.createElement("nav");
-toolbar.className = "lab-controls";
+toolbar.className = "lab-controls ui-lab-controls";
 toolbar.setAttribute("aria-label", "UI 状态预览");
-for (const [phase, label] of [
-  ["ready", "准备"],
-  ["playing", "游戏中"],
-  ["reward", "奖励"],
-  ["ended", "结算"],
+toolbar.dataset.gameControl = "";
+for (const [label, fixture] of Object.entries(fixtures)) {
+  const button = document.createElement("button");
+  button.textContent = label;
+  button.onclick = (): void => {
+    // Re-enter phases to reset presentation-only result caches between fixtures.
+    screen.update(initial);
+    state = {
+      ...fixture,
+      rewards: { ...fixture.rewards },
+      difficulty: state.difficulty,
+    };
+    screen.update(state);
+    toolbar.querySelectorAll("button").forEach((item) => {
+      item.setAttribute("aria-pressed", String(item === button));
+    });
+  };
+  toolbar.append(button);
+}
+for (const [label, streak, record] of [
+  ["完美反馈", 1, false],
+  ["连击反馈", 5, false],
+  ["纪录反馈", 6, true],
 ] as const) {
   const button = document.createElement("button");
   button.textContent = label;
   button.onclick = (): void => {
-    show(phase);
+    const before: GameSnapshot = {
+      ...initial,
+      phase: "playing",
+      layers: 6,
+      score: 20,
+      perfectStreak: streak - 1,
+      bestLayers: record ? 6 : 24,
+      layersUntilReward: 4,
+    };
+    screen.update(initial);
+    screen.update(before);
+    state = {
+      ...before,
+      layers: 7,
+      score: 20 + Math.min(streak, 5),
+      perfectStreak: streak,
+      lastResult: "perfect",
+      layersUntilReward: 3,
+      recordBroken: record,
+      bestLayers: record ? 7 : 24,
+    };
+    screen.update(state);
+    toolbar.querySelectorAll("button").forEach((item) => {
+      item.setAttribute("aria-pressed", String(item === button));
+    });
   };
   toolbar.append(button);
 }

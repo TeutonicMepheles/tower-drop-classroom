@@ -44,9 +44,7 @@ describe("TowerDropPage", () => {
     );
     screen.getByRole("button", { name: /开始游戏|再玩一次/ }).click();
     expect(document.querySelector(".run-summary")).not.toBeVisible();
-    expect(document.querySelector(".run-bonuses")).toHaveTextContent(
-      "暂无加成"
-    );
+    expect(document.querySelector(".run-bonuses")).toBeEmptyDOMElement();
   });
   it("shows three reward cards after five landings and resumes without an extra drop", () => {
     jest.spyOn(Math, "random").mockReturnValue(0);
@@ -60,12 +58,13 @@ describe("TowerDropPage", () => {
     expect(screen.getAllByRole("button")).toHaveLength(3);
     screen.getByRole("button", { name: /精准辅助/ }).click();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(document.querySelector(".gameplay-status")).toHaveTextContent(
-      "5 层"
-    );
-    expect(document.querySelector(".gameplay-status")).toHaveTextContent(
-      "精准 1/3"
-    );
+    expect(document.querySelector("[data-game-layers]")).toHaveTextContent("5");
+    expect(screen.getByLabelText("精准辅助 1/3")).toBeVisible();
+    expect(session.getSnapshot()).toMatchObject({
+      phase: "playing",
+      layers: 5,
+      rewards: { precision: 1 },
+    });
   });
   afterEach(() => {
     page?.cleanup?.();
@@ -111,7 +110,7 @@ describe("TowerDropPage", () => {
     it("should render the last score heading with initial value", () => {
       renderPage();
       expect(
-        screen.getByRole("heading", { name: /准备好挑战了吗/i, level: 2 })
+        screen.getByRole("heading", { name: /游戏开始菜单/i, level: 2 })
       ).toBeInTheDocument();
     });
 

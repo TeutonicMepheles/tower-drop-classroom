@@ -134,7 +134,8 @@ export function createSkillMenu(game: GameCommands): {
         });
         if (state.phase === "playing") {
           if (trigger.disabled)
-            element.parentElement
+            element
+              .closest(".tower-drop-page")
               ?.querySelector<HTMLCanvasElement>("canvas")
               ?.focus({ preventScroll: true });
           else trigger.focus({ preventScroll: true });

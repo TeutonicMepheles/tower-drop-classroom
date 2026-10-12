@@ -1,6 +1,13 @@
 body {
-  background: #182b42;
+  background: radial-gradient(ellipse at 50% 45%, #203f47, #0e202e 75%);
   color: #fff;
+}
+body:has(.ui-lab-controls) .hud-bottom {
+  bottom: 68px;
+}
+body:has(.ui-lab-controls) .tower-drop__menu,
+body:has(.ui-lab-controls) .reward-panel {
+  padding-bottom: 80px;
 }
 .lab-controls {
   position: fixed;
@@ -8,9 +15,50 @@ body {
   right: 12px;
   bottom: 12px;
   display: flex;
-  gap: 8px;
+  gap: 5px;
+  padding: 6px;
+  background: #07141df2;
+  border: 1px solid #a8edd344;
+  border-radius: 10px;
+  flex-wrap: wrap;
+  max-width: calc(100vw - 24px);
 }
 .lab-controls button {
-  padding: 6px 12px;
+  padding: 6px 10px;
   cursor: pointer;
+  color: #b8cdd1;
+  background: transparent;
+  border: 1px solid #b8cdd12b;
+  border-radius: 5px;
+  font-size: 11px;
+}
+.lab-controls button:hover,
+.lab-controls button[aria-pressed="true"] {
+  background: #a8edd325;
+  color: #a8edd3;
+}
+@media (max-width: 600px) {
+  .ui-lab-controls {
+    bottom: 4px;
+    right: 4px;
+    left: 4px;
+    max-width: none;
+    gap: 3px;
+    justify-content: center;
+  }
+  .ui-lab-controls button {
+    padding: 5px;
+    font-size: 10px;
+  }
+}
+
+body:has(.ui-lab-controls) .skill-menu {
+  bottom: 80px;
+  max-height: calc(100dvh - 104px);
+}
+@media (max-width: 600px) {
+  body:has(.ui-lab-controls) .skill-menu {
+    bottom: 120px;
+    max-height: calc(100dvh - 140px);
+  }
 }
