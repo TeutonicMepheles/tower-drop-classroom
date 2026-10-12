@@ -1,13 +1,20 @@
 export type RewardId =
   | "repair"
-  | "slow"
   | "precision"
   | "shield"
   | "perfectRepair"
   | "steady";
 export type RewardLevels = Record<RewardId, number>;
 export type Difficulty = "easy" | "normal";
+export interface SkillSnapshot {
+  magnetCharges: number;
+  menuOpen: boolean;
+  remainingMs: number;
+  usedThisLayer: boolean;
+  canUseMagnet: boolean;
+}
 export interface GameSnapshot {
+  skills: SkillSnapshot;
   difficulty: Difficulty;
   phase: "ready" | "playing" | "reward" | "ended";
   score: number;
@@ -25,6 +32,9 @@ export interface GameSnapshot {
   recordBroken: boolean;
 }
 export interface GameCommands {
+  openSkillMenu(): boolean;
+  closeSkillMenu(): void;
+  useMagnet(): boolean;
   start(): void;
   drop(): void;
   setDifficulty(difficulty: Difficulty): void;

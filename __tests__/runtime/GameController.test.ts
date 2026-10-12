@@ -11,6 +11,7 @@ const setup = (): {
   publish: jest.Mock;
 } => {
   const scene = {
+    hitTestMovingBlock: jest.fn((_x: number, _y: number) => true),
     sync: jest.fn(),
     feedback: jest.fn(),
     follow: jest.fn(),
@@ -92,7 +93,7 @@ it("orders frame updates and makes stale callbacks inert after disposal", () => 
   expect(model.getBlocks().at(-1)!.position.x - initial).toBeCloseTo(
     model.speed / 2
   );
-  expect(physics.step).toHaveBeenCalledWith(-16);
+  expect(physics.step).toHaveBeenCalledWith(-16, expect.closeTo(0.5));
   const calls = scene.render.mock.calls.length;
   game.dispose();
   game.dispose();
@@ -115,4 +116,27 @@ it("does not restart active games and reinitializes an ended round", () => {
   expect(scene.reset).toHaveBeenCalledTimes(2);
   expect(game.getSnapshot()).toMatchObject({ phase: "playing", score: 0 });
   game.dispose();
+});
+
+it("keeps one loop during bullet time, uses real elapsed time and persists skill landings", () => {
+  const { game, model, driver, physics, save, publish } = setup();
+  jest.spyOn(performance, "now").mockReturnValue(1000);
+  game.start();
+  align(model, 0.5);
+  const frame = driver.setAnimationLoop.mock.calls.at(-1)![0] as (
+    time: number
+  ) => void;
+  game.openSkillMenu();
+  expect(driver.setAnimationLoop).toHaveBeenCalledTimes(2); // stop before start, then one loop
+  frame(1016.6666667);
+  expect(physics.step).toHaveBeenLastCalledWith(-16, expect.closeTo(0.2));
+  expect(publish.mock.calls.at(-1)![0].skills.remainingMs).toBeCloseTo(
+    1983.3333333
+  );
+  expect(game.useMagnet()).toBe(true);
+  expect(save).toHaveBeenLastCalledWith({ easy: 0, normal: 1 });
+  expect(game.getSnapshot().layers).toBe(1);
+  game.dispose();
+  expect(game.openSkillMenu()).toBe(false);
+  expect(game.useMagnet()).toBe(false);
 });

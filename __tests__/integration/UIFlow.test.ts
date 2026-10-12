@@ -13,7 +13,7 @@ describe("Chinese game UI integration", () => {
     button.click();
     expect(easy.disabled).toBe(true);
     expect(page.dataset.phase).toBe("playing");
-    session.advance(10 / session.speed);
+    session.advance(-session.getBlocks().at(-1)!.position.x / session.speed);
     window.dispatchEvent(new MouseEvent("click"));
     expect(page.querySelector("[data-game-score]")).toHaveTextContent("1");
     expect(page.querySelector("[data-game-layers]")).toHaveTextContent("1");

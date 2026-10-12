@@ -15,6 +15,7 @@ export interface FragmentPose {
   quaternion: { x: number; y: number; z: number; w: number };
 }
 export interface ScenePort {
+  hitTestMovingBlock(clientX: number, clientY: number): boolean;
   sync(blocks: readonly BlockData[], fragments: readonly FragmentPose[]): void;
   feedback(events: readonly GameEvent[], phase: GameSnapshot["phase"]): void;
   follow(layers: number, movement: number): void;
@@ -27,7 +28,7 @@ export interface ScenePort {
 export interface PhysicsPort {
   sync(blocks: readonly BlockData[]): void;
   addFragment(block: BlockData): void;
-  step(minHeight: number): void;
+  step(minHeight: number, frameScale?: number): void;
   getFragments(): FragmentPose[];
   reset(): void;
   dispose(): void;

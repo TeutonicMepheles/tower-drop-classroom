@@ -73,8 +73,8 @@ export class TowerPhysics implements PhysicsPort {
     );
     this.fragments.set(block.id, entry);
   }
-  public step(minHeight: number): void {
-    this.world.step(1 / 60);
+  public step(minHeight: number, frameScale = 1): void {
+    if (frameScale > 0) this.world.step(frameScale / 60);
     for (const [id, entry] of this.fragments)
       if (entry.body.position.y < minHeight) {
         this.world.remove(entry.body);

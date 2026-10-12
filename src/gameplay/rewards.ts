@@ -3,7 +3,6 @@ export type { RewardId, RewardLevels } from "@/contracts/game";
 export const REWARD_INTERVAL = 5;
 const REWARDS = {
   repair: { max: null },
-  slow: { max: 3 },
   precision: { max: 3 },
   shield: { max: null },
   perfectRepair: { max: 3 },
@@ -12,7 +11,6 @@ const REWARDS = {
 
 export const emptyRewards = (): RewardLevels => ({
   repair: 0,
-  slow: 0,
   precision: 0,
   shield: 0,
   perfectRepair: 0,

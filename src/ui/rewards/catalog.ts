@@ -3,13 +3,10 @@ export const REWARD_LABELS = {
     title: "塔身修复",
     description: "塔顶宽、深各恢复 0.3，最多恢复至初始尺寸。",
   },
-  slow: {
-    title: "从容节奏",
-    description: "移动速度降低 8%，本局最多选择 3 次。",
-  },
   precision: {
     title: "精准辅助",
-    description: "完美判定范围增加基础值的 20%，本局最多选择 3 次。",
+    description:
+      "完美判定范围增加基础值的 35%，本局最多选择 3 次；判定偏差不超过当前移动方向较小方块尺寸的 20%。",
   },
   shield: {
     title: "安全护盾",

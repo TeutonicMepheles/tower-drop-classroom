@@ -16,7 +16,6 @@ it("draws unique options and guarantees narrow towers a repair", () => {
 it("filters full upgrades without leaving an empty reward screen", () => {
   const levels = {
     ...emptyRewards(),
-    slow: 3,
     precision: 3,
     perfectRepair: 3,
     steady: 3,
