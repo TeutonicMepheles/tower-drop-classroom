@@ -20,7 +20,7 @@ export const createHud = (): View<GameSnapshot> => {
     </div><div class="hud-resources"><div class="shield-meter" role="img"><span class="shield-slot">${icon("shield")}</span><span class="shield-slot">${icon("shield")}</span><span class="hud-caption">护盾</span></div><div class="run-bonuses" aria-label="持续加成"></div></div></div>
     <div class="combo-badge" hidden>${icon("spark")}<span>完美连击</span><strong>×<span data-game-streak>0</span></strong></div>
     <div class="hud-bottom"><div class="reward-track" role="progressbar" aria-label="下次奖励进度" aria-valuemin="0" aria-valuemax="5">
-      <div class="reward-track__header"><span>${icon("gift")} 下次奖励</span><span data-reward-distance></span></div><div class="reward-track__steps">${Array.from({ length: 5 }, () => "<i></i>").join("")}</div></div><p class="play-hint">点击画面落块</p></div>`;
+      <div class="reward-track__header"><span>${icon("gift")} 下次奖励</span><span data-reward-distance></span></div><div class="reward-track__steps">${Array.from({ length: 5 }, () => "<i></i>").join("")}</div></div><p class="play-hint">短按落块 · 长按方块选择技能</p></div>`;
   let bonusKey = "";
   const motion = createMotion();
   let previous: Readonly<GameSnapshot> | undefined;

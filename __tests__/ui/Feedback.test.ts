@@ -42,9 +42,13 @@ it("names the reward actually obtained, and does not treat starting a run as a l
   expect(
     feedbackMessage(
       { ...initial, phase: "reward" },
-      { ...initial, phase: "playing", rewards: { ...initial.rewards, slow: 1 } }
+      {
+        ...initial,
+        phase: "playing",
+        rewards: { ...initial.rewards, precision: 1 },
+      }
     )
-  ).toMatchObject({ kind: "reward", title: "已获得：移动减速" });
+  ).toMatchObject({ kind: "reward", title: "已获得：精准辅助" });
   expect(
     feedbackMessage(initial, { ...initial, phase: "playing", layers: 9 })
   ).toBeUndefined();

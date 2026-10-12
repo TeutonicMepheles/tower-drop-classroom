@@ -1,9 +1,13 @@
 import type { RewardId } from "@/contracts/game";
 /** Symbolic effect diagrams, not numerical previews of live tower geometry. */
 const drawings: Record<RewardId, string> = {
+  magnetSupply:
+    '<path d="M48 20v32a32 32 0 0 0 64 0V20H94v32a14 14 0 0 1-28 0V20ZM48 33h18m28 0h18M26 44l12 6m96-6-12 6M80 76v14"/>',
+  repairSupply: '<path d="M38 32h84v50H38zM64 32V20h32v12M80 43v28M66 57h28"/>',
   repair:
     '<path d="m18 47 21-11 21 11-21 11-21-11Zm0 0v15l21 11 21-11V47"/><path d="M73 53h18m-5-5 5 5-5 5"/><path d="m102 43 24-13 24 13-24 13-24-13Zm0 0v19l24 13 24-13V43"/><path d="M99 25v-8h12m32 0h10v8" stroke-dasharray="3 4"/>',
-  slow: '<path d="M12 37h36M22 49h26M32 61h16" opacity=".45"/><circle cx="93" cy="48" r="28"/><path d="M93 31v17l-13 9m6-45h14m-7 0v8M119 23l7-7"/><path d="m64 75-4 6m66-6 4 6"/>',
+  freezeSupply:
+    '<path d="M12 37h36M22 49h26M32 61h16" opacity=".45"/><circle cx="93" cy="48" r="28"/><path d="M93 31v17l-13 9m6-45h14m-7 0v8M119 23l7-7"/><path d="m64 75-4 6m66-6 4 6"/>',
   precision:
     '<path d="M30 27V15h24m76 12V15h-24M30 69v12h24m76-12v12h-24" opacity=".55"/><path d="M47 30h65v35H47z" stroke-dasharray="4 4"/><path d="M54 36h52v23H54z"/><path d="M80 22v10m0 30v12M38 48h12m60 0h12"/>',
   shield:

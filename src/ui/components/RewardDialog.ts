@@ -56,7 +56,10 @@ export const createRewardDialog = (
       );
       setText(element, "[data-reward-layer]", `第 ${state.layers} 层`);
       const key = current
-        .map((id) => `${id}:${state.rewards[id]}:${state.shields}`)
+        .map(
+          (id) =>
+            `${id}:${state.rewards[id]}:${state.shields}:${rewardUpgrade(id, state)}`
+        )
         .join("|");
       if (contentKey !== key) {
         contentKey = key;

@@ -1,5 +1,6 @@
+import { createSkillMenu } from "./skills/SkillMenu";
 import type { Page } from "@/ui/types";
-import type { GameCommands, GameSnapshot } from "@/contracts/game";
+import type { GameCommands, GameSnapshot, SkillId } from "@/contracts/game";
 import { createHud } from "./components/Hud";
 import { createRewardDialog } from "./components/RewardDialog";
 import { createRunMenu } from "./components/RunMenu";
@@ -12,6 +13,7 @@ export const createGameScreen = (
   element: Page;
   update: (state: Readonly<GameSnapshot>) => void;
   dispose: () => void;
+  pointAtSkill: (x: number, y: number) => SkillId | "cancel" | null;
 } => {
   const main = document.createElement("main") as Page;
   main.className = "tower-drop-page";
@@ -32,7 +34,8 @@ export const createGameScreen = (
   const rewards = createRewardDialog((id) => {
     game.chooseReward(id);
   });
-  const views = [hud, feedback, menu, rewards];
+  const skills = createSkillMenu(game);
+  const views = [hud, feedback, menu, rewards, skills];
   main
     .querySelector(".tower-drop__container")!
     .append(...views.map((view) => view.element));
@@ -46,7 +49,8 @@ export const createGameScreen = (
     });
     if (
       (previous === "reward" || previous === "ready" || previous === "ended") &&
-      state.phase === "playing"
+      state.phase === "playing" &&
+      !state.skills.menuOpen
     )
       canvas.focus();
     previous = state.phase;
@@ -59,5 +63,10 @@ export const createGameScreen = (
     });
   };
   main.cleanup = dispose;
-  return { element: main, update, dispose };
+  return {
+    element: main,
+    update,
+    dispose,
+    pointAtSkill: (x, y) => skills.pointAt(x, y),
+  };
 };

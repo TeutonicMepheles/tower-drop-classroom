@@ -1,5 +1,18 @@
 import type { GameSnapshot } from "@/contracts/game";
 export const initial: GameSnapshot = {
+  speedMultiplier: 1,
+  skills: {
+    magnetCharges: 1,
+    repairCharges: 1,
+    freezeCharges: 1,
+    freezeRemainingMs: 0,
+    canUseRepair: false,
+    canUseFreeze: true,
+    menuOpen: false,
+    remainingMs: 2000,
+    usedThisLayer: false,
+    canUseMagnet: false,
+  },
   difficulty: "normal",
   phase: "ready",
   score: 0,
@@ -8,7 +21,9 @@ export const initial: GameSnapshot = {
   lastResult: "none",
   rewards: {
     repair: 0,
-    slow: 0,
+    magnetSupply: 0,
+    repairSupply: 0,
+    freezeSupply: 0,
     precision: 0,
     shield: 0,
     perfectRepair: 0,
@@ -36,7 +51,7 @@ export const fixtures: Record<string, GameSnapshot> = {
     longestStreak: 4,
     layersUntilReward: 2,
     shields: 1,
-    rewards: { ...initial.rewards, shield: 1, slow: 1 },
+    rewards: { ...initial.rewards, shield: 1, precision: 1 },
   },
   满级加成: {
     ...initial,
@@ -52,8 +67,9 @@ export const fixtures: Record<string, GameSnapshot> = {
     bestLayers: 42,
     recordBroken: true,
     rewards: {
+      ...initial.rewards,
       repair: 2,
-      slow: 3,
+
       precision: 3,
       shield: 3,
       perfectRepair: 3,
@@ -69,7 +85,7 @@ export const fixtures: Record<string, GameSnapshot> = {
     perfectCount: 4,
     longestStreak: 4,
     layersUntilReward: 0,
-    rewardChoices: ["repair", "slow", "shield"],
+    rewardChoices: ["repair", "precision", "shield"],
   },
   持续奖励: {
     ...initial,
@@ -92,7 +108,7 @@ export const fixtures: Record<string, GameSnapshot> = {
     shields: 1,
     rewards: {
       ...initial.rewards,
-      slow: 3,
+
       precision: 3,
       perfectRepair: 3,
       steady: 3,
@@ -111,4 +127,38 @@ export const fixtures: Record<string, GameSnapshot> = {
     bestLayers: 28,
     recordBroken: true,
   },
+};
+
+fixtures.技能菜单 = {
+  ...fixtures.游戏中!,
+  skills: {
+    ...initial.skills,
+    menuOpen: true,
+    canUseMagnet: true,
+    canUseRepair: true,
+  },
+};
+fixtures.技能补给 = {
+  ...fixtures.奖励!,
+  rewardChoices: ["magnetSupply", "repairSupply", "freezeSupply"],
+  skills: {
+    ...initial.skills,
+    magnetCharges: 0,
+    repairCharges: 0,
+    freezeCharges: 0,
+  },
+};
+fixtures.技能耗尽 = {
+  ...fixtures.游戏中!,
+  skills: {
+    ...initial.skills,
+    magnetCharges: 0,
+    repairCharges: 0,
+    freezeCharges: 0,
+    canUseFreeze: false,
+  },
+};
+fixtures.定格中 = {
+  ...fixtures.游戏中!,
+  skills: { ...initial.skills, freezeRemainingMs: 800, usedThisLayer: true },
 };

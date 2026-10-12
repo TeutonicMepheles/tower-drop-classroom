@@ -31,6 +31,7 @@ export class TowerScene implements ScenePort, AnimationDriver {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly atmosphere: Atmosphere;
   private readonly particles: SuccessParticles;
+  private movingId: number | undefined;
   private readonly views = new Map<number, View>();
   private feedbackMaterial: THREE.MeshStandardMaterial | undefined;
   private feedbackUntil = 0;
@@ -113,10 +114,30 @@ export class TowerScene implements ScenePort, AnimationDriver {
     );
     return view;
   }
+  public hitTestMovingBlock(clientX: number, clientY: number): boolean {
+    const view =
+      this.movingId === undefined ? undefined : this.views.get(this.movingId);
+    if (!view || this.disposed) return false;
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    const point = new THREE.Vector2(
+      ((clientX - rect.left) / rect.width) * 2 - 1,
+      1 - ((clientY - rect.top) / rect.height) * 2
+    );
+    this.camera.updateMatrixWorld();
+    view.mesh.updateMatrixWorld();
+    const ray = new THREE.Raycaster();
+    ray.setFromCamera(point, this.camera);
+    const bounds = new THREE.Box3()
+      .setFromObject(view.mesh)
+      .expandByScalar(0.15);
+    return ray.ray.intersectsBox(bounds);
+  }
   public sync(
     blocks: readonly BlockData[],
     fragments: readonly FragmentPose[]
   ): void {
+    this.movingId = blocks.at(-1)?.id;
     const ids = new Set([
       ...blocks.map((b) => b.id),
       ...fragments.map((f) => f.block.id),

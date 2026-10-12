@@ -6,6 +6,34 @@ import "./uiLab.css";
 // Visual fixtures only: no gameplay, records, audio or frame loop.
 let state = { ...initial };
 const screen = createGameScreen({
+  openSkillMenu: () => {
+    state = { ...state, skills: { ...state.skills, menuOpen: true } };
+    screen.update(state);
+    return true;
+  },
+  closeSkillMenu: () => {
+    state = { ...state, skills: { ...state.skills, menuOpen: false } };
+    screen.update(state);
+  },
+  useSkill: (id) => {
+    const charge = {
+      magnet: "magnetCharges",
+      repair: "repairCharges",
+      freeze: "freezeCharges",
+    } as const;
+    state = {
+      ...state,
+      skills: {
+        ...state.skills,
+        [charge[id]]: Math.max(0, state.skills[charge[id]] - 1),
+        menuOpen: false,
+        usedThisLayer: true,
+      },
+    };
+    screen.update(state);
+    return true;
+  },
+  useMagnet: () => false,
   start: () => {
     state = { ...fixtures.游戏中!, difficulty: state.difficulty };
     screen.update(state);
@@ -23,6 +51,15 @@ const screen = createGameScreen({
       phase: "playing",
       rewardChoices: [],
       layersUntilReward: 5,
+      skills: {
+        ...state.skills,
+        magnetCharges:
+          state.skills.magnetCharges + (id === "magnetSupply" ? 1 : 0),
+        repairCharges:
+          state.skills.repairCharges + (id === "repairSupply" ? 1 : 0),
+        freezeCharges:
+          state.skills.freezeCharges + (id === "freezeSupply" ? 1 : 0),
+      },
       shields: state.shields + (id === "shield" ? 1 : 0),
       rewards: { ...state.rewards, [id]: state.rewards[id] + 1 },
     };

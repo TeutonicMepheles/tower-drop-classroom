@@ -11,6 +11,30 @@ interface RewardPresentation {
 }
 /** Display semantics only. Eligibility and effects remain owned by gameplay. */
 export const REWARD_PRESENTATION: Record<RewardId, RewardPresentation> = {
+  freezeSupply: {
+    icon: "slow",
+    tone: "blue",
+    kind: "resource",
+    category: "技能补给",
+    headline: "让方块停住一秒",
+    shortName: "定格",
+  },
+  repairSupply: {
+    icon: "repair",
+    tone: "mint",
+    kind: "resource",
+    category: "技能补给",
+    headline: "主动恢复塔顶尺寸",
+    shortName: "修复",
+  },
+  magnetSupply: {
+    icon: "precision",
+    tone: "gold",
+    kind: "resource",
+    category: "技能补给",
+    headline: "靠近塔顶时吸附对齐",
+    shortName: "磁力",
+  },
   repair: {
     icon: "repair",
     tone: "mint",
@@ -18,14 +42,6 @@ export const REWARD_PRESENTATION: Record<RewardId, RewardPresentation> = {
     category: "即时修复",
     headline: "恢复塔顶尺寸",
     shortName: "修复",
-  },
-  slow: {
-    icon: "slow",
-    tone: "blue",
-    kind: "passive",
-    category: "持续加成",
-    headline: "多一点对齐时间",
-    shortName: "减速",
   },
   precision: {
     icon: "precision",
@@ -68,6 +84,13 @@ export const rewardUpgrade = (
   id: RewardId,
   state: Readonly<GameSnapshot>
 ): string => {
+  if (id.endsWith("Supply")) {
+    const total =
+      state.skills.magnetCharges +
+      state.skills.repairCharges +
+      state.skills.freezeCharges;
+    return `技能库存 ${total} → ${total + 1} / 3`;
+  }
   if (id === "repair") return "立即生效";
   if (id === "shield")
     return `护盾 ${state.shields} → ${state.shields + 1} / 2`;
