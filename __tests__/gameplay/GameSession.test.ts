@@ -26,8 +26,8 @@ describe("pure gameplay", () => {
     blocks[0]!.position.x = 999;
     expect(game.getBlocks()[0]!.position.x).toBe(0);
     const copy = game.getSnapshot();
-    copy.rewards.slow = 999;
-    expect(game.getSnapshot().rewards.slow).toBe(0);
+    copy.rewards.precision = 999;
+    expect(game.getSnapshot().rewards.precision).toBe(0);
     const ids = game.getBlocks().map((b) => b.id);
     game.start();
     expect(game.getBlocks().map((b) => b.id)).toEqual(ids);
@@ -43,18 +43,18 @@ describe("pure gameplay", () => {
       phase: "reward",
     });
     expect(game.getSnapshot().rewardChoices).toEqual([
-      "slow",
       "precision",
       "shield",
+      "perfectRepair",
     ]);
     const before = game.getBlocks();
     game.advance(1);
     game.drop();
     expect(game.getBlocks()).toEqual(before);
     expect(game.chooseReward("repair")).toBe(false);
-    expect(game.chooseReward("slow")).toBe(true);
-    expect(game.chooseReward("slow")).toBe(false);
-    expect(game.speed).toBeCloseTo(0.039 * 0.92);
+    expect(game.chooseReward("precision")).toBe(true);
+    expect(game.chooseReward("precision")).toBe(false);
+    expect(game.speed).toBeCloseTo(0.05 * 1.175);
   });
   it("cuts correct dimensions and emits positive fragments without leaking live blocks", () => {
     const game = new GameSession();
@@ -107,7 +107,7 @@ describe("pure gameplay", () => {
       rescuesUsed: 1,
       lastResult: "rescue",
     });
-    expect(game.getBlocks().at(-1)!.position.z).toBe(-10);
+    expect(game.getBlocks().at(-1)!.position.z).toBe(-4.2);
     land(game, 4);
     expect(game.getSnapshot().phase).toBe("ended");
     game.setDifficulty("easy");
@@ -135,7 +135,7 @@ describe("pure gameplay", () => {
     land(game, 0.5);
     expect(game.getBlocks().at(-1)!.sizes.width).toBeCloseTo(2.225);
   });
-  it("continues 150 layers without increasing speed or exceeding reward caps", () => {
+  it("caps speed and rewards during a 150-layer run", () => {
     const game = new GameSession(undefined, () => 0);
     game.start();
     for (let i = 0; i < 150; i++) {
@@ -146,10 +146,10 @@ describe("pure gameplay", () => {
     expect(game.getSnapshot()).toMatchObject({
       layers: 150,
       phase: "playing",
-      rewards: { slow: 3, precision: 3, perfectRepair: 3, steady: 3 },
+      rewards: { precision: 3, perfectRepair: 3, steady: 3 },
       shields: 2,
     });
-    expect(game.speed).toBeCloseTo(0.039 * 0.92 ** 3);
+    expect(game.speed).toBeCloseTo(0.05 * 2.2);
   });
   it("uses the same elapsed movement at 60 and 120 Hz", () => {
     const a = new GameSession(),
@@ -177,4 +177,93 @@ describe("pure gameplay", () => {
       perfect: true,
     });
   });
+});
+
+describe("faster pacing and precision", () => {
+  it.each([
+    ["normal", 1.4],
+    ["easy", 1.75],
+  ] as const)(
+    "%s reaches its first alignment in %s seconds",
+    (difficulty, seconds) => {
+      const game = new GameSession();
+      game.setDifficulty(difficulty);
+      game.start();
+      game.advance(seconds * 60);
+      expect(game.getBlocks().at(-1)!.position.x).toBeCloseTo(0);
+      game.drop();
+      expect(game.getSnapshot().lastResult).toBe("perfect");
+    }
+  );
+  it("keeps shifted towers centred on both axes and rescues nearby", () => {
+    const game = new GameSession(undefined, () => 0.999);
+    game.start();
+    land(game, 0.5);
+    land(game, 0.5);
+    for (let i = 0; i < 3; i++) land(game);
+    game.chooseReward("shield");
+    const [bottom, top] = game.getBlocks().slice(-2);
+    const axis = top!.direction;
+    expect(top!.position[axis] - bottom!.position[axis]).toBeCloseTo(-4.2);
+    land(game, 4);
+    expect(game.getSnapshot().lastResult).toBe("rescue");
+    expect(
+      game.getBlocks().at(-1)!.position[axis] - bottom!.position[axis]
+    ).toBeCloseTo(-4.2);
+    land(game);
+    expect(game.getSnapshot().lastResult).toBe("perfect");
+  });
+  it("reflects at both bounds without losing travel at different frame rates", () => {
+    const games = [new GameSession(), new GameSession()];
+    for (const [index, game] of games.entries()) {
+      game.start();
+      for (let frame = 0; frame < 1200 * (index + 1); frame++) {
+        game.advance(1 / (index + 1));
+        expect(
+          Math.abs(game.getBlocks().at(-1)!.position.x)
+        ).toBeLessThanOrEqual(4.2 + 1e-9);
+      }
+    }
+    expect(games[0]!.getBlocks().at(-1)!.position.x).toBeCloseTo(
+      games[1]!.getBlocks().at(-1)!.position.x
+    );
+    const largeStep = new GameSession();
+    largeStep.start();
+    largeStep.advance(1200);
+    expect(largeStep.getBlocks().at(-1)!.position.x).toBeCloseTo(
+      games[0]!.getBlocks().at(-1)!.position.x
+    );
+  });
+  it("upgrades perfect placement without slowing movement", () => {
+    const plain = new GameSession();
+    plain.start();
+    land(plain, 0.19);
+    expect(plain.getSnapshot().lastResult).toBe("normal");
+    const upgraded = new GameSession(undefined, () => 0);
+    upgraded.start();
+    reward(upgraded);
+    const speed = upgraded.speed;
+    expect(upgraded.chooseReward("precision")).toBe(true);
+    expect(upgraded.speed).toBe(speed);
+    land(upgraded, 0.19);
+    expect(upgraded.getSnapshot().lastResult).toBe("perfect");
+  });
+  it.each(["x", "z"] as const)(
+    "caps snapping on narrow %s blocks and cannot rescue a miss",
+    (axis) => {
+      const [bottom, top] = new GameSession().getBlocks();
+      top!.direction = axis;
+      const dimension = axis === "x" ? "width" : "depth";
+      top!.sizes[dimension] = bottom!.sizes[dimension] = 0.2;
+      top!.position[axis] = 0.03;
+      expect(measureLanding(top!, bottom!, 0.5).perfect).toBe(true);
+      top!.position[axis] = 0.05;
+      expect(measureLanding(top!, bottom!, 0.5).perfect).toBe(false);
+      top!.position[axis] = 0.2;
+      expect(measureLanding(top!, bottom!, 0.5)).toMatchObject({
+        perfect: false,
+        overlap: 0,
+      });
+    }
+  );
 });

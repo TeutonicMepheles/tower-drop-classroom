@@ -1,8 +1,9 @@
+import { createSkillMenu } from "@/ui/skills/SkillMenu";
 import type { Page } from "@/ui/types";
 import Button from "@/ui/components/Button/Button";
 import type { GameCommands } from "@/contracts/game";
 import { REWARD_LABELS as REWARDS } from "./rewards/catalog";
-import type { RewardId } from "@/contracts/game";
+import type { RewardId, SkillId } from "@/contracts/game";
 import type { Difficulty, GameSnapshot } from "@/contracts/game";
 import "@/ui/GameScreen.css";
 
@@ -12,6 +13,7 @@ export const createGameScreen = (
   element: Page;
   update: (state: Readonly<GameSnapshot>) => void;
   dispose: () => void;
+  pointAtSkill: (x: number, y: number) => SkillId | "cancel" | null;
 } => {
   const main = document.createElement("main") as Page;
   main.className = "tower-drop-page";
@@ -42,11 +44,14 @@ export const createGameScreen = (
             <label><input type="radio" autocomplete="off" name="difficulty" value="easy"> 简单 <small>速度较慢 · 对齐更宽容</small></label>
             <label><input type="radio" autocomplete="off" name="difficulty" value="normal" checked> 普通 <small>标准速度 · 挑战精准度</small></label>
           </fieldset>
-          <p class="instructions">点击游戏区域落块。连续完美落块，每层可获得 1–5 分。</p>
+          <p class="instructions">短按落块，长按移动方块进入子弹时间。开局三种技能各 1 次，每五层可选技能补给；层数越高，方块越快。</p>
         </div>
       </div>
-      <p class="play-hint">点击空白区域落块 · 对齐方块以获得完美连击</p>
+      <p class="play-hint">短按落块 · 长按移动方块 0.3 秒，拖向技能释放</p>
     </div>`;
+  const skills = createSkillMenu(game);
+  main.append(skills.element);
+  let lastGameplayState = "";
   const playButton = Button({
     id: "playbtn",
     ariaLabel: "开始游戏",
@@ -69,6 +74,10 @@ export const createGameScreen = (
   const summary = main.querySelector<HTMLElement>(".run-summary")!;
   let feedbackTimer: ReturnType<typeof setTimeout> | undefined;
   const update = (state: Readonly<GameSnapshot>): void => {
+    skills.update(state);
+    const gameplayState = JSON.stringify({ ...state, skills: undefined });
+    if (gameplayState === lastGameplayState) return;
+    lastGameplayState = gameplayState;
     main.dataset.phase = state.phase;
     main.querySelector<HTMLElement>(".tower-drop__menu")!.style.display =
       state.phase === "ready" || state.phase === "ended" ? "flex" : "none";
@@ -82,10 +91,10 @@ export const createGameScreen = (
       reward: "选择奖励",
       ended: "本局结束",
     }[state.phase];
-    status.textContent = `${phaseLabel} · ${state.layers} 层 · 连击 ${state.perfectStreak}${state.lastResult === "perfect" ? " · 完美拼接！" : ""} · 减速 ${state.rewards.slow}/3 · 精准 ${state.rewards.precision}/3`;
+    status.textContent = `${phaseLabel} · ${state.layers} 层 · 连击 ${state.perfectStreak}${state.lastResult === "perfect" ? " · 完美拼接！" : ""} · 精准 ${state.rewards.precision}/3 · 速度 ×${state.speedMultiplier.toFixed(2)}`;
     record.textContent = `${state.difficulty === "easy" ? "简单" : "普通"}纪录 ${state.bestLayers} 层 · 本局 ${state.layers} 层${state.recordBroken ? " · 已刷新纪录！" : ""}`;
     const acquired = (Object.keys(REWARDS) as RewardId[]).filter(
-      (id) => state.rewards[id] > 0
+      (id) => state.rewards[id] > 0 && !id.endsWith("Supply")
     );
     bonuses.textContent = `护盾 ${state.shields}/2 · ${acquired.length ? acquired.map((id) => `${REWARDS[id].title} ×${state.rewards[id]}`).join(" · ") : "暂无加成"}`;
     runFeedback.textContent =
@@ -176,6 +185,7 @@ export const createGameScreen = (
 
   main.addEventListener("change", onDifficulty);
   main.cleanup = (): void => {
+    skills.dispose();
     main.removeEventListener("change", onDifficulty);
     if (feedbackTimer) clearTimeout(feedbackTimer);
     cards.removeEventListener("click", onReward);
@@ -183,5 +193,10 @@ export const createGameScreen = (
     playButton.removeEventListener("click", onStart);
     playButton.cleanup?.();
   };
-  return { element: main, update, dispose: main.cleanup };
+  return {
+    element: main,
+    update,
+    dispose: main.cleanup,
+    pointAtSkill: (x, y) => skills.pointAt(x, y),
+  };
 };

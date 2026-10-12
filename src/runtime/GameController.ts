@@ -3,6 +3,7 @@ import type {
   GameCommands,
   GameSnapshot,
   RewardId,
+  SkillId,
 } from "@/contracts/game";
 import type {
   AnimationDriver,
@@ -23,8 +24,8 @@ export class GameController implements GameCommands {
     private readonly store: RecordStore,
     private readonly publish: (state: Readonly<GameSnapshot>) => void
   ) {
-    this.loop = new FrameLoop(driver, (scale) => {
-      this.tick(scale);
+    this.loop = new FrameLoop(driver, (scale, elapsedMs) => {
+      this.tick(scale, elapsedMs);
     });
     this.sync();
     this.scene.render();
@@ -49,14 +50,22 @@ export class GameController implements GameCommands {
     this.publish(state);
     this.scene.render();
   }
-  private tick(scale: number): void {
+  private tick(scale: number, elapsedMs: number): void {
     if (this.disposed || this.getSnapshot().phase !== "playing") return;
-    this.session.advance(scale);
-    this.scene.follow(this.getSnapshot().layers, this.session.speed * scale);
+    const wasOpen =
+      this.getSnapshot().skills.menuOpen ||
+      this.getSnapshot().skills.freezeRemainingMs > 0;
+    const motionScale = scale * this.session.timeScale;
+    this.session.advance(scale, elapsedMs);
+    this.scene.follow(
+      this.getSnapshot().layers,
+      this.session.speed * motionScale
+    );
     this.physics.sync(this.session.getBlocks());
-    this.physics.step(this.scene.cameraHeight - 20);
+    this.physics.step(this.scene.cameraHeight - 20, motionScale);
     this.scene.sync(this.session.getBlocks(), this.physics.getFragments());
     this.scene.render();
+    if (wasOpen) this.publish(this.getSnapshot());
   }
   public start(): void {
     if (
@@ -78,6 +87,28 @@ export class GameController implements GameCommands {
     if (this.getSnapshot().bestLayers > before)
       this.store.save(this.session.getRecords());
     this.changed();
+  }
+  public openSkillMenu(): boolean {
+    if (this.disposed || !this.session.openSkillMenu()) return false;
+    this.changed();
+    return true;
+  }
+  public closeSkillMenu(): void {
+    if (this.disposed || !this.getSnapshot().skills.menuOpen) return;
+    this.session.closeSkillMenu();
+    this.changed();
+  }
+  public useMagnet(): boolean {
+    return this.useSkill("magnet");
+  }
+  public useSkill(id: SkillId): boolean {
+    if (this.disposed) return false;
+    const before = this.getSnapshot().bestLayers;
+    if (!this.session.useSkill(id)) return false;
+    if (this.getSnapshot().bestLayers > before)
+      this.store.save(this.session.getRecords());
+    this.changed();
+    return true;
   }
   public setDifficulty(difficulty: Difficulty): void {
     if (this.disposed) return;

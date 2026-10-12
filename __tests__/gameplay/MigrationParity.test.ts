@@ -2,7 +2,7 @@
 import { GameSession } from "@/gameplay/GameSession";
 import type { Difficulty } from "@/contracts/game";
 it.each(["easy", "normal"] as Difficulty[])(
-  "matches the existing engine for %s commands",
+  "preserves the reviewed gameplay command trace for %s",
   (difficulty) => {
     const model = new GameSession(undefined, () => 0.999);
     model.setDifficulty(difficulty);

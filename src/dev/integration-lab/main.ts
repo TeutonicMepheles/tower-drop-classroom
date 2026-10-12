@@ -9,7 +9,8 @@ if (!import.meta.env.DEV)
   throw new Error("Integration lab is development-only");
 let offset = 0;
 class FixtureSession extends GameSession {
-  public override advance(_scale: number): void {
+  public override advance(_scale: number, elapsedMs = 0): void {
+    super.advance(0, elapsedMs);
     /* Deterministic fixture clock; drops advance to the selected position. */
   }
   public override drop(): void {

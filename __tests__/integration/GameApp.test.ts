@@ -32,7 +32,7 @@ describe("TowerDropPage", () => {
       align();
       window.dispatchEvent(new MouseEvent("click"));
     }
-    screen.getByRole("button", { name: /从容节奏/ }).click();
+    screen.getByRole("button", { name: /精准辅助/ }).click();
     align(4);
     window.dispatchEvent(new MouseEvent("click"));
     expect(document.querySelector(".run-summary")).toBeVisible();
@@ -58,13 +58,13 @@ describe("TowerDropPage", () => {
     }
     expect(screen.getByRole("dialog")).toBeVisible();
     expect(screen.getAllByRole("button")).toHaveLength(3);
-    screen.getByRole("button", { name: /从容节奏/ }).click();
+    screen.getByRole("button", { name: /精准辅助/ }).click();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(document.querySelector(".gameplay-status")).toHaveTextContent(
       "5 层"
     );
     expect(document.querySelector(".gameplay-status")).toHaveTextContent(
-      "减速 1/3"
+      "精准 1/3"
     );
   });
   afterEach(() => {
@@ -168,7 +168,9 @@ it("recreates the app without retaining old global input handlers", () => {
   const nextPage = createGameApp(nextSession);
   document.body.append(nextPage);
   nextPage.querySelector<HTMLButtonElement>("#playbtn")!.click();
-  nextSession.advance(10 / nextSession.speed);
+  nextSession.advance(
+    -nextSession.getBlocks().at(-1)!.position.x / nextSession.speed
+  );
   window.dispatchEvent(new MouseEvent("click"));
   expect(nextSession.getSnapshot().layers).toBe(1);
   expect(oldSession.getSnapshot()).toMatchObject({

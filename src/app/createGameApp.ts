@@ -18,6 +18,12 @@ export function createGameApp(session?: GameSession): Page {
       game.setDifficulty(difficulty);
     },
     chooseReward: (id) => game.chooseReward(id),
+    openSkillMenu: () => game.openSkillMenu(),
+    closeSkillMenu: () => {
+      game.closeSkillMenu();
+    },
+    useMagnet: () => game.useMagnet(),
+    useSkill: (id) => game.useSkill(id),
   });
   const page = screen.element;
   const scene = new TowerScene(page.querySelector("canvas")!, page);
@@ -37,9 +43,22 @@ export function createGameApp(session?: GameSession): Page {
       window.devicePixelRatio
     );
   };
-  const unbindInput = bindInput(() => {
-    game.drop();
-  });
+  const unbindInput = bindInput(
+    () => {
+      game.drop();
+    },
+    {
+      surface: page.querySelector("canvas")!,
+      hitTest: (x, y) => scene.hitTestMovingBlock(x, y),
+      open: () => game.openSkillMenu(),
+      close: () => {
+        game.closeSkillMenu();
+      },
+      use: (id) => game.useSkill(id),
+      isOpen: () => game.getSnapshot().skills.menuOpen,
+      pointAt: screen.pointAtSkill,
+    }
+  );
   window.addEventListener("resize", resize);
   resize();
   screen.update(game.getSnapshot());

@@ -3,6 +3,19 @@ import type { GameSnapshot } from "@/contracts/game";
 import "@/ui/styles/global.css";
 import "./uiLab.css";
 const initial: GameSnapshot = {
+  speedMultiplier: 1,
+  skills: {
+    magnetCharges: 1,
+    repairCharges: 1,
+    freezeCharges: 1,
+    freezeRemainingMs: 0,
+    canUseRepair: false,
+    canUseFreeze: false,
+    menuOpen: false,
+    remainingMs: 2000,
+    usedThisLayer: false,
+    canUseMagnet: false,
+  },
   difficulty: "normal",
   phase: "ready",
   score: 0,
@@ -11,11 +24,13 @@ const initial: GameSnapshot = {
   lastResult: "none",
   rewards: {
     repair: 0,
-    slow: 0,
     precision: 0,
     shield: 0,
     perfectRepair: 0,
     steady: 0,
+    magnetSupply: 0,
+    repairSupply: 0,
+    freezeSupply: 0,
   },
   rewardChoices: [],
   layersUntilReward: 5,
@@ -28,6 +43,34 @@ const initial: GameSnapshot = {
 };
 let state = { ...initial };
 const screen = createGameScreen({
+  openSkillMenu: () => {
+    state = {
+      ...state,
+      skills: { ...state.skills, menuOpen: true, canUseMagnet: true },
+    };
+    screen.update(state);
+    return true;
+  },
+  closeSkillMenu: () => {
+    state = { ...state, skills: { ...state.skills, menuOpen: false } };
+    screen.update(state);
+  },
+  useSkill: () => {
+    state = {
+      ...state,
+      skills: { ...state.skills, menuOpen: false, usedThisLayer: true },
+    };
+    screen.update(state);
+    return true;
+  },
+  useMagnet: () => {
+    state = {
+      ...state,
+      skills: { ...state.skills, menuOpen: false, magnetCharges: 0 },
+    };
+    screen.update(state);
+    return true;
+  },
   start: () => {
     show("playing");
   },
@@ -60,7 +103,7 @@ function show(phase: GameSnapshot["phase"]): void {
     perfectCount: 5,
     longestStreak: 5,
     lastResult: phase === "ended" ? "miss" : "perfect",
-    rewardChoices: phase === "reward" ? ["repair", "slow", "shield"] : [],
+    rewardChoices: phase === "reward" ? ["repair", "precision", "shield"] : [],
   };
   screen.update(state);
 }

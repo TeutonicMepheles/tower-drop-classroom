@@ -16,7 +16,6 @@ it("draws unique options and guarantees narrow towers a repair", () => {
 it("filters full upgrades without leaving an empty reward screen", () => {
   const levels = {
     ...emptyRewards(),
-    slow: 3,
     precision: 3,
     perfectRepair: 3,
     steady: 3,
@@ -28,4 +27,18 @@ it("filters full upgrades without leaving an empty reward screen", () => {
   expect(drawRewards(emptyRewards(), 0, false, () => 0, false)).not.toContain(
     "repair"
   );
+});
+
+it("guarantees a supply with space, retains narrow-tower repair, and hides supplies when full", () => {
+  for (const random of [0, 0.4, 0.999]) {
+    const choices = drawRewards(emptyRewards(), 0, true, () => random, true, 1);
+    expect(choices).toContain("repair");
+    expect(choices.filter((id) => id.endsWith("Supply"))).toHaveLength(1);
+    expect(new Set(choices).size).toBe(3);
+    expect(
+      drawRewards(emptyRewards(), 0, false, () => random, false, 0).some((id) =>
+        id.endsWith("Supply")
+      )
+    ).toBe(false);
+  }
 });
