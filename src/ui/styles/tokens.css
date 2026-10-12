@@ -1,0 +1,52 @@
+.tower-drop-page {
+  --ui-ink: #f7f6ed;
+  --ui-muted: #d0dfd7;
+  --ui-panel: #203a3a;
+  --ui-line: #c9e7d638;
+  --ui-mint: #bde6c6;
+  --ui-blue: #b9dedc;
+  --ui-gold: #f6d795;
+  --ui-radius: 28px;
+  --ui-fast: 220ms;
+  --text-small: 18px;
+  --text-body: 20px;
+  --text-emphasis: 24px;
+  --text-card-title: 30px;
+  --text-title: 48px;
+  --text-hero: 112px;
+  color: var(--ui-ink);
+  font-family:
+    "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "Segoe UI", sans-serif;
+  font-size: var(--text-body);
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+.tower-drop-page [data-tone="mint"] {
+  --accent: var(--ui-mint);
+}
+.tower-drop-page [data-tone="blue"] {
+  --accent: var(--ui-blue);
+}
+.tower-drop-page [data-tone="gold"] {
+  --accent: var(--ui-gold);
+}
+.tower-drop__menu,
+.reward-panel {
+  color: var(--ui-ink);
+  --ui-ink: #263e38;
+  --ui-muted: #52685f;
+  --ui-line: #45635330;
+  --ui-mint: #326c57;
+  --ui-blue: #36696b;
+  --ui-gold: #7b5924;
+}
+@media (max-width: 700px) {
+  .tower-drop-page {
+    --text-small: 16px;
+    --text-body: 18px;
+    --text-emphasis: 20px;
+    --text-card-title: 24px;
+    --text-title: 34px;
+    --text-hero: 72px;
+  }
+}
