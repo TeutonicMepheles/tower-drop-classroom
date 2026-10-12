@@ -1,4 +1,5 @@
 import { createGameScreen } from "@/ui/GameScreen";
+import type { GameSnapshot } from "@/contracts/game";
 import { initial, fixtures } from "./fixtures";
 import "@/ui/styles/global.css";
 import "./uiLab.css";
@@ -43,6 +44,42 @@ for (const [label, fixture] of Object.entries(fixtures)) {
       ...fixture,
       rewards: { ...fixture.rewards },
       difficulty: state.difficulty,
+    };
+    screen.update(state);
+    toolbar.querySelectorAll("button").forEach((item) => {
+      item.setAttribute("aria-pressed", String(item === button));
+    });
+  };
+  toolbar.append(button);
+}
+for (const [label, streak, record] of [
+  ["完美反馈", 1, false],
+  ["连击反馈", 5, false],
+  ["纪录反馈", 6, true],
+] as const) {
+  const button = document.createElement("button");
+  button.textContent = label;
+  button.onclick = (): void => {
+    const before: GameSnapshot = {
+      ...initial,
+      phase: "playing",
+      layers: 6,
+      score: 20,
+      perfectStreak: streak - 1,
+      bestLayers: record ? 6 : 24,
+      layersUntilReward: 4,
+    };
+    screen.update(initial);
+    screen.update(before);
+    state = {
+      ...before,
+      layers: 7,
+      score: 20 + Math.min(streak, 5),
+      perfectStreak: streak,
+      lastResult: "perfect",
+      layersUntilReward: 3,
+      recordBroken: record,
+      bestLayers: record ? 7 : 24,
     };
     screen.update(state);
     toolbar.querySelectorAll("button").forEach((item) => {
