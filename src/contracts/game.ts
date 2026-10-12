@@ -3,10 +3,19 @@ export type RewardId =
   | "precision"
   | "shield"
   | "perfectRepair"
-  | "steady";
+  | "steady"
+  | "magnetSupply"
+  | "repairSupply"
+  | "freezeSupply";
 export type RewardLevels = Record<RewardId, number>;
 export type Difficulty = "easy" | "normal";
+export type SkillId = "magnet" | "repair" | "freeze";
 export interface SkillSnapshot {
+  repairCharges: number;
+  freezeCharges: number;
+  freezeRemainingMs: number;
+  canUseRepair: boolean;
+  canUseFreeze: boolean;
   magnetCharges: number;
   menuOpen: boolean;
   remainingMs: number;
@@ -15,6 +24,7 @@ export interface SkillSnapshot {
 }
 export interface GameSnapshot {
   skills: SkillSnapshot;
+  speedMultiplier: number;
   difficulty: Difficulty;
   phase: "ready" | "playing" | "reward" | "ended";
   score: number;
@@ -35,6 +45,7 @@ export interface GameCommands {
   openSkillMenu(): boolean;
   closeSkillMenu(): void;
   useMagnet(): boolean;
+  useSkill(id: SkillId): boolean;
   start(): void;
   drop(): void;
   setDifficulty(difficulty: Difficulty): void;

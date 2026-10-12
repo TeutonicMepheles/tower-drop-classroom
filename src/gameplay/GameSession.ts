@@ -6,6 +6,7 @@ import type {
   GameSnapshot,
   Records,
   RewardId,
+  SkillId,
 } from "@/contracts/game";
 import {
   GAME_CONFIG,
@@ -41,8 +42,14 @@ export class GameSession implements GameCommands {
     phase: GameSnapshot["phase"]
   ): GameSnapshot {
     return {
+      speedMultiplier: 1,
       skills: {
         magnetCharges: 1,
+        repairCharges: 1,
+        freezeCharges: 1,
+        freezeRemainingMs: 0,
+        canUseRepair: false,
+        canUseFreeze: false,
         menuOpen: false,
         remainingMs: 2000,
         usedThisLayer: false,
@@ -68,10 +75,34 @@ export class GameSession implements GameCommands {
   public getSnapshot(): Readonly<GameSnapshot> {
     return {
       ...this.snapshot,
-      skills: { ...this.snapshot.skills, canUseMagnet: this.canUseMagnet() },
+      speedMultiplier: this.speed / GAME_CONFIG[this.snapshot.difficulty].speed,
+      skills: {
+        ...this.snapshot.skills,
+        canUseMagnet: this.canUseMagnet(),
+        canUseRepair: this.canUseSkill("repair"),
+        canUseFreeze: this.canUseSkill("freeze"),
+      },
       rewards: { ...this.snapshot.rewards },
       rewardChoices: [...this.snapshot.rewardChoices],
     };
+  }
+  private inventoryCount(): number {
+    const skills = this.snapshot.skills;
+    return skills.magnetCharges + skills.repairCharges + skills.freezeCharges;
+  }
+  private canUseSkill(id: SkillId): boolean {
+    const { skills, phase } = this.snapshot;
+    if (phase !== "playing" || !skills.menuOpen || skills.usedThisLayer)
+      return false;
+    if (id === "magnet") return this.canUseMagnet();
+    if (id === "freeze")
+      return skills.freezeCharges > 0 && skills.freezeRemainingMs <= 0;
+    return (
+      skills.repairCharges > 0 &&
+      this.blocks
+        .slice(-2)
+        .some((block) => block.sizes.width < 3 || block.sizes.depth < 3)
+    );
   }
   private canUseMagnet(): boolean {
     const state = this.snapshot;
@@ -96,7 +127,7 @@ export class GameSession implements GameCommands {
     if (
       phase !== "playing" ||
       skills.menuOpen ||
-      skills.magnetCharges < 1 ||
+      this.inventoryCount() < 1 ||
       skills.remainingMs <= 0 ||
       skills.usedThisLayer
     )
@@ -108,18 +139,36 @@ export class GameSession implements GameCommands {
     this.snapshot.skills.menuOpen = false;
   }
   public useMagnet(): boolean {
-    if (!this.canUseMagnet()) return false;
+    return this.useSkill("magnet");
+  }
+  public useSkill(id: SkillId): boolean {
+    if (!this.canUseSkill(id)) return false;
     const [bottom, top] = this.blocks.slice(-2);
     const skills = this.snapshot.skills;
-    skills.magnetCharges -= 1;
     skills.usedThisLayer = true;
     skills.menuOpen = false;
-    top!.position[top!.direction] = bottom!.position[top!.direction];
-    this.drop();
+    if (id === "magnet") {
+      skills.magnetCharges -= 1;
+      top!.position[top!.direction] = bottom!.position[top!.direction];
+      this.drop();
+    } else if (id === "repair") {
+      skills.repairCharges -= 1;
+      for (const block of this.blocks.slice(-2)) {
+        block.sizes.width = Math.min(3, block.sizes.width + 0.6);
+        block.sizes.depth = Math.min(3, block.sizes.depth + 0.6);
+      }
+    } else {
+      skills.freezeCharges -= 1;
+      skills.freezeRemainingMs = 1000;
+    }
     return true;
   }
   public get timeScale(): number {
-    return this.snapshot.skills.menuOpen ? 0.2 : 1;
+    return this.snapshot.skills.freezeRemainingMs > 0
+      ? 0
+      : this.snapshot.skills.menuOpen
+        ? 0.2
+        : 1;
   }
   public getBlocks(): BlockData[] {
     return this.blocks.map(cloneBlock);
@@ -133,7 +182,14 @@ export class GameSession implements GameCommands {
     return events;
   }
   public get speed(): number {
-    return GAME_CONFIG[this.snapshot.difficulty].speed;
+    const config = GAME_CONFIG[this.snapshot.difficulty];
+    return (
+      config.speed *
+      Math.min(
+        config.maxSpeedMultiplier,
+        1 + config.speedGrowth * this.snapshot.layers
+      )
+    );
   }
   private resetBlocks(): void {
     this.events = [];
@@ -178,6 +234,15 @@ export class GameSession implements GameCommands {
   ): void {
     if (this.snapshot.phase !== "playing") return;
     const skills = this.snapshot.skills;
+    if (skills.freezeRemainingMs > 0) {
+      const elapsed = Math.max(0, elapsedMs);
+      const frozenMs = Math.min(elapsed, skills.freezeRemainingMs);
+      frameScale *= elapsed > 0 ? 1 - frozenMs / elapsed : 0;
+      skills.freezeRemainingMs = Math.max(
+        0,
+        skills.freezeRemainingMs - elapsed
+      );
+    }
     if (skills.menuOpen) {
       const elapsed = Math.max(0, elapsedMs);
       const slowMs = Math.min(elapsed, skills.remainingMs);
@@ -204,7 +269,11 @@ export class GameSession implements GameCommands {
     const state = this.snapshot;
     if (state.phase !== "reward" || !state.rewardChoices.includes(id))
       return false;
+    if (id.endsWith("Supply") && this.inventoryCount() >= 3) return false;
     state.rewards[id] += 1;
+    if (id === "magnetSupply") state.skills.magnetCharges += 1;
+    if (id === "repairSupply") state.skills.repairCharges += 1;
+    if (id === "freezeSupply") state.skills.freezeCharges += 1;
     if (id === "shield") state.shields += 1;
     if (id === "repair")
       for (const block of this.blocks.slice(-2)) {
@@ -220,6 +289,7 @@ export class GameSession implements GameCommands {
   public drop(): void {
     const state = this.snapshot;
     if (state.phase !== "playing" || state.skills.menuOpen) return;
+    state.skills.freezeRemainingMs = 0;
     const top = this.blocks.at(-1)!;
     const bottom = this.blocks.at(-2)!;
     const axis = top.direction;
@@ -302,7 +372,8 @@ export class GameSession implements GameCommands {
         state.shields,
         Math.min(top.sizes.width, top.sizes.depth) < 1.8,
         this.random,
-        top.sizes.width < 3 || top.sizes.depth < 3
+        top.sizes.width < 3 || top.sizes.depth < 3,
+        3 - this.inventoryCount()
       );
       if (state.rewardChoices.length > 0) {
         state.phase = "reward";

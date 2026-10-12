@@ -1,11 +1,12 @@
+import type { SkillId } from "@/contracts/game";
 interface SkillInput {
   surface: HTMLElement;
   hitTest(x: number, y: number): boolean;
   open(): boolean;
   close(): void;
-  use(): boolean;
+  use(id: SkillId): boolean;
   isOpen(): boolean;
-  pointAt(x: number, y: number): "magnet" | "cancel" | null;
+  pointAt(x: number, y: number): SkillId | "cancel" | null;
 }
 const isControl = (target: EventTarget | null): boolean =>
   target instanceof Element &&
@@ -61,11 +62,10 @@ export function bindInput(drop: () => void, skills?: SkillInput): () => void {
     pointer = undefined;
     suppressClick = true;
     if (held) {
-      if (
-        skills?.isOpen() &&
-        skills.pointAt(event.clientX, event.clientY) === "magnet"
-      )
-        skills.use();
+      const selection = skills?.isOpen()
+        ? skills.pointAt(event.clientX, event.clientY)
+        : null;
+      if (selection && selection !== "cancel") skills?.use(selection);
       skills?.close();
       skills?.pointAt(-1, -1);
     } else if (!isControl(event.target)) drop();

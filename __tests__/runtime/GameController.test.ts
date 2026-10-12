@@ -140,3 +140,23 @@ it("keeps one loop during bullet time, uses real elapsed time and persists skill
   expect(game.openSkillMenu()).toBe(false);
   expect(game.useMagnet()).toBe(false);
 });
+
+it("publishes freeze countdown and timeout without adding a layer", () => {
+  const { game, model, driver, publish } = setup();
+  jest.spyOn(performance, "now").mockReturnValue(1000);
+  game.start();
+  align(model);
+  game.openSkillMenu();
+  expect(game.useSkill("freeze")).toBe(true);
+  const frame = driver.setAnimationLoop.mock.calls.at(-1)![0] as (
+    time: number
+  ) => void;
+  frame(1500);
+  expect(publish.mock.calls.at(-1)![0].skills.freezeRemainingMs).toBe(500);
+  frame(2000);
+  expect(publish.mock.calls.at(-1)![0].skills.freezeRemainingMs).toBe(0);
+  expect(game.getSnapshot().layers).toBe(0);
+  game.drop();
+  expect(game.getSnapshot().layers).toBe(1);
+  game.dispose();
+});

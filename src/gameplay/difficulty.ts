@@ -2,6 +2,16 @@
 export const MOVEMENT_RADIUS = 4.2;
 export const PRECISION_GAIN = 0.35;
 export const GAME_CONFIG = {
-  easy: { speed: 0.04, perfectTolerance: 0.26 },
-  normal: { speed: 0.05, perfectTolerance: 0.15 },
+  easy: {
+    speed: 0.04,
+    perfectTolerance: 0.26,
+    speedGrowth: 0.025,
+    maxSpeedMultiplier: 1.8,
+  },
+  normal: {
+    speed: 0.05,
+    perfectTolerance: 0.15,
+    speedGrowth: 0.035,
+    maxSpeedMultiplier: 2.2,
+  },
 } as const;

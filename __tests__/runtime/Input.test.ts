@@ -65,7 +65,9 @@ const gesture = (): {
     }),
     use: jest.fn(() => true),
     isOpen: jest.fn(() => open),
-    pointAt: jest.fn(() => null as "magnet" | "cancel" | null),
+    pointAt: jest.fn(
+      () => null as "magnet" | "repair" | "freeze" | "cancel" | null
+    ),
   };
   const unbind = bindInput(drop, options);
   return {
@@ -179,3 +181,20 @@ it("Escape cancels an active gesture and disposal clears a pending hold", () => 
   expect(g.options.open).toHaveBeenCalledTimes(1);
   jest.useRealTimers();
 });
+
+it.each(["repair", "freeze"] as const)(
+  "drag release dispatches %s without dropping",
+  (id) => {
+    jest.useFakeTimers();
+    const g = gesture();
+    g.canvas.dispatchEvent(pointerEvent("pointerdown"));
+    jest.advanceTimersByTime(300);
+    g.options.pointAt.mockReturnValue(id);
+    window.dispatchEvent(pointerEvent("pointerup"));
+    g.canvas.click();
+    expect(g.options.use).toHaveBeenCalledWith(id);
+    expect(g.drop).not.toHaveBeenCalled();
+    g.unbind();
+    jest.useRealTimers();
+  }
+);

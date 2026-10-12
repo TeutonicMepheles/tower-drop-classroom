@@ -3,8 +3,14 @@ import type { GameSnapshot } from "@/contracts/game";
 import "@/ui/styles/global.css";
 import "./uiLab.css";
 const initial: GameSnapshot = {
+  speedMultiplier: 1,
   skills: {
     magnetCharges: 1,
+    repairCharges: 1,
+    freezeCharges: 1,
+    freezeRemainingMs: 0,
+    canUseRepair: false,
+    canUseFreeze: false,
     menuOpen: false,
     remainingMs: 2000,
     usedThisLayer: false,
@@ -22,6 +28,9 @@ const initial: GameSnapshot = {
     shield: 0,
     perfectRepair: 0,
     steady: 0,
+    magnetSupply: 0,
+    repairSupply: 0,
+    freezeSupply: 0,
   },
   rewardChoices: [],
   layersUntilReward: 5,
@@ -45,6 +54,14 @@ const screen = createGameScreen({
   closeSkillMenu: () => {
     state = { ...state, skills: { ...state.skills, menuOpen: false } };
     screen.update(state);
+  },
+  useSkill: () => {
+    state = {
+      ...state,
+      skills: { ...state.skills, menuOpen: false, usedThisLayer: true },
+    };
+    screen.update(state);
+    return true;
   },
   useMagnet: () => {
     state = {

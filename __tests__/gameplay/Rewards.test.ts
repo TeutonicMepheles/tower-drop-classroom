@@ -28,3 +28,17 @@ it("filters full upgrades without leaving an empty reward screen", () => {
     "repair"
   );
 });
+
+it("guarantees a supply with space, retains narrow-tower repair, and hides supplies when full", () => {
+  for (const random of [0, 0.4, 0.999]) {
+    const choices = drawRewards(emptyRewards(), 0, true, () => random, true, 1);
+    expect(choices).toContain("repair");
+    expect(choices.filter((id) => id.endsWith("Supply"))).toHaveLength(1);
+    expect(new Set(choices).size).toBe(3);
+    expect(
+      drawRewards(emptyRewards(), 0, false, () => random, false, 0).some((id) =>
+        id.endsWith("Supply")
+      )
+    ).toBe(false);
+  }
+});

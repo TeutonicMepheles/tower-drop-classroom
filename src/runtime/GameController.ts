@@ -3,6 +3,7 @@ import type {
   GameCommands,
   GameSnapshot,
   RewardId,
+  SkillId,
 } from "@/contracts/game";
 import type {
   AnimationDriver,
@@ -51,7 +52,9 @@ export class GameController implements GameCommands {
   }
   private tick(scale: number, elapsedMs: number): void {
     if (this.disposed || this.getSnapshot().phase !== "playing") return;
-    const wasOpen = this.getSnapshot().skills.menuOpen;
+    const wasOpen =
+      this.getSnapshot().skills.menuOpen ||
+      this.getSnapshot().skills.freezeRemainingMs > 0;
     const motionScale = scale * this.session.timeScale;
     this.session.advance(scale, elapsedMs);
     this.scene.follow(
@@ -96,9 +99,12 @@ export class GameController implements GameCommands {
     this.changed();
   }
   public useMagnet(): boolean {
+    return this.useSkill("magnet");
+  }
+  public useSkill(id: SkillId): boolean {
     if (this.disposed) return false;
     const before = this.getSnapshot().bestLayers;
-    if (!this.session.useMagnet()) return false;
+    if (!this.session.useSkill(id)) return false;
     if (this.getSnapshot().bestLayers > before)
       this.store.save(this.session.getRecords());
     this.changed();

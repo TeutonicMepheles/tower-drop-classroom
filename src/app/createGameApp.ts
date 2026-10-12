@@ -23,6 +23,7 @@ export function createGameApp(session?: GameSession): Page {
       game.closeSkillMenu();
     },
     useMagnet: () => game.useMagnet(),
+    useSkill: (id) => game.useSkill(id),
   });
   const page = screen.element;
   const scene = new TowerScene(page.querySelector("canvas")!, page);
@@ -53,7 +54,7 @@ export function createGameApp(session?: GameSession): Page {
       close: () => {
         game.closeSkillMenu();
       },
-      use: () => game.useMagnet(),
+      use: (id) => game.useSkill(id),
       isOpen: () => game.getSnapshot().skills.menuOpen,
       pointAt: screen.pointAtSkill,
     }

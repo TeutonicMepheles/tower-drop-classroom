@@ -2,8 +2,14 @@ import { createGameScreen } from "@/ui/GameScreen";
 import { emptyRewards } from "@/gameplay/rewards";
 import type { GameSnapshot } from "@/contracts/game";
 const state: GameSnapshot = {
+  speedMultiplier: 1,
   skills: {
     magnetCharges: 1,
+    repairCharges: 1,
+    freezeCharges: 1,
+    freezeRemainingMs: 0,
+    canUseRepair: false,
+    canUseFreeze: false,
     menuOpen: false,
     remainingMs: 2000,
     usedThisLayer: false,
@@ -30,6 +36,7 @@ it("renders snapshots without creating a game and emits commands without changin
     openSkillMenu: jest.fn(() => true),
     closeSkillMenu: jest.fn(),
     useMagnet: jest.fn(() => true),
+    useSkill: jest.fn(() => true),
     start: jest.fn(),
     drop: jest.fn(),
     setDifficulty: jest.fn(),
@@ -66,6 +73,7 @@ it("keeps reward focus inside the dialog and removes handlers on disposal", () =
     openSkillMenu: jest.fn(() => true),
     closeSkillMenu: jest.fn(),
     useMagnet: jest.fn(() => true),
+    useSkill: jest.fn(() => true),
     start: jest.fn(),
     drop: jest.fn(),
     setDifficulty: jest.fn(),
@@ -106,6 +114,7 @@ it("renders live skill availability, countdown and commands without disturbing g
     openSkillMenu: jest.fn(() => true),
     closeSkillMenu: jest.fn(),
     useMagnet: jest.fn(() => true),
+    useSkill: jest.fn(() => true),
   };
   const screen = createGameScreen(commands);
   document.body.append(screen.element);
@@ -131,7 +140,7 @@ it("renders live skill availability, countdown and commands without disturbing g
   expect(card).toBeEnabled();
   expect(menu).toHaveTextContent("1.2 秒");
   card.click();
-  expect(commands.useMagnet).toHaveBeenCalledTimes(1);
+  expect(commands.useSkill).toHaveBeenCalledTimes(1);
   expect(commands.drop).not.toHaveBeenCalled();
   menu.dispatchEvent(
     new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
@@ -140,7 +149,12 @@ it("renders live skill availability, countdown and commands without disturbing g
   screen.update({
     ...state,
     phase: "playing",
-    skills: { ...state.skills, magnetCharges: 0 },
+    skills: {
+      ...state.skills,
+      magnetCharges: 0,
+      repairCharges: 0,
+      freezeCharges: 0,
+    },
   });
   expect(menu).not.toBeVisible();
   expect(trigger).toBeDisabled();

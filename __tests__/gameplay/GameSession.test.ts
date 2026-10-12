@@ -54,7 +54,7 @@ describe("pure gameplay", () => {
     expect(game.chooseReward("repair")).toBe(false);
     expect(game.chooseReward("precision")).toBe(true);
     expect(game.chooseReward("precision")).toBe(false);
-    expect(game.speed).toBeCloseTo(0.05);
+    expect(game.speed).toBeCloseTo(0.05 * 1.175);
   });
   it("cuts correct dimensions and emits positive fragments without leaking live blocks", () => {
     const game = new GameSession();
@@ -135,7 +135,7 @@ describe("pure gameplay", () => {
     land(game, 0.5);
     expect(game.getBlocks().at(-1)!.sizes.width).toBeCloseTo(2.225);
   });
-  it("continues 150 layers without increasing speed or exceeding reward caps", () => {
+  it("caps speed and rewards during a 150-layer run", () => {
     const game = new GameSession(undefined, () => 0);
     game.start();
     for (let i = 0; i < 150; i++) {
@@ -149,7 +149,7 @@ describe("pure gameplay", () => {
       rewards: { precision: 3, perfectRepair: 3, steady: 3 },
       shields: 2,
     });
-    expect(game.speed).toBeCloseTo(0.05);
+    expect(game.speed).toBeCloseTo(0.05 * 2.2);
   });
   it("uses the same elapsed movement at 60 and 120 Hz", () => {
     const a = new GameSession(),
