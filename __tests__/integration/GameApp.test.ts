@@ -32,7 +32,7 @@ describe("TowerDropPage", () => {
       align();
       window.dispatchEvent(new MouseEvent("click"));
     }
-    screen.getByRole("button", { name: /从容节奏/ }).click();
+    screen.getByRole("button", { name: /移动减速/ }).click();
     align(4);
     window.dispatchEvent(new MouseEvent("click"));
     expect(document.querySelector(".run-summary")).toBeVisible();
@@ -56,10 +56,10 @@ describe("TowerDropPage", () => {
     }
     expect(screen.getByRole("dialog")).toBeVisible();
     expect(screen.getAllByRole("button")).toHaveLength(3);
-    screen.getByRole("button", { name: /从容节奏/ }).click();
+    screen.getByRole("button", { name: /移动减速/ }).click();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(document.querySelector("[data-game-layers]")).toHaveTextContent("5");
-    expect(screen.getByLabelText("从容节奏 1/3")).toBeVisible();
+    expect(screen.getByLabelText("移动减速 1/3")).toBeVisible();
     expect(session.getSnapshot()).toMatchObject({
       phase: "playing",
       layers: 5,
@@ -110,7 +110,7 @@ describe("TowerDropPage", () => {
     it("should render the last score heading with initial value", () => {
       renderPage();
       expect(
-        screen.getByRole("heading", { name: /准备好挑战了吗/i, level: 2 })
+        screen.getByRole("heading", { name: /游戏开始菜单/i, level: 2 })
       ).toBeInTheDocument();
     });
 

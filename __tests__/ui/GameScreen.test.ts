@@ -77,7 +77,7 @@ it("separates remaining shields, passive levels and historical instant purchases
   expect(screen.element.querySelectorAll(".bonus-chip")).toHaveLength(1);
   expect(screen.element.querySelector(".bonus-chip")).toHaveAttribute(
     "aria-label",
-    "从容节奏 2/3"
+    "移动减速 2/3"
   );
   expect(screen.element.querySelector(".reward-track")).toHaveAttribute(
     "aria-valuenow",
@@ -184,7 +184,7 @@ it("does not replay feedback for the same snapshot and releases its timer", () =
   jest.advanceTimersByTime(300);
   expect(feedback.element.querySelector(".feedback-toast")).not.toBeVisible();
   feedback.update({ ...landed, rescuesUsed: 1, lastResult: "rescue" });
-  expect(feedback.element).toHaveTextContent("护盾已救援");
+  expect(feedback.element).toHaveTextContent("护盾生效");
   feedback.dispose();
   expect(jest.getTimerCount()).toBe(0);
   feedback.element.remove();
