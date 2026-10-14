@@ -14,6 +14,7 @@ import {
   restoreBlockGlow,
 } from "@/presentation/materials/blockMaterials";
 import { VISUAL_THEME } from "@/presentation/theme";
+import { BackgroundStyle } from "@/presentation/BackgroundStyle";
 interface View {
   block: BlockData;
   mesh: THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardMaterial>;
@@ -31,6 +32,7 @@ export class TowerScene implements ScenePort, AnimationDriver {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly atmosphere: Atmosphere;
   private readonly particles: SuccessParticles;
+  private readonly backgroundStyle: BackgroundStyle;
   private movingId: number | undefined;
   private readonly views = new Map<number, View>();
   private feedbackMaterial: THREE.MeshStandardMaterial | undefined;
@@ -48,6 +50,7 @@ export class TowerScene implements ScenePort, AnimationDriver {
       alpha: true,
     });
     this.atmosphere = new Atmosphere(host);
+    this.backgroundStyle = new BackgroundStyle(this.atmosphere.element);
     this.particles = new SuccessParticles(this.scene);
     this.camera.position.set(4, 4, 4);
     this.camera.lookAt(0, 0, 0);
@@ -162,7 +165,7 @@ export class TowerScene implements ScenePort, AnimationDriver {
     events: readonly GameEvent[],
     phase: GameSnapshot["phase"]
   ): void {
-    for (const event of events)
+    for (const event of events) {
       if (event.type === "landed") {
         const block = event.block;
         this.particles.emit(
@@ -187,7 +190,10 @@ export class TowerScene implements ScenePort, AnimationDriver {
               performance.now() + VISUAL_THEME.feedback.durationMs;
           }
         }
+      } else if (event.type === "reward") {
+        this.backgroundStyle.next();
       }
+    }
     if (phase === "ready" || phase === "ended") {
       this.clearFeedback();
       this.particles.clear();
@@ -214,6 +220,7 @@ export class TowerScene implements ScenePort, AnimationDriver {
     this.render();
   }
   public reset(): void {
+    this.backgroundStyle.reset();
     this.clearFeedback();
     this.particles.clear();
     for (const view of this.views.values()) this.release(view);

@@ -1,19 +1,70 @@
+/* Background art-style engine (performance-oriented).
+   The seamless switch is done with a TWO-LAYER opacity cross-fade, not by
+   interpolating the gradient colors. `opacity` is composited on the GPU, so the
+   full-screen gradients and the `filter: blur` mist are never re-rasterized
+   frame-by-frame during a switch — that was the source of the stutter.
+   `BackgroundStyle` owns which layer is visible and which palette it shows. */
+
 .art-atmosphere {
   position: fixed;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse at 78% 8%, #633d6b55, transparent 48%),
-    radial-gradient(ellipse at 12% 70%, #1b746344, transparent 52%),
-    linear-gradient(170deg, #10162d 0%, #193047 52%, #34525e 100%);
 }
+
+/* Each scene holds a full, static background + decor set. Only `opacity`
+   transitions; the gradients themselves are constant per style. */
+.art-scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--atm-transition, 1200ms) ease;
+  /* Default palette (style 0). Per-style presets override via [data-style]. */
+  --atm-sky-top: #10162d;
+  --atm-sky-mid: #193047;
+  --atm-sky-bot: #34525e;
+  --atm-glow-a: #633d6b55;
+  --atm-glow-b: #1b746344;
+  --atm-aurora-a: #60d8d522;
+  --atm-aurora-b: #b090d822;
+  --atm-mist-a: #a6e1de3a;
+  --atm-mist-b: #b2badf35;
+  --atm-star: #d0efff;
+  --atm-star-glow: #8fdbe580;
+  --atm-orbit: #d2eafa12;
+  background:
+    radial-gradient(ellipse at 78% 8%, var(--atm-glow-a), transparent 48%),
+    radial-gradient(ellipse at 12% 70%, var(--atm-glow-b), transparent 52%),
+    linear-gradient(
+      170deg,
+      var(--atm-sky-top) 0%,
+      var(--atm-sky-mid) 52%,
+      var(--atm-sky-bot) 100%
+    );
+}
+/* Layer A is visible by default; [data-active] on the container drives both. */
+.art-scene--a {
+  opacity: 1;
+}
+.art-atmosphere[data-active="a"] .art-scene--a {
+  opacity: 1;
+}
+.art-atmosphere[data-active="a"] .art-scene--b {
+  opacity: 0;
+}
+.art-atmosphere[data-active="b"] .art-scene--b {
+  opacity: 1;
+}
+.art-atmosphere[data-active="b"] .art-scene--a {
+  opacity: 0;
+}
+
 .art-aurora {
   position: absolute;
   inset: -35%;
   background:
-    radial-gradient(ellipse at 35% 45%, #60d8d522, transparent 38%),
-    radial-gradient(ellipse at 75% 30%, #b090d822, transparent 38%);
+    radial-gradient(ellipse at 35% 45%, var(--atm-aurora-a), transparent 38%),
+    radial-gradient(ellipse at 75% 30%, var(--atm-aurora-b), transparent 38%);
   animation: art-drift 28s ease-in-out infinite alternate;
 }
 .art-orbit {
@@ -22,11 +73,11 @@
   height: 70vw;
   top: -44vw;
   right: -10vw;
-  border: 1px solid #d2eafa12;
+  border: 1px solid var(--atm-orbit);
   border-radius: 50%;
   box-shadow:
-    0 0 0 48px #d2eafa03,
-    0 0 0 96px #d2eafa03;
+    0 0 0 48px var(--atm-orbit),
+    0 0 0 96px var(--atm-orbit);
 }
 .art-stars {
   position: absolute;
@@ -36,10 +87,10 @@
   position: absolute;
   width: var(--size);
   height: var(--size);
-  background: #d0efff;
+  background: var(--atm-star);
   border-radius: 50%;
   opacity: 0.35;
-  box-shadow: 0 0 6px #8fdbe580;
+  box-shadow: 0 0 6px var(--atm-star-glow);
   animation: art-twinkle 5s ease-in-out var(--delay) infinite alternate;
 }
 @keyframes art-drift {
@@ -54,8 +105,10 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .art-atmosphere,
   .art-atmosphere * {
     animation: none !important;
+    transition: none !important;
   }
 }
 
@@ -64,8 +117,8 @@
   position: absolute;
   inset: 56% -30% -25%;
   background:
-    radial-gradient(ellipse at 25% 80%, #a6e1de3a, transparent 60%),
-    radial-gradient(ellipse at 80% 90%, #b2badf35, transparent 62%);
+    radial-gradient(ellipse at 25% 80%, var(--atm-mist-a), transparent 60%),
+    radial-gradient(ellipse at 80% 90%, var(--atm-mist-b), transparent 62%);
   filter: blur(20px);
   animation: art-mist-drift 36s ease-in-out infinite alternate;
 }
@@ -79,4 +132,66 @@
   to {
     transform: translateX(8%) translateY(-4%);
   }
+}
+
+/* ---- Per-style palettes (cycled on each reward pickup) ---- */
+/* 1: molten sunset */
+.art-scene[data-style="1"] {
+  --atm-sky-top: #2a1330;
+  --atm-sky-mid: #5e2a3a;
+  --atm-sky-bot: #c8743f;
+  --atm-glow-a: #ff9d5c55;
+  --atm-glow-b: #ffcf8a44;
+  --atm-aurora-a: #ff7e5f22;
+  --atm-aurora-b: #ffd19422;
+  --atm-mist-a: #ffb27a3a;
+  --atm-mist-b: #ffd9b035;
+  --atm-star: #fff0d6;
+  --atm-star-glow: #ffb87780;
+  --atm-orbit: #ffe2b012;
+}
+/* 2: emerald grove */
+.art-scene[data-style="2"] {
+  --atm-sky-top: #0c1f1a;
+  --atm-sky-mid: #123a2e;
+  --atm-sky-bot: #2f6b4f;
+  --atm-glow-a: #3df2a055;
+  --atm-glow-b: #1bbf8a44;
+  --atm-aurora-a: #6effc722;
+  --atm-aurora-b: #aef9c822;
+  --atm-mist-a: #8ff0c83a;
+  --atm-mist-b: #bff5d035;
+  --atm-star: #d6fff0;
+  --atm-star-glow: #8ff0c880;
+  --atm-orbit: #b6ffe012;
+}
+/* 3: deep ocean */
+.art-scene[data-style="3"] {
+  --atm-sky-top: #06121f;
+  --atm-sky-mid: #0a2a4a;
+  --atm-sky-bot: #1d5b8a;
+  --atm-glow-a: #2a7fff55;
+  --atm-glow-b: #19c6e644;
+  --atm-aurora-a: #4fb8ff22;
+  --atm-aurora-b: #9be8ff22;
+  --atm-mist-a: #6fd0ff3a;
+  --atm-mist-b: #9fb6ff35;
+  --atm-star: #cfeaff;
+  --atm-star-glow: #7fc8ff80;
+  --atm-orbit: #aee0ff12;
+}
+/* 4: sakura neon */
+.art-scene[data-style="4"] {
+  --atm-sky-top: #1d0f24;
+  --atm-sky-mid: #3a1746;
+  --atm-sky-bot: #7a3b6e;
+  --atm-glow-a: #ff7ad955;
+  --atm-glow-b: #c77dff44;
+  --atm-aurora-a: #ff9ed822;
+  --atm-aurora-b: #ffc4ec22;
+  --atm-mist-a: #ffb3e63a;
+  --atm-mist-b: #d9a8ff35;
+  --atm-star: #ffe6f6;
+  --atm-star-glow: #ff9ed880;
+  --atm-orbit: #ffc6ef12;
 }
