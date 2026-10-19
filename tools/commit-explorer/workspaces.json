@@ -1,0 +1,380 @@
+{
+  "checkedAt": "2026-10-18T06:38:51.101Z",
+  "workspaces": [
+    {
+      "name": "tower-drop",
+      "path": "B:\\GithubProject\\tower-drop",
+      "branch": "main",
+      "head": "d21b933c8c7bffe5245d5ce6e553160438844aaa",
+      "main": "d21b933c8c7bffe5245d5ce6e553160438844aaa",
+      "ahead": 0,
+      "behind": 0,
+      "upstream": "origin/main",
+      "dirty": true,
+      "remote": "https://github.com/DiegoLibonati/tower-drop.git",
+      "commits": [
+        {
+          "sha": "d21b933c8c7bffe5245d5ce6e553160438844aaa",
+          "date": "2026-07-29T00:11:51-03:00",
+          "subject": "fix(security): allow iframe embedding only from the portfolio domain"
+        },
+        {
+          "sha": "dffb9873fda5c56e50a1229e7c079abee8d59728",
+          "date": "2026-07-02T12:54:54-03:00",
+          "subject": "fix: separate noscript from div root"
+        },
+        {
+          "sha": "7df0fa2f8e8d3c8d963e6309ab35cc163df6a2cc",
+          "date": "2026-07-02T12:47:31-03:00",
+          "subject": "fix(a11y): promote game title to h1 and fix heading hierarchy for SEO"
+        },
+        {
+          "sha": "47b1f89eb5bdbc10f30eda952a84279b2a9f47f1",
+          "date": "2026-07-01T23:07:09-03:00",
+          "subject": " feat(seo): optimize metadata, structured data, and crawlability"
+        },
+        {
+          "sha": "b52dc58255f743b6b1e8dcba862367f01f970b17",
+          "date": "2026-06-28T20:08:14-03:00",
+          "subject": "fix(ci): cloudflared added to deploy server - remove debug"
+        },
+        {
+          "sha": "b2e8b31d8dc6ca6b00a6c2e1cb20d2b1c84955cd",
+          "date": "2026-06-28T20:03:56-03:00",
+          "subject": "fix(ci): cloudflared added to deploy server - debug"
+        },
+        {
+          "sha": "56c142647df29326be3e2d3d2451aed315def5b8",
+          "date": "2026-06-28T19:58:23-03:00",
+          "subject": "fix(ci): cloudflared added to deploy server"
+        },
+        {
+          "sha": "e3482e2a9d9f20c16a02ded9163d5c42e710c70f",
+          "date": "2026-06-28T19:51:56-03:00",
+          "subject": "fix(ci): cloudflared added to deploy server"
+        },
+        {
+          "sha": "c6faee6165d933a20c5c2efb4afd6c2ca7c8a4b4",
+          "date": "2026-06-28T19:36:34-03:00",
+          "subject": "fix: bind prod app port to 127.0.0.1 instead of exposing on all interfaces"
+        },
+        {
+          "sha": "833c32048fa7e57e6f2844731d3899d21d72bdd9",
+          "date": "2026-06-28T13:49:05-03:00",
+          "subject": "fix: readme updated [skip release]"
+        },
+        {
+          "sha": "29ea824de05092f9f5f8fa7510fc2649b1822ae5",
+          "date": "2026-06-28T12:18:22-03:00",
+          "subject": "feat: add continuous deployment to server via GitHub Actions"
+        },
+        {
+          "sha": "4e0a818a152c442eae45a723deacf3f931b7e8af",
+          "date": "2026-05-17T13:17:53-03:00",
+          "subject": "feat: new ci in dockerfiles with npmrc file"
+        }
+      ],
+      "fetchedAt": "2026-10-18T06:38:40.745Z"
+    },
+    {
+      "name": "GolajahSlide",
+      "path": "B:\\GithubProject\\GolajahSlide",
+      "branch": "main",
+      "head": "1651b08d66c49b4f7e52aba00f0f023fe58e8d31",
+      "main": "1651b08d66c49b4f7e52aba00f0f023fe58e8d31",
+      "ahead": 0,
+      "behind": 0,
+      "upstream": "origin/main",
+      "dirty": false,
+      "remote": "https://github.com/TeutonicMepheles/GolajahSlide.git",
+      "commits": [
+        {
+          "sha": "1651b08d66c49b4f7e52aba00f0f023fe58e8d31",
+          "date": "2026-09-20T22:44:40+08:00",
+          "subject": "docs: explain cross-machine slide editing workflow"
+        },
+        {
+          "sha": "563df47fbc00a06de8f7cdcef2463dc857db5090",
+          "date": "2026-09-19T21:32:54+08:00",
+          "subject": "Improve content editing and navigation, add Lark import and nested lists"
+        },
+        {
+          "sha": "3ecc2b241861d40d021c683fd6ac6176257df3e8",
+          "date": "2026-08-24T19:32:45+08:00",
+          "subject": "Merge pull request #11 from TeutonicMepheles/codex/bilingual-readmes"
+        },
+        {
+          "sha": "072ab0f841ef80b16a7cc64d749ca65aebedfda4",
+          "date": "2026-08-24T19:30:33+08:00",
+          "subject": "docs: add bilingual designer README guides"
+        },
+        {
+          "sha": "ab52fa7038345f67e113d9aab4b62c09f0018794",
+          "date": "2026-08-24T19:15:14+08:00",
+          "subject": "Merge pull request #10 from TeutonicMepheles/codex/content-authoring"
+        },
+        {
+          "sha": "638a1ee099f25b0aae9ef2f23de63af670161fc1",
+          "date": "2026-08-24T18:44:52+08:00",
+          "subject": "feat: add experimental animated PowerPoint export"
+        },
+        {
+          "sha": "ed287f2fb46de856cb36ba9d4b817d09465c53ea",
+          "date": "2026-08-24T16:30:04+08:00",
+          "subject": "docs: document authoring and export contracts"
+        },
+        {
+          "sha": "a2ed8a9ecee5af9bb0eae5e4ec5928c1b99e4d33",
+          "date": "2026-08-24T16:12:59+08:00",
+          "subject": "feat: harden content authoring and Chapter editing"
+        },
+        {
+          "sha": "c16af975fcb28fbc12d18439359d10fe2f1cd6b9",
+          "date": "2026-08-24T14:12:12+08:00",
+          "subject": "Add Agent CLI and stdio MCP tools"
+        },
+        {
+          "sha": "ff4c8aede7f5b3198ba1bab421ba01a52a4cb1f0",
+          "date": "2026-08-24T10:22:01+08:00",
+          "subject": "feat: support fullscreen video playback"
+        },
+        {
+          "sha": "4b7368fff67d9dcd498a38b2a8c89c5dba0ef9d0",
+          "date": "2026-08-24T09:45:10+08:00",
+          "subject": "feat: export static PDF and PowerPoint"
+        },
+        {
+          "sha": "2c4b71e5d9b00c97972e2d75588e560f2938185d",
+          "date": "2026-08-24T09:09:17+08:00",
+          "subject": "feat: group editor controls by frequency"
+        }
+      ],
+      "fetchedAt": "2026-10-18T06:38:42.143Z"
+    },
+    {
+      "name": "tower-drop-classroom/member-a-gameplay",
+      "path": "B:\\GithubProject\\tower-drop-classroom\\member-a-gameplay",
+      "branch": "main",
+      "head": "9e732a3347468666aaaf46414a01f7fb4bdc81da",
+      "main": "690829c52516d5f10b28194a8d5e3e537da85f05",
+      "ahead": 0,
+      "behind": 1,
+      "upstream": "origin/main",
+      "dirty": true,
+      "remote": "https://github.com/TeutonicMepheles/tower-drop-classroom.git",
+      "commits": [
+        {
+          "sha": "690829c52516d5f10b28194a8d5e3e537da85f05",
+          "date": "2026-10-12T21:26:01+08:00",
+          "subject": "Merge pull request #10"
+        },
+        {
+          "sha": "affec4b52af96f7222f5255119f01e606e011f12",
+          "date": "2026-10-12T16:46:42+08:00",
+          "subject": "Merge branch 'main' into ui-反馈信息UI展示效果优化"
+        },
+        {
+          "sha": "9e732a3347468666aaaf46414a01f7fb4bdc81da",
+          "date": "2026-10-12T15:18:07+08:00",
+          "subject": "Merge pull request #9"
+        },
+        {
+          "sha": "49ca6c11a4f62e36c60bef641d997932465e9f65",
+          "date": "2026-10-12T13:55:41+08:00",
+          "subject": "补充同步"
+        },
+        {
+          "sha": "cfb41bcf99b4786d12c225a968ed8278223416ad",
+          "date": "2026-10-12T11:26:43+08:00",
+          "subject": "261012-ui-ui文本润色重写，去AI味"
+        },
+        {
+          "sha": "87dbb296df32bd7bed1b1345c2cfbaca98910364",
+          "date": "2026-10-12T08:39:54+08:00",
+          "subject": "261012-ui-动效&Text展示优化"
+        },
+        {
+          "sha": "7c124a360e0b32556ff6e4d05bbc54f54e164fa9",
+          "date": "2026-10-11T23:06:31+08:00",
+          "subject": "261011-ui-初版优化UI提交，仍需要调整字号/动效/图标资源"
+        },
+        {
+          "sha": "e001a9ec86328d2c6b5286db3ec8c9130950187d",
+          "date": "2026-10-11T20:00:55+08:00",
+          "subject": "Merge pull request #8"
+        },
+        {
+          "sha": "ea144e09c7f48c19470e0aeb18f114813a19dcba",
+          "date": "2026-10-11T18:56:13+08:00",
+          "subject": "feat: add commit tree explorer with 16:9 game previews"
+        },
+        {
+          "sha": "08aeeba1d96aa3721865aa183ab23d04b38964ac",
+          "date": "2026-10-11T16:21:33+08:00",
+          "subject": "Merge pull request #7"
+        },
+        {
+          "sha": "ab7dbda3af063d77a5edb2aba2783d8853f9c03b",
+          "date": "2026-10-10T18:17:05+08:00",
+          "subject": "test: 完成模块重构交互验收与生命周期回归"
+        },
+        {
+          "sha": "cf6ef6b5fab841b222ce5b3a2ef46540c98b5255",
+          "date": "2026-10-10T18:10:42+08:00",
+          "subject": "refactor: 整理模块目录预览入口及协作边界"
+        }
+      ],
+      "fetchedAt": "2026-10-18T06:38:45.351Z"
+    },
+    {
+      "name": "tower-drop-classroom/member-b-art",
+      "path": "B:\\GithubProject\\tower-drop-classroom\\member-b-art",
+      "branch": "feature/b-art",
+      "head": "de0c1bc8584d4817373bf23379123803de10ad5d",
+      "main": "690829c52516d5f10b28194a8d5e3e537da85f05",
+      "ahead": 0,
+      "behind": 11,
+      "upstream": null,
+      "dirty": false,
+      "remote": "https://github.com/TeutonicMepheles/tower-drop-classroom.git",
+      "commits": [
+        {
+          "sha": "690829c52516d5f10b28194a8d5e3e537da85f05",
+          "date": "2026-10-12T21:26:01+08:00",
+          "subject": "Merge pull request #10"
+        },
+        {
+          "sha": "affec4b52af96f7222f5255119f01e606e011f12",
+          "date": "2026-10-12T16:46:42+08:00",
+          "subject": "Merge branch 'main' into ui-反馈信息UI展示效果优化"
+        },
+        {
+          "sha": "9e732a3347468666aaaf46414a01f7fb4bdc81da",
+          "date": "2026-10-12T15:18:07+08:00",
+          "subject": "Merge pull request #9"
+        },
+        {
+          "sha": "49ca6c11a4f62e36c60bef641d997932465e9f65",
+          "date": "2026-10-12T13:55:41+08:00",
+          "subject": "补充同步"
+        },
+        {
+          "sha": "cfb41bcf99b4786d12c225a968ed8278223416ad",
+          "date": "2026-10-12T11:26:43+08:00",
+          "subject": "261012-ui-ui文本润色重写，去AI味"
+        },
+        {
+          "sha": "87dbb296df32bd7bed1b1345c2cfbaca98910364",
+          "date": "2026-10-12T08:39:54+08:00",
+          "subject": "261012-ui-动效&Text展示优化"
+        },
+        {
+          "sha": "7c124a360e0b32556ff6e4d05bbc54f54e164fa9",
+          "date": "2026-10-11T23:06:31+08:00",
+          "subject": "261011-ui-初版优化UI提交，仍需要调整字号/动效/图标资源"
+        },
+        {
+          "sha": "e001a9ec86328d2c6b5286db3ec8c9130950187d",
+          "date": "2026-10-11T20:00:55+08:00",
+          "subject": "Merge pull request #8"
+        },
+        {
+          "sha": "ea144e09c7f48c19470e0aeb18f114813a19dcba",
+          "date": "2026-10-11T18:56:13+08:00",
+          "subject": "feat: add commit tree explorer with 16:9 game previews"
+        },
+        {
+          "sha": "08aeeba1d96aa3721865aa183ab23d04b38964ac",
+          "date": "2026-10-11T16:21:33+08:00",
+          "subject": "Merge pull request #7"
+        },
+        {
+          "sha": "ab7dbda3af063d77a5edb2aba2783d8853f9c03b",
+          "date": "2026-10-10T18:17:05+08:00",
+          "subject": "test: 完成模块重构交互验收与生命周期回归"
+        },
+        {
+          "sha": "cf6ef6b5fab841b222ce5b3a2ef46540c98b5255",
+          "date": "2026-10-10T18:10:42+08:00",
+          "subject": "refactor: 整理模块目录预览入口及协作边界"
+        }
+      ],
+      "fetchedAt": "2026-10-18T06:38:48.585Z"
+    },
+    {
+      "name": "tower-drop-classroom/member-c-ui",
+      "path": "B:\\GithubProject\\tower-drop-classroom\\member-c-ui",
+      "branch": "ui-反馈信息UI展示效果优化",
+      "head": "affec4b52af96f7222f5255119f01e606e011f12",
+      "main": "690829c52516d5f10b28194a8d5e3e537da85f05",
+      "ahead": 5,
+      "behind": 1,
+      "upstream": "origin/ui-反馈信息UI展示效果优化",
+      "dirty": false,
+      "remote": "https://github.com/TeutonicMepheles/tower-drop-classroom.git",
+      "commits": [
+        {
+          "sha": "690829c52516d5f10b28194a8d5e3e537da85f05",
+          "date": "2026-10-12T21:26:01+08:00",
+          "subject": "Merge pull request #10"
+        },
+        {
+          "sha": "affec4b52af96f7222f5255119f01e606e011f12",
+          "date": "2026-10-12T16:46:42+08:00",
+          "subject": "Merge branch 'main' into ui-反馈信息UI展示效果优化"
+        },
+        {
+          "sha": "9e732a3347468666aaaf46414a01f7fb4bdc81da",
+          "date": "2026-10-12T15:18:07+08:00",
+          "subject": "Merge pull request #9"
+        },
+        {
+          "sha": "49ca6c11a4f62e36c60bef641d997932465e9f65",
+          "date": "2026-10-12T13:55:41+08:00",
+          "subject": "补充同步"
+        },
+        {
+          "sha": "cfb41bcf99b4786d12c225a968ed8278223416ad",
+          "date": "2026-10-12T11:26:43+08:00",
+          "subject": "261012-ui-ui文本润色重写，去AI味"
+        },
+        {
+          "sha": "87dbb296df32bd7bed1b1345c2cfbaca98910364",
+          "date": "2026-10-12T08:39:54+08:00",
+          "subject": "261012-ui-动效&Text展示优化"
+        },
+        {
+          "sha": "7c124a360e0b32556ff6e4d05bbc54f54e164fa9",
+          "date": "2026-10-11T23:06:31+08:00",
+          "subject": "261011-ui-初版优化UI提交，仍需要调整字号/动效/图标资源"
+        },
+        {
+          "sha": "e001a9ec86328d2c6b5286db3ec8c9130950187d",
+          "date": "2026-10-11T20:00:55+08:00",
+          "subject": "Merge pull request #8"
+        },
+        {
+          "sha": "ea144e09c7f48c19470e0aeb18f114813a19dcba",
+          "date": "2026-10-11T18:56:13+08:00",
+          "subject": "feat: add commit tree explorer with 16:9 game previews"
+        },
+        {
+          "sha": "08aeeba1d96aa3721865aa183ab23d04b38964ac",
+          "date": "2026-10-11T16:21:33+08:00",
+          "subject": "Merge pull request #7"
+        },
+        {
+          "sha": "ab7dbda3af063d77a5edb2aba2783d8853f9c03b",
+          "date": "2026-10-10T18:17:05+08:00",
+          "subject": "test: 完成模块重构交互验收与生命周期回归"
+        },
+        {
+          "sha": "cf6ef6b5fab841b222ce5b3a2ef46540c98b5255",
+          "date": "2026-10-10T18:10:42+08:00",
+          "subject": "refactor: 整理模块目录预览入口及协作边界"
+        }
+      ],
+      "fetchedAt": "2026-10-18T06:38:51.101Z"
+    }
+  ]
+}

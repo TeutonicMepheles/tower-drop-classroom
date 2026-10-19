@@ -1,0 +1,866 @@
+[
+  {
+    "event_id": "22973228413",
+    "push_id": 45419622460,
+    "time": "2026-10-04T22:18:54+08:00",
+    "branch": "main",
+    "actor": "TeutonicMepheles",
+    "before": "d21b933c8c7bffe5245d5ce6e553160438844aaa",
+    "after": "6bd5f137a71d1eaf46a60cb64f876464b6f48304",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "6bd5f137a71d1eaf46a60cb64f876464b6f48304",
+        "subject": "docs: 建立三人协作教学基线与课堂任务"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "22973257541",
+    "push_id": 45419649452,
+    "time": "2026-10-04T22:19:22+08:00",
+    "branch": "main",
+    "actor": "TeutonicMepheles",
+    "before": "6bd5f137a71d1eaf46a60cb64f876464b6f48304",
+    "after": "9119bf79526549daaa7ba8c14d111e4a6c74d653",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "9119bf79526549daaa7ba8c14d111e4a6c74d653",
+        "subject": "chore: 统一换行符避免 Windows 教学检查误报"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "22973389907",
+    "push_id": 45419772412,
+    "time": "2026-10-04T22:21:25+08:00",
+    "branch": "feature/a-gameplay",
+    "actor": "TeutonicMepheles",
+    "before": "9119bf79526549daaa7ba8c14d111e4a6c74d653",
+    "after": "36b19d2454ea24281c7420b568fdc47808450dee",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "36b19d2454ea24281c7420b568fdc47808450dee",
+        "subject": "docs: 明确A·玩法工作区任务与验收"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "22973394558",
+    "push_id": 45419776773,
+    "time": "2026-10-04T22:21:29+08:00",
+    "branch": "feature/b-art",
+    "actor": "TeutonicMepheles",
+    "before": "9119bf79526549daaa7ba8c14d111e4a6c74d653",
+    "after": "4847668e8ad2960d1d2aed9f7d4737c90646d38d",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "4847668e8ad2960d1d2aed9f7d4737c90646d38d",
+        "subject": "docs: 明确B·美术工作区任务与验收"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23104007965",
+    "push_id": 45419781217,
+    "time": "2026-10-04T22:21:33+08:00",
+    "branch": "feature/c-ui",
+    "actor": "TeutonicMepheles",
+    "before": "9119bf79526549daaa7ba8c14d111e4a6c74d653",
+    "after": "58f47da7a9c05081bac69bd5393354fa48fa6f70",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "58f47da7a9c05081bac69bd5393354fa48fa6f70",
+        "subject": "docs: 明确C·UI工作区任务与验收"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23297914265",
+    "push_id": 45682945078,
+    "time": "2026-10-07T09:49:13+08:00",
+    "branch": "feature/a-gameplay",
+    "actor": "TeutonicMepheles",
+    "before": "36b19d2454ea24281c7420b568fdc47808450dee",
+    "after": "b3f8b7b23b64e8e3c86fc11e6bdcc3c614970807",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "22bbdfd668acbd50eb225a904459384e1d39acce",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "b3f8b7b23b64e8e3c86fc11e6bdcc3c614970807",
+        "subject": "feat: 完善玩法演示控件与分支成果记录"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23234881257",
+    "push_id": 45682952256,
+    "time": "2026-10-07T09:49:20+08:00",
+    "branch": "feature/c-ui",
+    "actor": "TeutonicMepheles",
+    "before": "58f47da7a9c05081bac69bd5393354fa48fa6f70",
+    "after": "a44071dbf9c61efceca3919fa28c814361dde696",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "40affe07372d7c5c02dc91787784be44914b2995",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "a44071dbf9c61efceca3919fa28c814361dde696",
+        "subject": "feat: 实现中文界面与完整游戏状态展示"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23295561724",
+    "push_id": 45682952277,
+    "time": "2026-10-07T09:49:21+08:00",
+    "branch": "feature/b-art",
+    "actor": "TeutonicMepheles",
+    "before": "4847668e8ad2960d1d2aed9f7d4737c90646d38d",
+    "after": "60d08fe6b56d5971d3541141eaa40bacde6cce3a",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "69d14af9871d23cdb1e2d525408dbe07513c9248",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "60d08fe6b56d5971d3541141eaa40bacde6cce3a",
+        "subject": "feat: 实现三维主题与完美落块视觉反馈"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23297940905",
+    "push_id": 45682978604,
+    "time": "2026-10-07T09:49:46+08:00",
+    "branch": "feature/a-gameplay",
+    "actor": "TeutonicMepheles",
+    "before": "b3f8b7b23b64e8e3c86fc11e6bdcc3c614970807",
+    "after": "b8f0a59c548e72b91364b938873936c4a0169d0e",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "b8f0a59c548e72b91364b938873936c4a0169d0e",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23304304268",
+    "push_id": 45682983286,
+    "time": "2026-10-07T09:49:51+08:00",
+    "branch": "feature/b-art",
+    "actor": "TeutonicMepheles",
+    "before": "60d08fe6b56d5971d3541141eaa40bacde6cce3a",
+    "after": "368f2efe2134dec2203b9b7a333fd5cda59c0a3a",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "368f2efe2134dec2203b9b7a333fd5cda59c0a3a",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23289118416",
+    "push_id": 45682988119,
+    "time": "2026-10-07T09:49:56+08:00",
+    "branch": "feature/c-ui",
+    "actor": "TeutonicMepheles",
+    "before": "a44071dbf9c61efceca3919fa28c814361dde696",
+    "after": "b480077b4869bb948884687755ee273c8738cb4e",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "b480077b4869bb948884687755ee273c8738cb4e",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23289178941",
+    "push_id": 45683066661,
+    "time": "2026-10-07T09:51:11+08:00",
+    "branch": "feature/b-art",
+    "actor": "TeutonicMepheles",
+    "before": "368f2efe2134dec2203b9b7a333fd5cda59c0a3a",
+    "after": "1b690843326601dfe484d9c2db0de302d5c7cd82",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "1b690843326601dfe484d9c2db0de302d5c7cd82",
+        "subject": "fix: 游戏结束时清理完美落块发光"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23242044600",
+    "push_id": 45696285394,
+    "time": "2026-10-07T13:23:22+08:00",
+    "branch": "feature/b-art",
+    "actor": "TeutonicMepheles",
+    "before": "1b690843326601dfe484d9c2db0de302d5c7cd82",
+    "after": "1376cf2a2dd861668c32200fa4d4850ae3e3c454",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "f4025f87406d1af1a43bcd74e8fe2dd74bbc01c6",
+        "subject": "feat(art): 01 动态渐变背景与远景光点"
+      },
+      {
+        "sha": "3f51a7174ff3009a0a1219e83f7c0df19986b164",
+        "subject": "feat(art): 02 距离雾与低位动态雾片"
+      },
+      {
+        "sha": "0d6f5339ec8555070424eeb957486d6eb7aa34e6",
+        "subject": "feat(art): 03 陶瓷金属发光材质与程序化纹理"
+      },
+      {
+        "sha": "9c68817be350116169138dd372237813445ebcdf",
+        "subject": "feat(art): 04 拼接成功边缘粒子与固定容量复用"
+      },
+      {
+        "sha": "107c6400858fc94cdf889be92590c12c59d7ff0d",
+        "subject": "feat(art): 05 完美拼接金色粒子轮廓与课堂效果演示"
+      },
+      {
+        "sha": "1376cf2a2dd861668c32200fa4d4850ae3e3c454",
+        "subject": "perf(art): 06 清理资源减少空闲更新并完善教学验收"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23306134161",
+    "push_id": 45732635561,
+    "time": "2026-10-07T20:41:47+08:00",
+    "branch": "feature/a-gameplay",
+    "actor": "TeutonicMepheles",
+    "before": "b8f0a59c548e72b91364b938873936c4a0169d0e",
+    "after": "d1dc810f62e52963432561a5a2eabf5f4a3f91aa",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "f41f900d0e870cd4d3c84ac35dd64493bd3911b1",
+        "subject": "local-261007-提交玩法改动"
+      },
+      {
+        "sha": "d1dc810f62e52963432561a5a2eabf5f4a3f91aa",
+        "subject": "chore: 无代码变更"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23404025030",
+    "push_id": 45734767642,
+    "time": "2026-10-07T21:03:39+08:00",
+    "branch": "feature/a-gameplay",
+    "actor": "TeutonicMepheles",
+    "before": "d1dc810f62e52963432561a5a2eabf5f4a3f91aa",
+    "after": "e1835f514a3bb6393edf34c0415b8abf4ff361a5",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "e1835f514a3bb6393edf34c0415b8abf4ff361a5",
+        "subject": "feat(gameplay): 深化肉鸽玩法与纪录系统"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23281411357",
+    "push_id": 45734922525,
+    "time": "2026-10-07T21:05:13+08:00",
+    "branch": "feature/a-gameplay",
+    "actor": "TeutonicMepheles",
+    "before": "e1835f514a3bb6393edf34c0415b8abf4ff361a5",
+    "after": "ab2373a60f23ac52ac35c380ee546d2b26593f9c",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "ab2373a60f23ac52ac35c380ee546d2b26593f9c",
+        "subject": "fix(gameplay): 补齐纪录模块测试与验收材料"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23310409104",
+    "push_id": 45735602138,
+    "time": "2026-10-07T21:12:07+08:00",
+    "branch": "main",
+    "actor": "TeutonicMepheles",
+    "before": "9119bf79526549daaa7ba8c14d111e4a6c74d653",
+    "after": "219742d0a76ab4a86c8ff235015a04ce44eb7e4b",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "36b19d2454ea24281c7420b568fdc47808450dee",
+        "subject": "docs: 明确A·玩法工作区任务与验收"
+      },
+      {
+        "sha": "22bbdfd668acbd50eb225a904459384e1d39acce",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "b3f8b7b23b64e8e3c86fc11e6bdcc3c614970807",
+        "subject": "feat: 完善玩法演示控件与分支成果记录"
+      },
+      {
+        "sha": "b8f0a59c548e72b91364b938873936c4a0169d0e",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      },
+      {
+        "sha": "f41f900d0e870cd4d3c84ac35dd64493bd3911b1",
+        "subject": "local-261007-提交玩法改动"
+      },
+      {
+        "sha": "d1dc810f62e52963432561a5a2eabf5f4a3f91aa",
+        "subject": "chore: 无代码变更"
+      },
+      {
+        "sha": "e1835f514a3bb6393edf34c0415b8abf4ff361a5",
+        "subject": "feat(gameplay): 深化肉鸽玩法与纪录系统"
+      },
+      {
+        "sha": "ab2373a60f23ac52ac35c380ee546d2b26593f9c",
+        "subject": "fix(gameplay): 补齐纪录模块测试与验收材料"
+      },
+      {
+        "sha": "219742d0a76ab4a86c8ff235015a04ce44eb7e4b",
+        "subject": "Merge pull request #4 from TeutonicMepheles/feature/a-gameplay"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23310594624",
+    "push_id": 45735696982,
+    "time": "2026-10-07T21:13:05+08:00",
+    "branch": "feature/b-art",
+    "actor": "TeutonicMepheles",
+    "before": "1376cf2a2dd861668c32200fa4d4850ae3e3c454",
+    "after": "91623beb973d65243670425da9802083dd7ae2b3",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "36b19d2454ea24281c7420b568fdc47808450dee",
+        "subject": "docs: 明确A·玩法工作区任务与验收"
+      },
+      {
+        "sha": "22bbdfd668acbd50eb225a904459384e1d39acce",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "b3f8b7b23b64e8e3c86fc11e6bdcc3c614970807",
+        "subject": "feat: 完善玩法演示控件与分支成果记录"
+      },
+      {
+        "sha": "b8f0a59c548e72b91364b938873936c4a0169d0e",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      },
+      {
+        "sha": "f41f900d0e870cd4d3c84ac35dd64493bd3911b1",
+        "subject": "local-261007-提交玩法改动"
+      },
+      {
+        "sha": "d1dc810f62e52963432561a5a2eabf5f4a3f91aa",
+        "subject": "chore: 无代码变更"
+      },
+      {
+        "sha": "e1835f514a3bb6393edf34c0415b8abf4ff361a5",
+        "subject": "feat(gameplay): 深化肉鸽玩法与纪录系统"
+      },
+      {
+        "sha": "ab2373a60f23ac52ac35c380ee546d2b26593f9c",
+        "subject": "fix(gameplay): 补齐纪录模块测试与验收材料"
+      },
+      {
+        "sha": "219742d0a76ab4a86c8ff235015a04ce44eb7e4b",
+        "subject": "Merge pull request #4 from TeutonicMepheles/feature/a-gameplay"
+      },
+      {
+        "sha": "91623beb973d65243670425da9802083dd7ae2b3",
+        "subject": "merge: 整合最新奖励玩法与三维美术"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23289383743",
+    "push_id": 45735703423,
+    "time": "2026-10-07T21:13:09+08:00",
+    "branch": "main",
+    "actor": "TeutonicMepheles",
+    "before": "219742d0a76ab4a86c8ff235015a04ce44eb7e4b",
+    "after": "37b875f175419816412cd4740cc949ac83cb8b36",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "4847668e8ad2960d1d2aed9f7d4737c90646d38d",
+        "subject": "docs: 明确B·美术工作区任务与验收"
+      },
+      {
+        "sha": "69d14af9871d23cdb1e2d525408dbe07513c9248",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "60d08fe6b56d5971d3541141eaa40bacde6cce3a",
+        "subject": "feat: 实现三维主题与完美落块视觉反馈"
+      },
+      {
+        "sha": "368f2efe2134dec2203b9b7a333fd5cda59c0a3a",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      },
+      {
+        "sha": "1b690843326601dfe484d9c2db0de302d5c7cd82",
+        "subject": "fix: 游戏结束时清理完美落块发光"
+      },
+      {
+        "sha": "f4025f87406d1af1a43bcd74e8fe2dd74bbc01c6",
+        "subject": "feat(art): 01 动态渐变背景与远景光点"
+      },
+      {
+        "sha": "3f51a7174ff3009a0a1219e83f7c0df19986b164",
+        "subject": "feat(art): 02 距离雾与低位动态雾片"
+      },
+      {
+        "sha": "0d6f5339ec8555070424eeb957486d6eb7aa34e6",
+        "subject": "feat(art): 03 陶瓷金属发光材质与程序化纹理"
+      },
+      {
+        "sha": "9c68817be350116169138dd372237813445ebcdf",
+        "subject": "feat(art): 04 拼接成功边缘粒子与固定容量复用"
+      },
+      {
+        "sha": "107c6400858fc94cdf889be92590c12c59d7ff0d",
+        "subject": "feat(art): 05 完美拼接金色粒子轮廓与课堂效果演示"
+      },
+      {
+        "sha": "1376cf2a2dd861668c32200fa4d4850ae3e3c454",
+        "subject": "perf(art): 06 清理资源减少空闲更新并完善教学验收"
+      },
+      {
+        "sha": "91623beb973d65243670425da9802083dd7ae2b3",
+        "subject": "merge: 整合最新奖励玩法与三维美术"
+      },
+      {
+        "sha": "37b875f175419816412cd4740cc949ac83cb8b36",
+        "subject": "Merge pull request #5 from TeutonicMepheles/feature/b-art"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23314648668",
+    "push_id": 45736267871,
+    "time": "2026-10-07T21:18:54+08:00",
+    "branch": "feature/c-ui",
+    "actor": "TeutonicMepheles",
+    "before": "b480077b4869bb948884687755ee273c8738cb4e",
+    "after": "a818200d63355181a12d051bd4b91a6eba634695",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "4847668e8ad2960d1d2aed9f7d4737c90646d38d",
+        "subject": "docs: 明确B·美术工作区任务与验收"
+      },
+      {
+        "sha": "69d14af9871d23cdb1e2d525408dbe07513c9248",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "60d08fe6b56d5971d3541141eaa40bacde6cce3a",
+        "subject": "feat: 实现三维主题与完美落块视觉反馈"
+      },
+      {
+        "sha": "368f2efe2134dec2203b9b7a333fd5cda59c0a3a",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      },
+      {
+        "sha": "1b690843326601dfe484d9c2db0de302d5c7cd82",
+        "subject": "fix: 游戏结束时清理完美落块发光"
+      },
+      {
+        "sha": "f4025f87406d1af1a43bcd74e8fe2dd74bbc01c6",
+        "subject": "feat(art): 01 动态渐变背景与远景光点"
+      },
+      {
+        "sha": "3f51a7174ff3009a0a1219e83f7c0df19986b164",
+        "subject": "feat(art): 02 距离雾与低位动态雾片"
+      },
+      {
+        "sha": "0d6f5339ec8555070424eeb957486d6eb7aa34e6",
+        "subject": "feat(art): 03 陶瓷金属发光材质与程序化纹理"
+      },
+      {
+        "sha": "9c68817be350116169138dd372237813445ebcdf",
+        "subject": "feat(art): 04 拼接成功边缘粒子与固定容量复用"
+      },
+      {
+        "sha": "107c6400858fc94cdf889be92590c12c59d7ff0d",
+        "subject": "feat(art): 05 完美拼接金色粒子轮廓与课堂效果演示"
+      },
+      {
+        "sha": "1376cf2a2dd861668c32200fa4d4850ae3e3c454",
+        "subject": "perf(art): 06 清理资源减少空闲更新并完善教学验收"
+      },
+      {
+        "sha": "36b19d2454ea24281c7420b568fdc47808450dee",
+        "subject": "docs: 明确A·玩法工作区任务与验收"
+      },
+      {
+        "sha": "22bbdfd668acbd50eb225a904459384e1d39acce",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "b3f8b7b23b64e8e3c86fc11e6bdcc3c614970807",
+        "subject": "feat: 完善玩法演示控件与分支成果记录"
+      },
+      {
+        "sha": "b8f0a59c548e72b91364b938873936c4a0169d0e",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      },
+      {
+        "sha": "f41f900d0e870cd4d3c84ac35dd64493bd3911b1",
+        "subject": "local-261007-提交玩法改动"
+      },
+      {
+        "sha": "d1dc810f62e52963432561a5a2eabf5f4a3f91aa",
+        "subject": "chore: 无代码变更"
+      },
+      {
+        "sha": "e1835f514a3bb6393edf34c0415b8abf4ff361a5",
+        "subject": "feat(gameplay): 深化肉鸽玩法与纪录系统"
+      },
+      {
+        "sha": "ab2373a60f23ac52ac35c380ee546d2b26593f9c",
+        "subject": "fix(gameplay): 补齐纪录模块测试与验收材料"
+      },
+      {
+        "sha": "219742d0a76ab4a86c8ff235015a04ce44eb7e4b",
+        "subject": "Merge pull request #4 from TeutonicMepheles/feature/a-gameplay"
+      },
+      {
+        "sha": "91623beb973d65243670425da9802083dd7ae2b3",
+        "subject": "merge: 整合最新奖励玩法与三维美术"
+      },
+      {
+        "sha": "37b875f175419816412cd4740cc949ac83cb8b36",
+        "subject": "Merge pull request #5 from TeutonicMepheles/feature/b-art"
+      },
+      {
+        "sha": "a818200d63355181a12d051bd4b91a6eba634695",
+        "subject": "merge: 整合玩法美术与中文UI并完成交互验收"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23314700450",
+    "push_id": 45736301924,
+    "time": "2026-10-07T21:19:15+08:00",
+    "branch": "main",
+    "actor": "TeutonicMepheles",
+    "before": "37b875f175419816412cd4740cc949ac83cb8b36",
+    "after": "de0c1bc8584d4817373bf23379123803de10ad5d",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "58f47da7a9c05081bac69bd5393354fa48fa6f70",
+        "subject": "docs: 明确C·UI工作区任务与验收"
+      },
+      {
+        "sha": "40affe07372d7c5c02dc91787784be44914b2995",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "a44071dbf9c61efceca3919fa28c814361dde696",
+        "subject": "feat: 实现中文界面与完整游戏状态展示"
+      },
+      {
+        "sha": "b480077b4869bb948884687755ee273c8738cb4e",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      },
+      {
+        "sha": "a818200d63355181a12d051bd4b91a6eba634695",
+        "subject": "merge: 整合玩法美术与中文UI并完成交互验收"
+      },
+      {
+        "sha": "de0c1bc8584d4817373bf23379123803de10ad5d",
+        "subject": "Merge pull request #6 from TeutonicMepheles/feature/c-ui"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23314797546",
+    "push_id": 45736365663,
+    "time": "2026-10-07T21:19:54+08:00",
+    "branch": "feature/c-ui",
+    "actor": "TeutonicMepheles",
+    "before": "a818200d63355181a12d051bd4b91a6eba634695",
+    "after": "de0c1bc8584d4817373bf23379123803de10ad5d",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "de0c1bc8584d4817373bf23379123803de10ad5d",
+        "subject": "Merge pull request #6 from TeutonicMepheles/feature/c-ui"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23406046567",
+    "push_id": 45736459869,
+    "time": "2026-10-07T21:20:50+08:00",
+    "branch": "feature/b-art",
+    "actor": "TeutonicMepheles",
+    "before": "91623beb973d65243670425da9802083dd7ae2b3",
+    "after": "de0c1bc8584d4817373bf23379123803de10ad5d",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "58f47da7a9c05081bac69bd5393354fa48fa6f70",
+        "subject": "docs: 明确C·UI工作区任务与验收"
+      },
+      {
+        "sha": "40affe07372d7c5c02dc91787784be44914b2995",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "a44071dbf9c61efceca3919fa28c814361dde696",
+        "subject": "feat: 实现中文界面与完整游戏状态展示"
+      },
+      {
+        "sha": "b480077b4869bb948884687755ee273c8738cb4e",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      },
+      {
+        "sha": "37b875f175419816412cd4740cc949ac83cb8b36",
+        "subject": "Merge pull request #5 from TeutonicMepheles/feature/b-art"
+      },
+      {
+        "sha": "a818200d63355181a12d051bd4b91a6eba634695",
+        "subject": "merge: 整合玩法美术与中文UI并完成交互验收"
+      },
+      {
+        "sha": "de0c1bc8584d4817373bf23379123803de10ad5d",
+        "subject": "Merge pull request #6 from TeutonicMepheles/feature/c-ui"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23400215475",
+    "push_id": 45736459537,
+    "time": "2026-10-07T21:20:50+08:00",
+    "branch": "feature/a-gameplay",
+    "actor": "TeutonicMepheles",
+    "before": "ab2373a60f23ac52ac35c380ee546d2b26593f9c",
+    "after": "de0c1bc8584d4817373bf23379123803de10ad5d",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "58f47da7a9c05081bac69bd5393354fa48fa6f70",
+        "subject": "docs: 明确C·UI工作区任务与验收"
+      },
+      {
+        "sha": "40affe07372d7c5c02dc91787784be44914b2995",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "a44071dbf9c61efceca3919fa28c814361dde696",
+        "subject": "feat: 实现中文界面与完整游戏状态展示"
+      },
+      {
+        "sha": "b480077b4869bb948884687755ee273c8738cb4e",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      },
+      {
+        "sha": "4847668e8ad2960d1d2aed9f7d4737c90646d38d",
+        "subject": "docs: 明确B·美术工作区任务与验收"
+      },
+      {
+        "sha": "69d14af9871d23cdb1e2d525408dbe07513c9248",
+        "subject": "feat: 实现难度、完美连击与跨角色状态接口"
+      },
+      {
+        "sha": "60d08fe6b56d5971d3541141eaa40bacde6cce3a",
+        "subject": "feat: 实现三维主题与完美落块视觉反馈"
+      },
+      {
+        "sha": "368f2efe2134dec2203b9b7a333fd5cda59c0a3a",
+        "subject": "docs: 按角色命名截图避免集成时二进制冲突"
+      },
+      {
+        "sha": "1b690843326601dfe484d9c2db0de302d5c7cd82",
+        "subject": "fix: 游戏结束时清理完美落块发光"
+      },
+      {
+        "sha": "f4025f87406d1af1a43bcd74e8fe2dd74bbc01c6",
+        "subject": "feat(art): 01 动态渐变背景与远景光点"
+      },
+      {
+        "sha": "3f51a7174ff3009a0a1219e83f7c0df19986b164",
+        "subject": "feat(art): 02 距离雾与低位动态雾片"
+      },
+      {
+        "sha": "0d6f5339ec8555070424eeb957486d6eb7aa34e6",
+        "subject": "feat(art): 03 陶瓷金属发光材质与程序化纹理"
+      },
+      {
+        "sha": "9c68817be350116169138dd372237813445ebcdf",
+        "subject": "feat(art): 04 拼接成功边缘粒子与固定容量复用"
+      },
+      {
+        "sha": "107c6400858fc94cdf889be92590c12c59d7ff0d",
+        "subject": "feat(art): 05 完美拼接金色粒子轮廓与课堂效果演示"
+      },
+      {
+        "sha": "1376cf2a2dd861668c32200fa4d4850ae3e3c454",
+        "subject": "perf(art): 06 清理资源减少空闲更新并完善教学验收"
+      },
+      {
+        "sha": "219742d0a76ab4a86c8ff235015a04ce44eb7e4b",
+        "subject": "Merge pull request #4 from TeutonicMepheles/feature/a-gameplay"
+      },
+      {
+        "sha": "91623beb973d65243670425da9802083dd7ae2b3",
+        "subject": "merge: 整合最新奖励玩法与三维美术"
+      },
+      {
+        "sha": "37b875f175419816412cd4740cc949ac83cb8b36",
+        "subject": "Merge pull request #5 from TeutonicMepheles/feature/b-art"
+      },
+      {
+        "sha": "a818200d63355181a12d051bd4b91a6eba634695",
+        "subject": "merge: 整合玩法美术与中文UI并完成交互验收"
+      },
+      {
+        "sha": "de0c1bc8584d4817373bf23379123803de10ad5d",
+        "subject": "Merge pull request #6 from TeutonicMepheles/feature/c-ui"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23670684407",
+    "push_id": 46119923873,
+    "time": "2026-10-11T16:21:34+08:00",
+    "branch": "main",
+    "actor": "TeutonicMepheles",
+    "before": "de0c1bc8584d4817373bf23379123803de10ad5d",
+    "after": "08aeeba1d96aa3721865aa183ab23d04b38964ac",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "4efbe3c4f62ee3234ecd67bbbefe501032a86d3e",
+        "subject": "refactor: 建立游戏公共契约与阶段验证基线"
+      },
+      {
+        "sha": "b9911a505b6bf2c1c49b77ec91e7f4b81cbfab6e",
+        "subject": "refactor: 分离界面渲染与游戏命令输入"
+      },
+      {
+        "sha": "f2bccf320022778fd5f9c9f572cc01cb7a6c9493",
+        "subject": "refactor: 提取纯数据玩法并验证旧引擎行为一致性"
+      },
+      {
+        "sha": "6b092489f13b86c5d00f4be0bd8537f9951d5946",
+        "subject": "refactor: 分离三维场景物理适配与运行协调"
+      },
+      {
+        "sha": "cf6ef6b5fab841b222ce5b3a2ef46540c98b5255",
+        "subject": "refactor: 整理模块目录预览入口及协作边界"
+      },
+      {
+        "sha": "ab7dbda3af063d77a5edb2aba2783d8853f9c03b",
+        "subject": "test: 完成模块重构交互验收与生命周期回归"
+      },
+      {
+        "sha": "08aeeba1d96aa3721865aa183ab23d04b38964ac",
+        "subject": "Merge pull request #7"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23830894567",
+    "push_id": 46132081654,
+    "time": "2026-10-11T20:00:56+08:00",
+    "branch": "main",
+    "actor": "TeutonicMepheles",
+    "before": "08aeeba1d96aa3721865aa183ab23d04b38964ac",
+    "after": "e001a9ec86328d2c6b5286db3ec8c9130950187d",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "ea144e09c7f48c19470e0aeb18f114813a19dcba",
+        "subject": "feat: add commit tree explorer with 16:9 game previews"
+      },
+      {
+        "sha": "e001a9ec86328d2c6b5286db3ec8c9130950187d",
+        "subject": "Merge pull request #8"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23808862813",
+    "push_id": 46202630539,
+    "time": "2026-10-12T15:18:09+08:00",
+    "branch": "main",
+    "actor": "TeutonicMepheles",
+    "before": "e001a9ec86328d2c6b5286db3ec8c9130950187d",
+    "after": "9e732a3347468666aaaf46414a01f7fb4bdc81da",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "9e732a3347468666aaaf46414a01f7fb4bdc81da",
+        "subject": "Merge pull request #9"
+      }
+    ],
+    "removed": []
+  },
+  {
+    "event_id": "23849373802",
+    "push_id": 46233786689,
+    "time": "2026-10-12T21:26:03+08:00",
+    "branch": "main",
+    "actor": "TeutonicMepheles",
+    "before": "9e732a3347468666aaaf46414a01f7fb4bdc81da",
+    "after": "690829c52516d5f10b28194a8d5e3e537da85f05",
+    "fast_forward": true,
+    "commits": [
+      {
+        "sha": "690829c52516d5f10b28194a8d5e3e537da85f05",
+        "subject": "Merge pull request #10"
+      }
+    ],
+    "removed": []
+  }
+]
