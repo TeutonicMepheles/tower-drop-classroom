@@ -3,66 +3,1432 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Tower Drop · 提交放映室</title>
+    <title>项目演变 课堂演示</title>
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <header>
-      <div>
-        <span class="eyebrow">TOWER DROP / CLASSROOM</span>
-        <h1>提交放映室<span>Commit Explorer</span></h1>
-      </div>
-      <button id="refresh">刷新历史 ↻</button>
-    </header>
-    <main>
-      <section class="history">
-        <div class="section-head">
-          <div>
-            <span class="eyebrow">01 / DEVELOPMENT TREE</span>
-            <h2>每条分支，都有一个故事</h2>
+    <main id="classroom">
+      <section class="history" aria-label="项目提交历史">
+        <header class="history-head">
+          <h1>项目演变</h1>
+          <span class="repo-label">GitHub tower-drop-classroom</span>
+          <div class="graph-key">
+            <span
+              class="node-key"
+              title="节点为推送记录；未查到推送事件的提交单独保留"
+              >节点：推送 / 提交</span
+            ><span>实线：提交关系</span
+            ><span class="squash-key">虚线：压缩合并</span>
           </div>
-          <p id="repository">正在读取本地 Git 历史…</p>
+          <button
+            id="terms-button"
+            aria-label="术语对照"
+            title="术语对照"
+            aria-haspopup="dialog"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 5v15M3 4c4-1 6 0 9 1 3-1 5-2 9-1v15c-4-1-6 0-9 1-3-1-5-2-9-1Z"
+              />
+            </svg></button
+          ><button
+            id="toggle-tree"
+            aria-expanded="true"
+            aria-controls="tree"
+            aria-label="收起历史"
+            title="收起历史"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 15 6-6 6 6" />
+            </svg>
+          </button>
+        </header>
+        <div class="tree-layout" id="tree-layout">
+          <aside id="lane-legend" aria-label="分支泳道图例"></aside>
+          <div id="tree" class="tree" aria-label="项目演变关系图"></div>
         </div>
-        <div class="filters">
-          <input
-            id="search"
-            aria-label="搜索提交"
-            placeholder="搜索说明、作者、SHA 或分支…"
-          /><label><input type="checkbox" id="all" /> 显示更早历史</label>
-        </div>
-        <div class="legend">
-          <span>● 提交节点</span><span>连线 = 父子关系</span
-          ><span>多条连线 = 合并</span>
-        </div>
-        <div id="tree" class="tree" aria-label="Git 提交关系图"></div>
       </section>
-      <section class="stage">
-        <div class="section-head stage-head">
-          <div>
-            <span class="eyebrow">02 / PLAY THE DIFFERENCE</span>
-            <h2>把提交变成可玩的版本</h2>
-          </div>
-          <div class="actions">
-            <span id="count">0 / 3</span><button id="clear">清空选择</button>
-          </div>
-        </div>
-        <p class="hint">
-          点击左侧节点，最多并排比较 3
-          个版本。先选分工前的基线，再选各角色成果，最后展示合并结果。
-        </p>
+      <section class="stage" aria-label="所选版本的游戏">
+        <header class="stage-head">
+          <h2>游戏预览</h2>
+          <div id="current-version">选择一个节点，查看对应版本</div>
+          <button id="restart" hidden aria-label="重新开始" title="重新开始">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 7v5h-5M20 12a8 8 0 1 0-2.3 5.7" />
+            </svg>
+          </button>
+        </header>
         <div id="notice" role="status" aria-live="polite"></div>
-        <div id="previews" class="previews">
+        <div id="previews">
           <div class="empty">
-            <div class="symbol">⌘</div>
-            <h3>从一个提交开始</h3>
-            <p>
-              选择节点后，这里会加载该提交的真实游戏。<br />首次构建需要等待，之后可直接打开。
-            </p>
+            <h3>选择一个版本</h3>
+            <p>单击节点运行游戏，双击推送节点查看提交。</p>
           </div>
         </div>
-        <footer>本地提交快照 · 连线来自真实父子关系 · 不包含未提交改动</footer>
       </section>
     </main>
+    <div id="push-tip" popover role="dialog" aria-label="推送包含的提交"></div>
+    <dialog id="terms-dialog" aria-labelledby="terms-title">
+      <header class="terms-head">
+        <h2 id="terms-title">术语对照</h2>
+        <form method="dialog">
+          <button aria-label="关闭术语对照" title="关闭">×</button>
+        </form>
+      </header>
+      <nav class="terms-tabs" role="tablist" aria-label="术语主题">
+        <button
+          role="tab"
+          id="tab-branch"
+          aria-selected="true"
+          aria-controls="terms-branch"
+        >
+          Branch</button
+        ><button
+          role="tab"
+          id="tab-head"
+          aria-selected="false"
+          aria-controls="terms-head"
+        >
+          HEAD / 分离 HEAD</button
+        ><button
+          role="tab"
+          id="tab-basics"
+          aria-selected="false"
+          aria-controls="terms-basics"
+        >
+          提交流程</button
+        ><button
+          role="tab"
+          id="tab-sync"
+          aria-selected="false"
+          aria-controls="terms-sync"
+        >
+          Push / Pull</button
+        ><button
+          role="tab"
+          id="tab-fetch"
+          aria-selected="false"
+          aria-controls="terms-fetch"
+        >
+          Fetch / Pull</button
+        ><button
+          role="tab"
+          id="tab-diverged"
+          aria-selected="false"
+          aria-controls="terms-diverged"
+        >
+          分叉后 Pull</button
+        ><button
+          role="tab"
+          id="tab-conflict"
+          aria-selected="false"
+          aria-controls="terms-conflict"
+        >
+          Conflict</button
+        ><button
+          role="tab"
+          id="tab-pr"
+          aria-selected="false"
+          aria-controls="terms-pr"
+        >
+          PR 审查流程</button
+        ><button
+          role="tab"
+          id="tab-merge"
+          aria-selected="false"
+          aria-controls="terms-merge"
+        >
+          Merge / Squash Merge</button
+        ><button
+          role="tab"
+          id="tab-ci"
+          aria-selected="false"
+          aria-controls="terms-ci"
+        >
+          CI/CD</button
+        ><button
+          role="tab"
+          id="tab-tag"
+          aria-selected="false"
+          aria-controls="terms-tag"
+        >
+          Tag
+        </button>
+      </nav>
+      <section
+        id="terms-sync"
+        role="tabpanel"
+        aria-labelledby="tab-sync"
+        hidden
+      >
+        <div class="term-split">
+          <div class="term-visual">
+            <div class="visual-cards">
+              <article>
+                <h4>Push <span>推送</span></h4>
+                <p class="action-summary">本地 → GitHub</p>
+                <svg
+                  class="sync-commits"
+                  viewBox="0 0 430 390"
+                  role="img"
+                  aria-label="推送前本地有ABC，GitHub有AB；推送后两端都有ABC"
+                >
+                  <text class="phase-label" x="48" y="30">操作前</text>
+                  <text class="endpoint-label" x="65" y="81">本地</text>
+                  <text class="endpoint-label" x="65" y="141">GitHub</text>
+                  <path class="commit-track" d="M160 74H316" />
+                  <rect
+                    class="commit-point local-point"
+                    x="142"
+                    y="56"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="160" y="81">A</text>
+                  <rect
+                    class="commit-point local-point"
+                    x="220"
+                    y="56"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="238" y="81">B</text>
+                  <rect
+                    class="commit-point local-point"
+                    x="298"
+                    y="56"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="316" y="81">C</text>
+                  <path class="commit-track" d="M160 134H238" />
+                  <circle class="commit-point" cx="160" cy="134" r="18" />
+                  <text class="commit-letter" x="160" y="141">A</text>
+                  <circle class="commit-point" cx="238" cy="134" r="18" />
+                  <text class="commit-letter" x="238" y="141">B</text>
+                  <path class="transfer-arrow" d="M370 74V125" />
+                  <path class="transfer-arrow" d="m362 117 8 8 8-8" />
+                  <text class="transfer-caption" x="250" y="194">
+                    Push：上传 C
+                  </text>
+                  <path class="phase-divider" d="M20 216H410" />
+                  <text class="phase-label" x="48" y="251">操作后</text>
+                  <text class="endpoint-label" x="65" y="301">本地</text>
+                  <text class="endpoint-label" x="65" y="361">GitHub</text>
+                  <path class="commit-track" d="M160 294H316" />
+                  <rect
+                    class="commit-point local-point"
+                    x="142"
+                    y="276"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="160" y="301">A</text>
+                  <rect
+                    class="commit-point local-point"
+                    x="220"
+                    y="276"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="238" y="301">B</text>
+                  <rect
+                    class="commit-point local-point"
+                    x="298"
+                    y="276"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="316" y="301">C</text>
+                  <path class="commit-track" d="M160 354H316" />
+                  <circle class="commit-point" cx="160" cy="354" r="18" />
+                  <text class="commit-letter" x="160" y="361">A</text>
+                  <circle class="commit-point" cx="238" cy="354" r="18" />
+                  <text class="commit-letter" x="238" y="361">B</text>
+                  <circle
+                    class="commit-point new-point"
+                    cx="316"
+                    cy="354"
+                    r="18"
+                  />
+                  <text class="commit-letter" x="316" y="361">C</text>
+                </svg>
+              </article>
+              <article>
+                <h4>Pull <span>拉取</span></h4>
+                <p class="action-summary">GitHub → 本地</p>
+                <svg
+                  class="sync-commits"
+                  viewBox="0 0 430 390"
+                  role="img"
+                  aria-label="拉取前本地有AB，GitHub有ABC；拉取后两端都有ABC"
+                >
+                  <text class="phase-label" x="48" y="30">操作前</text>
+                  <text class="endpoint-label" x="65" y="81">本地</text>
+                  <text class="endpoint-label" x="65" y="141">GitHub</text>
+                  <path class="commit-track" d="M160 74H238" />
+                  <rect
+                    class="commit-point local-point"
+                    x="142"
+                    y="56"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="160" y="81">A</text>
+                  <rect
+                    class="commit-point local-point"
+                    x="220"
+                    y="56"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="238" y="81">B</text>
+                  <path class="commit-track" d="M160 134H316" />
+                  <circle class="commit-point" cx="160" cy="134" r="18" />
+                  <text class="commit-letter" x="160" y="141">A</text>
+                  <circle class="commit-point" cx="238" cy="134" r="18" />
+                  <text class="commit-letter" x="238" y="141">B</text>
+                  <circle class="commit-point" cx="316" cy="134" r="18" />
+                  <text class="commit-letter" x="316" y="141">C</text>
+                  <path class="transfer-arrow" d="M370 134V83" />
+                  <path class="transfer-arrow" d="m362 91 8-8 8 8" />
+                  <text class="transfer-caption" x="250" y="194">
+                    Pull：GitHub → 本地
+                  </text>
+                  <path class="phase-divider" d="M20 216H410" />
+                  <text class="phase-label" x="48" y="251">操作后</text>
+                  <text class="endpoint-label" x="65" y="301">本地</text>
+                  <text class="endpoint-label" x="65" y="361">GitHub</text>
+                  <path class="commit-track" d="M160 294H316" />
+                  <rect
+                    class="commit-point local-point"
+                    x="142"
+                    y="276"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="160" y="301">A</text>
+                  <rect
+                    class="commit-point local-point"
+                    x="220"
+                    y="276"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="238" y="301">B</text>
+                  <rect
+                    class="commit-point local-point new-point"
+                    x="298"
+                    y="276"
+                    width="36"
+                    height="36"
+                    rx="6"
+                  />
+                  <text class="commit-letter" x="316" y="301">C</text>
+                  <path class="commit-track" d="M160 354H316" />
+                  <circle class="commit-point" cx="160" cy="354" r="18" />
+                  <text class="commit-letter" x="160" y="361">A</text>
+                  <circle class="commit-point" cx="238" cy="354" r="18" />
+                  <text class="commit-letter" x="238" y="361">B</text>
+                  <circle class="commit-point" cx="316" cy="354" r="18" />
+                  <text class="commit-letter" x="316" y="361">C</text>
+                </svg>
+              </article>
+            </div>
+          </div>
+          <aside class="term-notes">
+            <h3>Push / Pull</h3>
+            <h4>Push</h4>
+            <p>本地 → GitHub</p>
+            <h4>Pull</h4>
+            <p>GitHub → 本地，获取后整合</p>
+            <h4>Fetch</h4>
+            <p>只更新远端跟踪记录，当前分支不变</p>
+            <div class="side-key">
+              □ 本地提交<br />● 远端提交<br /><span>绿色 C：新同步的提交</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+      <section
+        id="terms-fetch"
+        role="tabpanel"
+        aria-labelledby="tab-fetch"
+        hidden
+      >
+        <div class="term-split">
+          <div class="term-visual">
+            <div class="fetch-cards">
+              <article>
+                <h4>Fetch</h4>
+                <svg
+                  viewBox="0 0 465 530"
+                  role="img"
+                  aria-label="Fetch 前后 main 和 origin/main 的提交位置"
+                >
+                  <defs>
+                    <marker
+                      id="fetch-arrow-Fetch"
+                      viewBox="0 0 10 10"
+                      refX="8"
+                      refY="5"
+                      markerWidth="10"
+                      markerHeight="10"
+                      orient="auto"
+                    >
+                      <path
+                        d="M1 1L8 5L1 9"
+                        fill="none"
+                        stroke="#24754d"
+                        stroke-width="2"
+                      />
+                    </marker>
+                  </defs>
+                  <text class="fetch-phase" x="24" y="30">操作前</text>
+                  <text class="fetch-label" x="24" y="89">GitHub main</text>
+                  <path class="fetch-track" d="M250 82H410" />
+                  <circle class="fetch-node" cx="250" cy="82" r="20" />
+                  <text class="fetch-letter" x="250" y="89">A</text>
+                  <circle class="fetch-node" cx="330" cy="82" r="20" />
+                  <text class="fetch-letter" x="330" y="89">B</text>
+                  <circle class="fetch-node" cx="410" cy="82" r="20" />
+                  <text class="fetch-letter" x="410" y="89">C</text>
+                  <text class="fetch-label" x="24" y="157">origin/main</text>
+                  <path class="fetch-track" d="M250 150H330" />
+                  <rect
+                    class="fetch-node"
+                    x="230"
+                    y="130"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="250" y="157">A</text>
+                  <rect
+                    class="fetch-node"
+                    x="310"
+                    y="130"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="330" y="157">B</text>
+                  <text class="fetch-label" x="24" y="225">main 当前</text>
+                  <path class="fetch-track" d="M250 218H330" />
+                  <rect
+                    class="fetch-node"
+                    x="230"
+                    y="198"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="250" y="225">A</text>
+                  <rect
+                    class="fetch-node"
+                    x="310"
+                    y="198"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="330" y="225">B</text>
+                  <path class="fetch-operation" d="M250 260V298" />
+                  <text class="fetch-action" x="285" y="284">Fetch</text>
+                  <text class="fetch-label" x="24" y="357">GitHub main</text>
+                  <path class="fetch-track" d="M250 350H410" />
+                  <circle class="fetch-node" cx="250" cy="350" r="20" />
+                  <text class="fetch-letter" x="250" y="357">A</text>
+                  <circle class="fetch-node" cx="330" cy="350" r="20" />
+                  <text class="fetch-letter" x="330" y="357">B</text>
+                  <circle class="fetch-node" cx="410" cy="350" r="20" />
+                  <text class="fetch-letter" x="410" y="357">C</text>
+                  <text class="fetch-label" x="24" y="425">origin/main</text>
+                  <path class="fetch-track" d="M250 418H410" />
+                  <rect
+                    class="fetch-node"
+                    x="230"
+                    y="398"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="250" y="425">A</text>
+                  <rect
+                    class="fetch-node"
+                    x="310"
+                    y="398"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="330" y="425">B</text>
+                  <rect
+                    class="fetch-node fetched"
+                    x="390"
+                    y="398"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="410" y="425">C</text>
+                  <text class="fetch-label" x="24" y="493">main 当前</text>
+                  <path class="fetch-track" d="M250 486H330" />
+                  <rect
+                    class="fetch-node"
+                    x="230"
+                    y="466"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="250" y="493">A</text>
+                  <rect
+                    class="fetch-node"
+                    x="310"
+                    y="466"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="330" y="493">B</text>
+                  <text class="fetch-phase" x="24" y="298">操作后</text>
+                  <style>
+                    #terms-fetch .fetch-operation {
+                      marker-end: url(#fetch-arrow-Fetch);
+                    }
+                  </style>
+                </svg>
+              </article>
+              <article>
+                <h4>Pull</h4>
+                <svg
+                  viewBox="0 0 465 530"
+                  role="img"
+                  aria-label="Pull 前后 main 和 origin/main 的提交位置"
+                >
+                  <defs>
+                    <marker
+                      id="fetch-arrow-Pull"
+                      viewBox="0 0 10 10"
+                      refX="8"
+                      refY="5"
+                      markerWidth="10"
+                      markerHeight="10"
+                      orient="auto"
+                    >
+                      <path
+                        d="M1 1L8 5L1 9"
+                        fill="none"
+                        stroke="#24754d"
+                        stroke-width="2"
+                      />
+                    </marker>
+                  </defs>
+                  <text class="fetch-phase" x="24" y="30">操作前</text>
+                  <text class="fetch-label" x="24" y="89">GitHub main</text>
+                  <path class="fetch-track" d="M250 82H410" />
+                  <circle class="fetch-node" cx="250" cy="82" r="20" />
+                  <text class="fetch-letter" x="250" y="89">A</text>
+                  <circle class="fetch-node" cx="330" cy="82" r="20" />
+                  <text class="fetch-letter" x="330" y="89">B</text>
+                  <circle class="fetch-node" cx="410" cy="82" r="20" />
+                  <text class="fetch-letter" x="410" y="89">C</text>
+                  <text class="fetch-label" x="24" y="157">origin/main</text>
+                  <path class="fetch-track" d="M250 150H330" />
+                  <rect
+                    class="fetch-node"
+                    x="230"
+                    y="130"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="250" y="157">A</text>
+                  <rect
+                    class="fetch-node"
+                    x="310"
+                    y="130"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="330" y="157">B</text>
+                  <text class="fetch-label" x="24" y="225">main 当前</text>
+                  <path class="fetch-track" d="M250 218H330" />
+                  <rect
+                    class="fetch-node"
+                    x="230"
+                    y="198"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="250" y="225">A</text>
+                  <rect
+                    class="fetch-node"
+                    x="310"
+                    y="198"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="330" y="225">B</text>
+                  <path class="fetch-operation" d="M250 260V298" />
+                  <text class="fetch-action" x="285" y="284">Pull</text>
+                  <text class="fetch-label" x="24" y="357">GitHub main</text>
+                  <path class="fetch-track" d="M250 350H410" />
+                  <circle class="fetch-node" cx="250" cy="350" r="20" />
+                  <text class="fetch-letter" x="250" y="357">A</text>
+                  <circle class="fetch-node" cx="330" cy="350" r="20" />
+                  <text class="fetch-letter" x="330" y="357">B</text>
+                  <circle class="fetch-node" cx="410" cy="350" r="20" />
+                  <text class="fetch-letter" x="410" y="357">C</text>
+                  <text class="fetch-label" x="24" y="425">origin/main</text>
+                  <path class="fetch-track" d="M250 418H410" />
+                  <rect
+                    class="fetch-node"
+                    x="230"
+                    y="398"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="250" y="425">A</text>
+                  <rect
+                    class="fetch-node"
+                    x="310"
+                    y="398"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="330" y="425">B</text>
+                  <rect
+                    class="fetch-node fetched"
+                    x="390"
+                    y="398"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="410" y="425">C</text>
+                  <text class="fetch-label" x="24" y="493">main 当前</text>
+                  <path class="fetch-track" d="M250 486H410" />
+                  <rect
+                    class="fetch-node"
+                    x="230"
+                    y="466"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="250" y="493">A</text>
+                  <rect
+                    class="fetch-node"
+                    x="310"
+                    y="466"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="330" y="493">B</text>
+                  <rect
+                    class="fetch-node fetched"
+                    x="390"
+                    y="466"
+                    width="40"
+                    height="40"
+                    rx="6"
+                  />
+                  <text class="fetch-letter" x="410" y="493">C</text>
+                  <text class="fetch-phase" x="24" y="298">操作后</text>
+                  <style>
+                    #terms-fetch .fetch-operation {
+                      marker-end: url(#fetch-arrow-Pull);
+                    }
+                  </style>
+                </svg>
+              </article>
+            </div>
+          </div>
+          <aside class="term-notes">
+            <h3>当前就在 main</h3>
+            <h4>Fetch 后</h4>
+            <p>origin/main → C<br />main 仍在 B，工作区不变。</p>
+            <h4>Pull 后</h4>
+            <p>先 Fetch，再整合到 main。<br />本例 main 前进到 C。</p>
+            <h4>origin/main 是什么？</h4>
+            <p>本地记录的远端分支位置，<br />不是 GitHub 上的分支本身。</p>
+            <div class="side-key">
+              □ 本地　● GitHub<br />绿色 C：本次更新<br />本例：main 跟踪
+              origin/main，无分叉。
+            </div>
+          </aside>
+        </div>
+      </section>
+      <section
+        id="terms-diverged"
+        role="tabpanel"
+        aria-labelledby="tab-diverged"
+        hidden
+      >
+        <div class="term-split">
+          <div class="term-visual">
+            <svg
+              class="diverged-graph"
+              viewBox="0 0 1000 560"
+              role="img"
+              aria-label="本地main有D，GitHub main有C；Pull先获取C再将C与D合并为M，本地main移到M，GitHub仍在C"
+            >
+              <defs>
+                <marker
+                  id="div-arrow"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="11"
+                  markerHeight="11"
+                  markerUnits="userSpaceOnUse"
+                  orient="auto"
+                >
+                  <path
+                    d="M1 1L8 5L1 9"
+                    fill="none"
+                    stroke="#567695"
+                    stroke-width="2"
+                  />
+                </marker>
+              </defs>
+              <rect
+                class="div-panel"
+                x="10"
+                y="20"
+                width="380"
+                height="520"
+                rx="14"
+              />
+              <rect
+                class="div-panel"
+                x="490"
+                y="20"
+                width="500"
+                height="520"
+                rx="14"
+              />
+              <text class="div-title" x="35" y="65">操作前 各自新增提交</text>
+              <text class="div-title" x="515" y="65">Pull 后 本地合并</text>
+              <text class="div-label" x="35" y="130">本地 main</text>
+              <text class="div-label" x="35" y="455">GitHub main</text>
+              <path class="div-edge" d="M115 280Q145 190 270 190" />
+              <path class="div-edge" d="M115 300Q145 390 270 390" />
+              <rect
+                class="div-node"
+                x="80"
+                y="265"
+                width="50"
+                height="50"
+                rx="8"
+              />
+              <text class="div-letter" x="105" y="298">B</text>
+              <rect
+                class="div-node"
+                x="280"
+                y="165"
+                width="50"
+                height="50"
+                rx="8"
+              />
+              <text class="div-letter" x="305" y="198">D</text>
+              <circle class="div-node" cx="305" cy="390" r="25" />
+              <text class="div-letter" x="305" y="398">C</text>
+              <text class="div-hint" x="45" y="345">共同提交</text>
+              <path class="div-edge" d="M405 285H472" />
+              <text class="div-action" x="440" y="245">Pull</text>
+              <text class="div-label" x="515" y="130">本地 main → M</text>
+              <path class="div-edge" d="M590 280Q620 190 710 190" />
+              <path class="div-edge" d="M590 300Q620 390 710 390" />
+              <path class="div-edge" d="M777 190H900" />
+              <path class="div-edge" d="M777 390Q865 390 918 225" />
+              <rect
+                class="div-node"
+                x="555"
+                y="265"
+                width="50"
+                height="50"
+                rx="8"
+              />
+              <text class="div-letter" x="580" y="298">B</text>
+              <rect
+                class="div-node"
+                x="720"
+                y="165"
+                width="50"
+                height="50"
+                rx="8"
+              />
+              <text class="div-letter" x="745" y="198">D</text>
+              <rect
+                class="div-node"
+                x="720"
+                y="365"
+                width="50"
+                height="50"
+                rx="8"
+              />
+              <text class="div-letter" x="745" y="398">C</text>
+              <rect
+                class="div-node div-result"
+                x="910"
+                y="165"
+                width="50"
+                height="50"
+                rx="8"
+              />
+              <text class="div-letter" x="935" y="198">M</text>
+              <text class="div-label" x="680" y="455">origin/main → C</text>
+              <text class="div-hint" x="515" y="505">
+                GitHub 的 main 仍在 C，尚未 Push。
+              </text>
+            </svg>
+          </div>
+          <aside class="term-notes">
+            <h3>Pull：获取后合并</h3>
+            <h4>① Fetch</h4>
+            <p>取回 C，origin/main 指向 C。</p>
+            <h4>② Merge</h4>
+            <p>合并 C 和 D，生成 M。<br />本地 main 指向 M。</p>
+            <h4>如果有冲突</h4>
+            <p>先解决冲突，再完成 M。</p>
+            <div class="side-key">
+              M 的父提交：D、C<br />□ 本地　● GitHub<br />本例使用合并：git pull
+              --no-rebase<br />变基模式会得到不同历史。
+            </div>
+          </aside>
+        </div>
+      </section>
+      <section id="terms-pr" role="tabpanel" aria-labelledby="tab-pr" hidden>
+        <div class="term-split">
+          <div class="term-visual">
+            <div class="pr-route">
+              <div class="pr-source">
+                <span class="route-label">源分支 feature/ui</span>
+                <div class="route-commits">● A ─ ● B ─ ● C</div>
+              </div>
+              <div class="route-arrow">→</div>
+              <div class="pr-target">
+                <span class="route-label">目标分支 main</span>
+                <div class="route-commits">等待合入</div>
+              </div>
+            </div>
+            <div class="review-flow">
+              <article>
+                <span class="step-number">1</span>
+                <h3>发起 PR</h3>
+                <p>选择源分支、目标分支</p>
+              </article>
+              <span class="route-arrow">→</span>
+              <article>
+                <span class="step-number">2</span>
+                <h3>审查</h3>
+                <p>查看差异 评论 自动检查</p>
+              </article>
+              <span class="route-arrow">→</span>
+              <article>
+                <span class="step-number">3</span>
+                <h3>通过并合并</h3>
+                <p>改动进入 main</p>
+              </article>
+            </div>
+            <div class="review-loop">
+              <span>需要修改</span
+              ><b>← 修改代码 → Commit → Push → 同一个 PR 更新 → 再次审查</b>
+            </div>
+          </div>
+          <aside class="term-notes">
+            <h3>PR Pull Request</h3>
+            <p>
+              请求审查改动，并合入目标分支。<br />不是把远端拉到本地的 Pull。
+            </p>
+            <h4>源 → 目标</h4>
+            <p>feature/ui → main</p>
+            <h4>需要修改</h4>
+            <p>Commit → Push<br />同一个 PR 自动更新</p>
+            <h4>何时更新 main</h4>
+            <p>合并后更新；仅发起或关闭 PR 不会更新。</p>
+          </aside>
+        </div>
+      </section>
+      <section
+        id="terms-merge"
+        role="tabpanel"
+        aria-labelledby="tab-merge"
+        hidden
+      >
+        <div class="term-split">
+          <div class="term-visual">
+            <div class="merge-cards">
+              <article>
+                <h4>普通合并 <span>Merge commit</span></h4>
+                <svg
+                  viewBox="0 0 620 260"
+                  role="img"
+                  aria-label="普通合并产生M，M连接主线和功能分支两个父节点"
+                >
+                  <defs>
+                    <marker
+                      id="term-flow-3"
+                      viewBox="0 0 10 10"
+                      refX="5"
+                      refY="5"
+                      markerWidth="10"
+                      markerHeight="10"
+                      markerUnits="userSpaceOnUse"
+                      orient="auto"
+                    >
+                      <path
+                        d="M2 1L7 5L2 9"
+                        fill="none"
+                        stroke="context-stroke"
+                        stroke-width="2"
+                      />
+                    </marker>
+                  </defs>
+                  <text x="45" y="80">主线</text>
+                  <text x="45" y="180">功能</text>
+                  <path
+                    d="M115 76H235H435H540"
+                    marker-mid="url(#term-flow-3)"
+                  />
+                  <path
+                    class="branch-line"
+                    d="M145 76Q165 176 230 176H265H335H370"
+                    marker-mid="url(#term-flow-3)"
+                  />
+                  <path
+                    class="branch-line"
+                    d="M370 176Q415 176 452.5 152.75Q490 129.5 520 83"
+                    marker-mid="url(#term-flow-3)"
+                  />
+                  <g class="main-dots">
+                    <circle cx="145" cy="76" r="14" />
+                    <circle cx="330" cy="76" r="14" />
+                  </g>
+                  <g class="branch-dots">
+                    <circle cx="230" cy="176" r="18" />
+                    <circle cx="300" cy="176" r="18" />
+                    <circle cx="370" cy="176" r="18" />
+                  </g>
+                  <g class="dot-letters">
+                    <text x="230" y="182">A</text>
+                    <text x="300" y="182">B</text>
+                    <text x="370" y="182">C</text>
+                  </g>
+                  <circle class="result-dot" cx="540" cy="76" r="24" />
+                  <text class="dot-letters" x="540" y="83">M</text>
+                  <text class="small-label" x="340" y="236">M：两个父节点</text>
+                </svg>
+              </article>
+              <article>
+                <h4>压缩合并 <span>Squash merge</span></h4>
+                <svg
+                  viewBox="0 0 620 260"
+                  role="img"
+                  aria-label="压缩合并产生一个新提交S，S只有主线父节点"
+                >
+                  <defs>
+                    <marker
+                      id="term-flow-4"
+                      viewBox="0 0 10 10"
+                      refX="5"
+                      refY="5"
+                      markerWidth="10"
+                      markerHeight="10"
+                      markerUnits="userSpaceOnUse"
+                      orient="auto"
+                    >
+                      <path
+                        d="M2 1L7 5L2 9"
+                        fill="none"
+                        stroke="context-stroke"
+                        stroke-width="2"
+                      />
+                    </marker>
+                  </defs>
+                  <text x="45" y="80">主线</text>
+                  <text x="45" y="180">功能</text>
+                  <path
+                    d="M115 76H235H435H540"
+                    marker-mid="url(#term-flow-4)"
+                  />
+                  <path
+                    class="branch-line"
+                    d="M145 76Q165 176 230 176H265H335H370"
+                    marker-mid="url(#term-flow-4)"
+                  />
+                  <path
+                    class="squash-link"
+                    d="M370 176Q415 176 452.5 152.75Q490 129.5 520 83"
+                    marker-mid="url(#term-flow-4)"
+                  />
+                  <text class="small-label" x="490" y="207">汇成一次</text>
+                  <g class="main-dots">
+                    <circle cx="145" cy="76" r="14" />
+                    <circle cx="330" cy="76" r="14" />
+                  </g>
+                  <g class="branch-dots">
+                    <circle cx="230" cy="176" r="18" />
+                    <circle cx="300" cy="176" r="18" />
+                    <circle cx="370" cy="176" r="18" />
+                  </g>
+                  <g class="dot-letters">
+                    <text x="230" y="182">A</text>
+                    <text x="300" y="182">B</text>
+                    <text x="370" y="182">C</text>
+                  </g>
+                  <circle class="result-dot" cx="540" cy="76" r="24" />
+                  <text class="dot-letters" x="540" y="83">S</text>
+                  <text class="small-label" x="340" y="236">
+                    S：一个父节点；汇入 A + B + C
+                  </text>
+                </svg>
+              </article>
+            </div>
+          </div>
+          <aside class="term-notes">
+            <h3>Merge / Squash</h3>
+            <h4>M 普通合并</h4>
+            <p>两个父提交，保留分支历史连接。</p>
+            <h4>S 压缩合并</h4>
+            <p>汇入 A、B、C 的改动，父提交只有主线前一个。</p>
+            <div class="side-key">实线：父子关系<br />虚线：改动来源示意</div>
+          </aside>
+        </div>
+      </section>
+      <section
+        id="terms-basics"
+        role="tabpanel"
+        aria-labelledby="tab-basics"
+        hidden
+      >
+        <div class="term-split basics-split">
+          <div class="term-visual">
+            <svg
+              class="workflow-diagram"
+              viewBox="0 0 600 510"
+              role="img"
+              aria-label="本地修改代码，暂存后Commit保存到本地历史，再Push到GitHub"
+            >
+              <defs>
+                <marker
+                  id="workflow-arrow"
+                  markerUnits="userSpaceOnUse"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="12"
+                  markerHeight="12"
+                  orient="auto"
+                >
+                  <path d="M1 1L8 5L1 9" />
+                </marker>
+              </defs>
+              <rect x="20" y="30" width="560" height="230" rx="12" />
+              <text class="workflow-area" x="60" y="70">本地</text>
+              <path d="M144 150H220" />
+              <path d="M305 150H390" />
+              <g class="workflow-boxes">
+                <rect x="65" y="115" width="80" height="70" rx="8" />
+                <rect x="235" y="115" width="70" height="70" rx="8" />
+                <rect x="405" y="115" width="110" height="70" rx="8" />
+              </g>
+              <text x="105" y="158">修改</text>
+              <text x="270" y="158">暂存</text>
+              <text x="460" y="158">Commit</text>
+              <text class="workflow-hint" x="365" y="220">本地历史</text>
+              <path d="M460 187V340" />
+              <text class="workflow-push-label" x="505" y="303">Push</text>
+              <rect x="20" y="350" width="560" height="130" rx="12" />
+              <text class="workflow-area" x="60" y="390">远端</text>
+              <circle cx="460" cy="414" r="36" />
+              <text x="460" y="422">C1</text>
+              <text x="220" y="422">GitHub</text>
+            </svg>
+          </div>
+          <aside class="term-notes">
+            <h3>提交前缀</h3>
+            <table class="prefix-table" aria-label="提交前缀对照">
+              <thead>
+                <tr>
+                  <th scope="col">前缀</th>
+                  <th scope="col">用途</th>
+                  <th scope="col">前缀</th>
+                  <th scope="col">用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">feat</th>
+                  <td>加功能</td>
+                  <th scope="row">test</th>
+                  <td>补测试</td>
+                </tr>
+                <tr>
+                  <th scope="row">fix</th>
+                  <td>修问题</td>
+                  <th scope="row">perf</th>
+                  <td>提性能</td>
+                </tr>
+                <tr>
+                  <th scope="row">refactor</th>
+                  <td>改结构，不改功能</td>
+                  <th scope="row">chore</th>
+                  <td>日常维护</td>
+                </tr>
+                <tr>
+                  <th scope="row">docs</th>
+                  <td>改文档</td>
+                  <th scope="row">build / ci</th>
+                  <td>构建 / 自动化</td>
+                </tr>
+                <tr>
+                  <th scope="row">style</th>
+                  <td>调代码格式</td>
+                  <th scope="row">revert</th>
+                  <td>撤销改动</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="side-example">
+              feat(ui): 增加难度选择<br /><span>类型（范围）：改了什么</span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="terms-branch" role="tabpanel" aria-labelledby="tab-branch">
+        <div class="term-split">
+          <div class="term-visual">
+            <svg
+              class="lesson-graph"
+              viewBox="0 0 1100 300"
+              role="img"
+              aria-label="主线从A到B到C，功能分支从B创建D和E，再合并到M；v1.0标签固定指向M"
+            >
+              <defs>
+                <marker
+                  id="branch-direction"
+                  markerUnits="userSpaceOnUse"
+                  viewBox="0 0 10 10"
+                  refX="7"
+                  refY="5"
+                  markerWidth="9"
+                  markerHeight="9"
+                  orient="auto"
+                >
+                  <path
+                    d="M1 1L7 5L1 9"
+                    fill="none"
+                    stroke="#526d8e"
+                    stroke-width="2"
+                  />
+                </marker>
+              </defs>
+              <text x="70" y="90">main</text>
+              <text x="90" y="222">feature/ui</text>
+              <path d="M200 82H950" />
+              <path
+                class="feature-path"
+                d="M380 82Q420 214 560 214H720Q850 214 950 82"
+              />
+              <path
+                d="M260 82H290M440 82H470M790 82H820"
+                marker-end="url(#branch-direction)"
+              />
+              <path d="M610 214H640" marker-end="url(#branch-direction)" />
+              <g class="branch-main">
+                <circle cx="200" cy="82" r="23" />
+                <circle cx="380" cy="82" r="23" />
+                <circle cx="650" cy="82" r="23" />
+                <circle cx="950" cy="82" r="23" />
+              </g>
+              <g class="branch-feature">
+                <circle cx="560" cy="214" r="23" />
+                <circle cx="720" cy="214" r="23" />
+              </g>
+              <g class="node-text">
+                <text x="200" y="90">A</text>
+                <text x="380" y="90">B</text>
+                <text x="650" y="90">C</text>
+                <text x="950" y="90">M</text>
+                <text x="560" y="222">D</text>
+                <text x="720" y="222">E</text>
+              </g>
+              <text class="graph-caption" x="480" y="280">新分支</text>
+              <rect
+                class="version-tag"
+                x="890"
+                y="10"
+                width="120"
+                height="35"
+                rx="7"
+              />
+              <text class="version-text" x="950" y="35">v1.0</text>
+              <path class="tag-stem" d="M950 45V58" />
+            </svg>
+            <div class="tag-example">
+              <div>
+                <h3>Tag 版本标签</h3>
+                <span>v1.0 固定在 M</span>
+              </div>
+              <div class="tag-track">
+                <span class="tagged-node">● M<small>v1.0</small></span
+                ><i>→</i><span>● N<small aria-hidden="true">&nbsp;</small></span
+                ><i>→</i><span>● P<small>main</small></span>
+              </div>
+            </div>
+          </div>
+          <aside class="term-notes">
+            <h3>Branch / Tag</h3>
+            <h4>Branch 分支</h4>
+            <p>从 B 分出 D、E，再合并到 M。</p>
+            <h4>Tag 标签</h4>
+            <p>v1.0 指向 M；main 继续前进到 P。</p>
+          </aside>
+        </div>
+      </section>
+      <section
+        id="terms-conflict"
+        role="tabpanel"
+        aria-labelledby="tab-conflict"
+        hidden
+      >
+        <div class="term-split">
+          <div class="term-visual">
+            <svg
+              class="conflict-node-graph"
+              viewBox="0 0 1000 440"
+              role="img"
+              aria-label="共同提交B的speed为5，主线提交C改为6，功能提交D改为8，合并冲突后选择8形成M"
+            >
+              <defs>
+                <marker
+                  id="conflict-direction"
+                  markerUnits="userSpaceOnUse"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="12"
+                  markerHeight="12"
+                  orient="auto"
+                >
+                  <path d="M1 1L8 5L1 9" />
+                </marker>
+              </defs>
+              <text x="100" y="145">共同提交</text>
+              <path d="M130 220C220 220 220 110 310 110" />
+              <path d="M130 220C220 220 220 330 310 330" />
+              <path d="M380 110C470 110 480 220 550 220" />
+              <path d="M380 330C470 330 480 220 550 220" />
+              <path d="M650 220H825" />
+              <circle cx="100" cy="220" r="32" />
+              <circle cx="345" cy="110" r="32" />
+              <circle cx="345" cy="330" r="32" />
+              <circle class="resolved-node" cx="860" cy="220" r="32" />
+              <g class="conflict-id">
+                <text x="100" y="228">B</text>
+                <text x="345" y="118">C</text>
+                <text x="345" y="338">D</text>
+                <text x="860" y="228">M</text>
+              </g>
+              <text x="100" y="280">speed = 5</text>
+              <text x="345" y="54">main</text>
+              <text x="345" y="174">speed = 6</text>
+              <text x="345" y="278">feature/gameplay</text>
+              <text x="345" y="395">speed = 8</text>
+              <rect x="552" y="181" width="98" height="78" rx="12" />
+              <text class="conflict-alert" x="601" y="228">冲突</text>
+              <text x="737" y="185">选择 8</text>
+              <text x="860" y="280">speed = 8</text>
+              <text x="860" y="145">完成合并</text>
+            </svg>
+          </div>
+          <aside class="term-notes">
+            <h3>Conflict 冲突</h3>
+            <h4>共同版本</h4>
+            <p>speed = 5</p>
+            <h4>两边改同一行</h4>
+            <p>main：6<br />feature/gameplay：8</p>
+            <h4>本例选择 8</h4>
+            <p>保存 → 暂存 → 完成合并</p>
+          </aside>
+        </div>
+      </section>
+      <section id="terms-ci" role="tabpanel" aria-labelledby="tab-ci" hidden>
+        <div class="ci-example-layout">
+          <svg
+            class="ci-example-graph"
+            viewBox="0 0 920 610"
+            role="img"
+            aria-label="提交C1增加难度选择，Push触发检查，测试失败后返回本地提交C2修复，再Push通过检查和测试，构建后部署到演示网页"
+          >
+            <defs>
+              <marker
+                id="ci-arrow"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerUnits="userSpaceOnUse"
+                markerWidth="12"
+                markerHeight="12"
+                orient="auto"
+              >
+                <path d="M1 1L8 5L1 9" />
+              </marker>
+            </defs>
+            <rect
+              class="ci-zone"
+              x="12"
+              y="48"
+              width="220"
+              height="545"
+              rx="12"
+            />
+            <rect
+              class="ci-zone remote"
+              x="250"
+              y="48"
+              width="654"
+              height="545"
+              rx="12"
+            />
+            <text class="ci-zone-title" x="36" y="84">本地</text>
+            <text class="ci-zone-title" x="274" y="84">GitHub 自动工作流</text>
+            <path class="ci-link" d="M146 156H303" />
+            <text class="ci-label" x="224" y="137">Push</text>
+            <path class="ci-link" d="M367 156H458" />
+            <path class="ci-link" d="M522 156H618" />
+            <rect
+              class="ci-commit"
+              x="80"
+              y="124"
+              width="64"
+              height="64"
+              rx="9"
+            />
+            <text class="ci-node-text" x="112" y="164">C1</text>
+            <text class="ci-caption" x="112" y="218">增加难度选择</text>
+            <circle class="ci-remote-node" cx="335" cy="156" r="32" />
+            <text class="ci-node-text" x="335" y="164">C1</text>
+            <circle class="ci-pass-node" cx="490" cy="156" r="32" />
+            <text class="ci-node-text" x="490" y="164">✓</text>
+            <text class="ci-caption" x="490" y="218">格式检查</text>
+            <circle class="ci-fail-node" cx="650" cy="156" r="32" />
+            <text class="ci-node-text" x="650" y="164">×</text>
+            <text class="ci-caption" x="650" y="218">测试失败</text>
+            <path class="ci-link failure" d="M684 156H720V268H112V327" />
+            <text class="ci-error" x="430" y="254">
+              困难模式速度不对 停止部署
+            </text>
+            <rect
+              class="ci-commit"
+              x="80"
+              y="340"
+              width="64"
+              height="64"
+              rx="9"
+            />
+            <text class="ci-node-text" x="112" y="380">C2</text>
+            <text class="ci-caption" x="112" y="434">修复速度参数</text>
+            <path class="ci-link" d="M146 372H303" />
+            <text class="ci-label" x="224" y="353">再 Push</text>
+            <circle class="ci-remote-node" cx="335" cy="372" r="32" />
+            <text class="ci-node-text" x="335" y="380">C2</text>
+            <path class="ci-link" d="M367 372H458" />
+            <path class="ci-link" d="M522 372H618" />
+            <path class="ci-link" d="M682 372H778" />
+            <circle class="ci-pass-node" cx="490" cy="372" r="32" />
+            <text class="ci-node-text" x="490" y="380">✓</text>
+            <text class="ci-caption" x="490" y="434">格式检查</text>
+            <circle class="ci-pass-node" cx="650" cy="372" r="32" />
+            <text class="ci-node-text" x="650" y="380">✓</text>
+            <text class="ci-caption" x="650" y="434">测试通过</text>
+            <circle class="ci-pass-node" cx="810" cy="372" r="32" />
+            <text class="ci-node-text" x="810" y="380">✓</text>
+            <text class="ci-caption" x="810" y="434">构建成功</text>
+            <path class="ci-link success" d="M844 372H880V518H692" />
+            <text class="ci-label" x="796" y="503">自动部署</text>
+            <rect
+              class="ci-web"
+              x="358"
+              y="474"
+              width="324"
+              height="96"
+              rx="10"
+            />
+            <path class="ci-browser-bar" d="M358 501H682" />
+            <circle class="ci-browser-dot" cx="374" cy="487" r="3" />
+            <circle class="ci-browser-dot" cx="385" cy="487" r="3" />
+            <circle class="ci-browser-dot" cx="396" cy="487" r="3" />
+            <text class="ci-web-title" x="520" y="536">演示网页 C2</text>
+            <text class="ci-small" x="520" y="559">已包含难度选择与修复</text>
+            <text class="ci-small" x="116" y="530">□ 本地提交</text>
+            <text class="ci-small" x="116" y="558">● 远端提交</text>
+          </svg>
+          <aside class="ci-example-notes">
+            <h3>一次游戏更新</h3>
+            <p class="ci-example-context">
+              例：main 收到 Push 后，自动检查并部署演示站。
+            </p>
+            <article>
+              <span class="ci-note-code">C1</span>
+              <h4>增加难度选择</h4>
+              <p>测试发现困难模式速度错误，网页暂不更新。</p>
+            </article>
+            <article>
+              <span class="ci-note-code">C2</span>
+              <h4>修复后再推送</h4>
+              <p>新增修复提交，自动重新检查。</p>
+            </article>
+            <article>
+              <h4>CI 检查与构建</h4>
+              <p>格式 ✓　测试 ✓　构建 ✓</p>
+            </article>
+            <article>
+              <h4>CD 自动部署</h4>
+              <p>通过后，演示网页更新到 C2。</p>
+            </article>
+          </aside>
+        </div>
+      </section>
+      <section id="terms-tag" role="tabpanel" aria-labelledby="tab-tag" hidden>
+        <div class="term-split">
+          <div class="term-visual"></div>
+          <aside class="term-notes"></aside>
+        </div>
+      </section>
+      <section
+        id="terms-head"
+        role="tabpanel"
+        aria-labelledby="tab-head"
+        hidden
+      >
+        <div class="term-split">
+          <div class="term-visual"></div>
+          <aside class="term-notes"></aside>
+        </div>
+      </section>
+    </dialog>
     <script type="module" src="/app.js"></script>
   </body>
 </html>

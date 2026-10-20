@@ -78,7 +78,7 @@ async function build(sha, job) {
     return;
   }
   job.state = "building";
-  job.message = "正在提取提交快照…";
+  job.message = "正在读取该版本代码…";
   await mkdir(root, { recursive: true });
   const archive = path.join(root, "source.tar");
   await run("git", ["archive", "--format=tar", "-o", archive, sha]);
@@ -87,7 +87,7 @@ async function build(sha, job) {
   const key = createHash("sha256").update(lock).digest("hex").slice(0, 20);
   const deps = path.join(cache, "dependencies", key);
   if (!(await exists(path.join(deps, "ready")))) {
-    job.message = "首次准备这个版本的依赖…";
+    job.message = "正在安装依赖，首次打开可能需要几分钟…";
     await mkdir(deps, { recursive: true });
     await writeFile(path.join(deps, "package-lock.json"), lock);
     await writeFile(
@@ -113,7 +113,7 @@ async function build(sha, job) {
       process.platform === "win32" ? "junction" : "dir"
     );
   }
-  job.message = "正在构建游戏页面…";
+  job.message = "正在构建游戏…";
   await run(
     process.execPath,
     [
@@ -128,11 +128,12 @@ async function build(sha, job) {
   );
   await writeFile(path.join(root, "ready"), "ok");
   job.state = "ready";
-  job.message = "可以开始游戏";
+  job.message = "加载完成";
 }
 const mime = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript",
+  ".mjs": "text/javascript",
   ".css": "text/css",
   ".json": "application/json",
   ".svg": "image/svg+xml",
@@ -196,7 +197,17 @@ const server = http.createServer(async (req, res) => {
         return json(403, { error: "无效路径" });
     } else {
       const name = url.pathname === "/" ? "index.html" : url.pathname.slice(1);
-      if (!["index.html", "app.js", "style.css"].includes(name))
+      if (
+        ![
+          "index.html",
+          "app.js",
+          "lanes.mjs",
+          "timeline.mjs",
+          "style.css",
+          "workspaces.json",
+          "pushes.json",
+        ].includes(name)
+      )
         return json(404, { error: "页面不存在" });
       file = path.join(here, name);
     }
