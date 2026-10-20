@@ -35,3 +35,21 @@
 ## 辅助工作区快照
 
 `node tools/commit-explorer/collect-workspaces.mjs` 可抓取配置工作区的远端并生成 `workspaces.json`。此操作不切换分支、不合并、不提交或推送。课堂页面不展示工作区状态卡片；辅助快照仍可单独读取。
+
+## 换机接续编辑
+
+完整克隆仓库以保留演变图需要的提交、分支和标签；不要使用 Download ZIP 或浅克隆。
+
+```powershell
+git clone https://github.com/TeutonicMepheles/tower-drop-classroom.git
+cd tower-drop-classroom
+git fetch origin --tags
+npm ci
+npm run explorer
+```
+
+打开 <http://127.0.0.1:3210>。已有 checkout 请先检查未提交改动，再在 main 执行 `git pull --ff-only`。首次预览历史版本时需要联网安装对应依赖。
+
+编辑入口：`index.html`、`app.js`、`style.css`；历史分组和泳道分别在 `timeline.mjs`、`lanes.mjs`，推送事件在 `pushes.json`。提交这些源码即可，`.commit-explorer/` 缓存不必迁移。无需复制原机器的 member-a / member-b / member-c 工作区；`collect-workspaces.mjs` 只是旧课堂目录布局的辅助采集工具，不是启动前置步骤。
+
+对应课件位于 [GolajahSlideArchive/Small-Team-Project-Management](https://github.com/TeutonicMepheles/GolajahSlideArchive/tree/main/Small-Team-Project-Management)，构建方法和工具版本由课件目录的 README、toolchain.json 管理。
