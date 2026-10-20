@@ -10,15 +10,17 @@ export function layoutTimeline(rows) {
   let offset = 0;
   for (const day of [...groups.keys()].sort()) {
     const members = groups.get(day);
-    const pending = new Map(members.map(c => [c.sha, c]));
+    const pending = new Map(members.map((c) => [c.sha, c]));
     const laneNext = new Map();
     let count = 0;
     function place(c) {
       if (!pending.has(c.sha)) return;
       pending.delete(c.sha);
       const dependencies = [...c.parents, ...(c.layoutParents || [])];
-      if (c.sha === "690829c52516d5f10b28194a8d5e3e537da85f05") dependencies.push("affec4b52af96f7222f5255119f01e606e011f12");
-      for (const sha of dependencies) if (pending.has(sha)) place(pending.get(sha));
+      if (c.sha === "690829c52516d5f10b28194a8d5e3e537da85f05")
+        dependencies.push("affec4b52af96f7222f5255119f01e606e011f12");
+      for (const sha of dependencies)
+        if (pending.has(sha)) place(pending.get(sha));
       let slot = laneNext.get(c.lane) || 0;
       for (const sha of dependencies) {
         const p = positions.get(sha);
@@ -29,7 +31,11 @@ export function layoutTimeline(rows) {
       count = Math.max(count, slot + 1);
     }
     // Independent branches share columns; timestamps order each lane's work.
-    members.sort((a,b) => a.date.localeCompare(b.date) || a.sha.localeCompare(b.sha)).forEach(place);
+    members
+      .sort(
+        (a, b) => a.date.localeCompare(b.date) || a.sha.localeCompare(b.sha)
+      )
+      .forEach(place);
     bands.push({ day, start: offset, count });
     offset += count;
   }

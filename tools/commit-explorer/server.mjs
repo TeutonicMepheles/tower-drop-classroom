@@ -197,7 +197,17 @@ const server = http.createServer(async (req, res) => {
         return json(403, { error: "无效路径" });
     } else {
       const name = url.pathname === "/" ? "index.html" : url.pathname.slice(1);
-      if (!["index.html", "app.js", "lanes.mjs", "timeline.mjs", "style.css", "workspaces.json", "pushes.json"].includes(name))
+      if (
+        ![
+          "index.html",
+          "app.js",
+          "lanes.mjs",
+          "timeline.mjs",
+          "style.css",
+          "workspaces.json",
+          "pushes.json",
+        ].includes(name)
+      )
         return json(404, { error: "页面不存在" });
       file = path.join(here, name);
     }
